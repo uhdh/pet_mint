@@ -9,17 +9,31 @@ namespace BunnyPet
     [DataContract]
     public sealed class AppSettings
     {
+        [DataMember(Name = "alwaysOnTop", EmitDefaultValue = false)]
+        private bool? alwaysOnTop;
+
+        [DataMember(Name = "autoStart", EmitDefaultValue = false)]
+        private bool? autoStart;
+
         public AppSettings()
         {
-            AlwaysOnTop = true;
-            AutoStart = false;
+            alwaysOnTop = true;
+            autoStart = false;
         }
 
-        [DataMember(Name = "alwaysOnTop")]
-        public bool AlwaysOnTop { get; set; }
+        [IgnoreDataMember]
+        public bool AlwaysOnTop
+        {
+            get { return alwaysOnTop ?? true; }
+            set { alwaysOnTop = value; }
+        }
 
-        [DataMember(Name = "autoStart")]
-        public bool AutoStart { get; set; }
+        [IgnoreDataMember]
+        public bool AutoStart
+        {
+            get { return autoStart ?? false; }
+            set { autoStart = value; }
+        }
 
         public static string FilePath
         {

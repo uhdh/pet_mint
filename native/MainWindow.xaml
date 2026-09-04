@@ -10,14 +10,14 @@
         Topmost="True"
         ShowActivated="False"
         Focusable="True"
+        PreviewKeyDown="OnKeyDown"
         MouseDoubleClick="OnMouseDoubleClick">
     <Grid x:Name="Root"
           Width="107" Height="100"
           Background="Transparent"
           MouseLeftButtonDown="OnMouseLeftButtonDown"
           MouseMove="OnMouseMove"
-          MouseLeftButtonUp="OnMouseLeftButtonUp"
-          KeyDown="OnKeyDown">
+          MouseLeftButtonUp="OnMouseLeftButtonUp">
         <Grid x:Name="DirectionLayer"
               Width="97" Height="88"
               HorizontalAlignment="Center"

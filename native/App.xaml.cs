@@ -23,10 +23,12 @@ namespace BunnyPet
         private AppSettings settings;
         private bool paused;
         private bool quitting;
+        private bool showPending;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            EnsureShowEvent();
             bool created;
             try
             {
@@ -41,6 +43,7 @@ namespace BunnyPet
             if (!created)
             {
                 SignalExistingInstance();
+                DisposeShowEvent();
                 Shutdown();
                 return;
             }
@@ -51,14 +54,28 @@ namespace BunnyPet
             MainWindow = window;
             window.SetAlwaysOnTop(settings.AlwaysOnTop);
             window.Show();
+            if (showPending) ShowWindow();
             CreateTray();
+        }
+
+        private void EnsureShowEvent()
+        {
+            try
+            {
+                showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName);
+            }
+            catch (Exception)
+            {
+                showEvent = null;
+            }
         }
 
         private void RegisterShowEvent()
         {
             try
             {
-                showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName);
+                if (showEvent == null)
+                    showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName);
                 showRegistration = ThreadPool.RegisterWaitForSingleObject(
                     showEvent,
                     OnShowSignal,
@@ -85,7 +102,8 @@ namespace BunnyPet
         {
             try
             {
-                using (var signal = EventWaitHandle.OpenExisting(ShowEventName)) signal.Set();
+                if (showEvent != null) showEvent.Set();
+                else using (var signal = EventWaitHandle.OpenExisting(ShowEventName)) signal.Set();
             }
             catch (Exception)
             {
@@ -193,7 +211,13 @@ namespace BunnyPet
 
         private void ShowWindow()
         {
-            if (quitting || window == null) return;
+            if (quitting) return;
+            if (window == null)
+            {
+                showPending = true;
+                return;
+            }
+            showPending = false;
             try
             {
                 window.Show();

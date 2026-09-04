@@ -39,6 +39,7 @@ namespace BunnyPet
         private bool dragging;
         private bool dragMoved;
         private bool allowClose;
+        private volatile bool resourcesDisposed;
 
         public bool ExitOnClose { get; set; }
 
@@ -67,6 +68,7 @@ namespace BunnyPet
 
         public void DisposeResources()
         {
+            resourcesDisposed = true;
             allowClose = true;
             CancelPointer();
             behaviorTimer.Stop();
@@ -231,13 +233,25 @@ namespace BunnyPet
             StopWalking();
             SetVisualState(BunnyState.Happy);
             AddHeart();
-            Task.Delay(190).ContinueWith(_ => Dispatcher.BeginInvoke(new Action(AddHeart)));
+            Task.Delay(190).ContinueWith(_ =>
+            {
+                if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                try
+                {
+                    Dispatcher.BeginInvoke(new Action(delegate
+                    {
+                        if (!resourcesDisposed) AddHeart();
+                    }));
+                }
+                catch (InvalidOperationException) { }
+            });
             ShowMessage(phrases[random.Next(phrases.Length)], 2100);
             ScheduleBehavior(2300);
         }
 
         private void AddHeart()
         {
+            if (resourcesDisposed) return;
             var heart = new TextBlock
             {
                 Text = "♥",

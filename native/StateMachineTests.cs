@@ -19,6 +19,10 @@ internal static class StateMachineTests
         Require(bunny.TurnAround() == 1, "turn around");
         var missing = AppSettings.Parse(null);
         Require(missing.AlwaysOnTop && !missing.AutoStart, "missing settings defaults");
+        var omittedMembers = AppSettings.Parse("{}");
+        Require(omittedMembers.AlwaysOnTop && !omittedMembers.AutoStart, "omitted settings merge defaults");
+        var autoStartOnly = AppSettings.Parse("{\"autoStart\":true}");
+        Require(autoStartOnly.AlwaysOnTop && autoStartOnly.AutoStart, "partial settings merge defaults");
         var malformed = AppSettings.Parse("{");
         Require(malformed.AlwaysOnTop && !malformed.AutoStart, "malformed settings defaults");
         var original = new AppSettings { AlwaysOnTop = false, AutoStart = true };

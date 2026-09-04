@@ -31,6 +31,15 @@ pnpm package:win
 pnpm package:linux
 ```
 
+`pnpm package:win` is the legacy Electron Windows build. The native Store build is Windows-only (Windows 10/11 x64), uses the dependency-free .NET Framework 4.8 WPF executable, and does not bundle Electron, Chromium, or Node.js:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-native.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build_native_store_msix.ps1
+```
+
+The native script builds `native/BunnyPet.csproj` as Release/x64 and creates an unsigned `store-output/BunnyPet-native_1.0.1.0_x64.msix` for Microsoft Store submission. The completed MSIX is expected to be at most 5 MB.
+
 ## 개인정보
 
 사진은 캐릭터 자산 제작에만 사용되었으며 앱에 원본 사진은 포함되지 않습니다. 앱은 네트워크 요청, 광고, 분석 도구 또는 데이터 수집 기능을 포함하지 않습니다.

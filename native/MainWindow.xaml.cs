@@ -38,6 +38,7 @@ namespace BunnyPet
         private double dragDistance;
         private bool dragging;
         private bool dragMoved;
+        private bool allowClose;
 
         public MainWindow()
         {
@@ -59,6 +60,17 @@ namespace BunnyPet
             };
             walkingTimer.Tick += OnWalkingTick;
             Loaded += OnLoaded;
+            Closing += OnClosing;
+        }
+
+        public void DisposeResources()
+        {
+            allowClose = true;
+            CancelPointer();
+            behaviorTimer.Stop();
+            walkingTimer.Stop();
+            StopAnimation();
+            Hearts.Children.Clear();
         }
 
         public void SetPaused(bool value)
@@ -80,6 +92,13 @@ namespace BunnyPet
         public void SetAlwaysOnTop(bool value)
         {
             Topmost = value;
+        }
+
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (allowClose) return;
+            e.Cancel = true;
+            Hide();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)

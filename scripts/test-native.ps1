@@ -14,7 +14,9 @@ if (-not $compiler) { throw 'Could not locate the .NET Framework C# compiler (cs
 $output = Join-Path $env:TEMP 'BunnyStateMachineTests.exe'
 & $compiler /nologo /target:exe /out:$output `
     (Join-Path $root 'native\StateMachineTests.cs') `
-    (Join-Path $root 'native\BunnyStateMachine.cs')
+    (Join-Path $root 'native\BunnyStateMachine.cs') `
+    (Join-Path $root 'native\AppSettings.cs') `
+    /r:System.Runtime.Serialization.dll
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 & $output

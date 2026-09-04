@@ -1,4 +1,5 @@
 using System;
+using BunnyPet;
 
 internal static class StateMachineTests
 {
@@ -16,6 +17,13 @@ internal static class StateMachineTests
         bunny.Touch(now);
         Require(bunny.ChooseNext(0.10, now.AddSeconds(121)) == BunnyState.Sleep, "inactivity sleeps");
         Require(bunny.TurnAround() == 1, "turn around");
+        var missing = AppSettings.Parse(null);
+        Require(missing.AlwaysOnTop && !missing.AutoStart, "missing settings defaults");
+        var malformed = AppSettings.Parse("{");
+        Require(malformed.AlwaysOnTop && !malformed.AutoStart, "malformed settings defaults");
+        var original = new AppSettings { AlwaysOnTop = false, AutoStart = true };
+        var parsed = AppSettings.Parse(AppSettings.Serialize(original));
+        Require(parsed.AlwaysOnTop == original.AlwaysOnTop && parsed.AutoStart == original.AutoStart, "settings round trip");
         Console.WriteLine("Native state tests passed.");
         return 0;
     }

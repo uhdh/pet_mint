@@ -17,15 +17,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsBase" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml" />
     <Page Include="MainWindow.xaml" />
     <Compile Include="BunnyStateMachine.cs" />
+    <Compile Include="AppSettings.cs" />
     <Compile Include="App.xaml.cs" />
     <Compile Include="MainWindow.xaml.cs" />
   </ItemGroup>
@@ -35,6 +40,7 @@
     <Resource Include="Assets\bunny-sleep.png" />
     <Resource Include="Assets\bunny-stand.png" />
     <Resource Include="Assets\bunny-walk.png" />
+    <Resource Include="Assets\icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

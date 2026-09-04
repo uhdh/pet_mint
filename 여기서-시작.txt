@@ -1,0 +1,7 @@
+내 토끼 데스크톱 펫
+
+바로 실행:
+dist\My Bunny Desktop Pet-win32-x64\My Bunny Desktop Pet.exe
+
+Microsoft Store 제출 안내:
+store-assets\MICROSOFT-STORE-SUBMISSION.md

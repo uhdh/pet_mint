@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>내 토끼</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="stage" aria-label="내 토끼 데스크톱 펫">
+    <div id="message" role="status" aria-live="polite"></div>
+    <div id="hearts" aria-hidden="true"></div>
+    <div id="direction" class="facing-left">
+      <button id="pet" type="button" aria-label="토끼 쓰다듬기" title="클릭해서 쓰다듬기 · 드래그해서 옮기기 · 우클릭 메뉴">
+        <img id="bunny" src="../assets/bunny-idle.png" draggable="false" alt="회색 귀를 가진 하얀 롭이어 토끼">
+      </button>
+    </div>
+  </main>
+  <script src="state-machine.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

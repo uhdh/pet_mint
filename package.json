@@ -1,0 +1,20 @@
+{
+  "name": "my-bunny-desktop-pet",
+  "version": "1.0.1",
+  "description": "사진 속 롭이어 토끼를 닮은 투명 바탕화면 펫",
+  "main": "src/main.js",
+  "author": "Manus",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "package:win": "electron-packager . \"My Bunny Desktop Pet\" --platform=win32 --arch=x64 --out=dist --overwrite --asar --icon=assets/icon.ico --ignore=\"^/(dist|store-(assets|output|package|staging)|test|scripts|\\.git)($|/)\" && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/trim-win-package.ps1",
+    "package:linux": "electron-packager . \"my-bunny-desktop-pet\" --platform=linux --arch=x64 --out=dist --overwrite --asar --icon=assets/icon.png --ignore=\"^/(dist|test|scripts|\\.git)($|/)\""
+  },
+  "devDependencies": {
+    "@electron/asar": "^4.3.0",
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.1.1",
+    "png-to-ico": "^3.0.1"
+  }
+}

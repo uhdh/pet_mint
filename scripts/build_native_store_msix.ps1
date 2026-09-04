@@ -26,7 +26,7 @@ function Assert-InProject([string]$Path, [string]$Label) {
 
 function Assert-StagedPackage([string]$Path) {
     $forbidden = @('electron.exe', 'resources.pak', 'icudtl.dat', 'node.dll')
-    $files = @(Get-ChildItem -LiteralPath $Path -File -Recurse)
+    $files = @(Get-ChildItem -LiteralPath $Path -File -Recurse -Force)
     foreach ($file in $files) {
         if ($file.Length -gt 10MB) { throw "Staged file exceeds 10 MB: $($file.FullName)" }
         $name = $file.Name.ToLowerInvariant()

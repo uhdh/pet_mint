@@ -34,7 +34,8 @@ namespace BunnyPet
             }
             catch (Exception)
             {
-                created = true;
+                Shutdown();
+                return;
             }
 
             if (!created)
@@ -156,8 +157,14 @@ namespace BunnyPet
             }
             catch (Exception)
             {
+                window.ExitOnClose = true;
                 DisposeTray();
             }
+        }
+
+        internal void QuitFromWindow()
+        {
+            Quit();
         }
 
         private System.Drawing.Icon LoadTrayIcon()
@@ -204,7 +211,7 @@ namespace BunnyPet
             }
             catch (Exception)
             {
-                return false;
+                return true;
             }
         }
 

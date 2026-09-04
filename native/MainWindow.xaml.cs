@@ -40,6 +40,8 @@ namespace BunnyPet
         private bool dragMoved;
         private bool allowClose;
 
+        public bool ExitOnClose { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -97,6 +99,16 @@ namespace BunnyPet
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (allowClose) return;
+            if (ExitOnClose)
+            {
+                e.Cancel = false;
+                Dispatcher.BeginInvoke(new Action(delegate
+                {
+                    var app = Application.Current as App;
+                    if (app != null) app.QuitFromWindow();
+                }));
+                return;
+            }
             e.Cancel = true;
             Hide();
         }

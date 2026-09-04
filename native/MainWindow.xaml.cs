@@ -87,7 +87,7 @@ namespace BunnyPet
             ResetPosition();
             Focus();
             SetVisualState(BunnyState.Idle);
-            ScheduleBehavior(2200);
+            ScheduleBehavior(RandomBetween(3500, 7600));
         }
 
         private void OnBehaviorTick(object sender, EventArgs e)
@@ -238,6 +238,7 @@ namespace BunnyPet
             Message.Text = text;
             Message.Visibility = Visibility.Visible;
             MessageBorder.BeginAnimation(OpacityProperty, null);
+            MessageBorder.Opacity = 1;
             var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(160))
             {
                 BeginTime = TimeSpan.FromMilliseconds(duration)
@@ -253,7 +254,7 @@ namespace BunnyPet
             dragging = true;
             dragMoved = false;
             dragDistance = 0;
-            lastPointer = PointToScreen(e.GetPosition(this));
+            lastPointer = GetPointerPosition(e);
             Root.CaptureMouse();
             e.Handled = true;
         }
@@ -261,7 +262,7 @@ namespace BunnyPet
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
             if (!dragging) return;
-            var current = PointToScreen(e.GetPosition(this));
+            var current = GetPointerPosition(e);
             var dx = current.X - lastPointer.X;
             var dy = current.Y - lastPointer.Y;
             dragDistance += Math.Abs(dx) + Math.Abs(dy);
@@ -311,6 +312,8 @@ namespace BunnyPet
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Escape) return;
+            CancelPointer();
+            StopWalking();
             SetVisualState(BunnyState.Idle);
             ResetPosition();
             ScheduleBehavior(1600);
@@ -330,8 +333,39 @@ namespace BunnyPet
             var monitor = MonitorFromWindow(handle, 2);
             var info = new MonitorInfo { cbSize = Marshal.SizeOf(typeof(MonitorInfo)) };
             if (monitor != IntPtr.Zero && GetMonitorInfo(monitor, ref info))
-                return new Rect(info.rcWork.Left, info.rcWork.Top, info.rcWork.Right - info.rcWork.Left, info.rcWork.Bottom - info.rcWork.Top);
+            {
+                var fromDevice = GetFromDeviceTransform(handle);
+                var topLeft = fromDevice.Transform(new Point(info.rcWork.Left, info.rcWork.Top));
+                var bottomRight = fromDevice.Transform(new Point(info.rcWork.Right, info.rcWork.Bottom));
+                return new Rect(topLeft, bottomRight);
+            }
             return SystemParameters.WorkArea;
+        }
+
+        private Point GetPointerPosition(MouseEventArgs e)
+        {
+            var local = e.GetPosition(this);
+            return new Point(Left + local.X, Top + local.Y);
+        }
+
+        private void CancelPointer()
+        {
+            if (!dragging) return;
+            Root.ReleaseMouseCapture();
+            dragging = false;
+            dragMoved = false;
+            dragDistance = 0;
+        }
+
+        private static Matrix GetFromDeviceTransform(IntPtr handle)
+        {
+            var source = PresentationSource.FromVisual(Application.Current.MainWindow);
+            if (source != null && source.CompositionTarget != null)
+                return source.CompositionTarget.TransformFromDevice;
+            var dpi = handle == IntPtr.Zero ? 96u : GetDpiForWindow(handle);
+            if (dpi == 0) dpi = 96;
+            var scale = 96.0 / dpi;
+            return new Matrix(scale, 0, 0, scale, 0, 0);
         }
 
         private int RandomBetween(int min, int max)
@@ -344,6 +378,9 @@ namespace BunnyPet
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
+
+        [DllImport("user32.dll")]
+        private static extern uint GetDpiForWindow(IntPtr hwnd);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct RectNative { public int Left; public int Top; public int Right; public int Bottom; }

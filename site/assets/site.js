@@ -242,10 +242,11 @@
 
     function setSimState(next) {
       simState = next;
-      if (ASSETS[next]) {
-        simImg.src = ASSETS[next];
+      const assetKey = (!simPlayMode && (next === 'idle' || next === 'sleep')) ? 'sleep' : next;
+      if (ASSETS[assetKey]) {
+        simImg.src = ASSETS[assetKey];
       }
-      simSprite.className = `sim-bunny-sprite ${simDirection < 0 ? 'facing-left' : ''} anim-${next === 'idle' ? 'breathe' : next === 'stand' ? 'curious' : next === 'happy' ? 'happy' : next === 'sleep' ? 'sleep' : ''}`;
+      simSprite.className = `sim-bunny-sprite ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' ? 'curious' : next === 'happy' ? 'happy' : ''}`;
     }
 
     function showSimSpeech(text, duration = 2000) {
@@ -413,6 +414,13 @@
       // 커서 위치 바라보기
       simDirection = relX < simX + 45 ? -1 : 1;
       updateSimTransform();
+
+      if (!simPlayMode) {
+        setSimState('idle');
+        showSimSpeech(randomItem(CURSOR_PHRASES), 1800);
+        scheduleSimBehavior(3600);
+        return;
+      }
 
       setSimState('stand');
       showSimSpeech(randomItem(CURSOR_PHRASES), 1800);

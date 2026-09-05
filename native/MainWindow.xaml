@@ -52,7 +52,7 @@
                    Stretch="Uniform"
                    StretchDirection="Both"
                    VerticalAlignment="Bottom"
-                   Source="/Assets/bunny-idle.png"
+                   Source="/Assets/bunny-sleep.png"
                    RenderTransformOrigin="0.5,1"
                    IsHitTestVisible="False" />
         </Grid>

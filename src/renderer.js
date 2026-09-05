@@ -87,9 +87,10 @@ function setDirection(value) {
 function setVisualState(next) {
   machine.setState(next);
   pet.className = `state-${next}`;
-  bunny.src = ASSETS[next];
-  bunny.alt = next === 'sleep'
-    ? '편안하게 잠든 회색 귀의 하얀 롭이어 토끼'
+  const assetKey = (!machine.playMode && (next === 'idle' || next === 'sleep')) ? 'sleep' : next;
+  bunny.src = ASSETS[assetKey];
+  bunny.alt = (next === 'sleep' || !machine.playMode)
+    ? '식빵을 굽고 있는 귀여운 흰색 롭이어 토끼'
     : '회색 귀를 가진 하얀 롭이어 토끼';
 }
 
@@ -292,6 +293,14 @@ function reactToHover(event) {
     } else {
       setDirection(1);
     }
+  }
+
+  if (!machine.playMode) {
+    setVisualState('idle');
+    const phrase = CURSOR_PHRASES[randomBetween(0, CURSOR_PHRASES.length - 1)];
+    showMessage(phrase, 1800);
+    scheduleBehavior(3600);
+    return;
   }
 
   setVisualState('stand');

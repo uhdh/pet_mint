@@ -340,7 +340,7 @@ namespace BunnyPet
                 }
                 else
                 {
-                    AnimateBreathing();
+                    AnimateSleeping();
                 }
 
                 ScheduleBehavior(RandomBetween(4500, 8500));
@@ -418,7 +418,10 @@ namespace BunnyPet
             StopAnimation();
             switch (next)
             {
-                case BunnyState.Idle: AnimateBreathing(); break;
+                case BunnyState.Idle:
+                    if (!machine.PlayMode) AnimateSleeping();
+                    else AnimateBreathing();
+                    break;
                 case BunnyState.Walk: AnimateHopping(); break;
                 case BunnyState.Stand: AnimateCurious(); break;
                 case BunnyState.Sleep: AnimateSleeping(); break;
@@ -427,8 +430,12 @@ namespace BunnyPet
             }
         }
 
-        private static string ImageName(BunnyState state)
+        private string ImageName(BunnyState state)
         {
+            if (!machine.PlayMode && (state == BunnyState.Idle || state == BunnyState.Sleep))
+            {
+                return "bunny-sleep.png";
+            }
             switch (state)
             {
                 case BunnyState.Walk: return "bunny-walk.png";
@@ -472,6 +479,22 @@ namespace BunnyPet
             AddHeart();
             string phrase = purrPhrases[random.Next(purrPhrases.Length)];
             ShowMessage(phrase, 2200);
+            Task.Delay(1800).ContinueWith(_ =>
+            {
+                if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                try
+                {
+                    Dispatcher.BeginInvoke(new Action(delegate
+                    {
+                        if (!resourcesDisposed && !dragging && !machine.PlayMode && machine.State == BunnyState.Idle)
+                        {
+                            StopAnimation();
+                            AnimateSleeping();
+                        }
+                    }));
+                }
+                catch (InvalidOperationException) { }
+            });
         }
 
         private void ShowRestingEmoji()
@@ -520,6 +543,22 @@ namespace BunnyPet
                         Dispatcher.BeginInvoke(new Action(delegate
                         {
                             if (!resourcesDisposed) AddHeart();
+                        }));
+                    }
+                    catch (InvalidOperationException) { }
+                });
+                Task.Delay(1800).ContinueWith(_ =>
+                {
+                    if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                    try
+                    {
+                        Dispatcher.BeginInvoke(new Action(delegate
+                        {
+                            if (!resourcesDisposed && !dragging && !machine.PlayMode && machine.State == BunnyState.Idle)
+                            {
+                                StopAnimation();
+                                AnimateSleeping();
+                            }
                         }));
                     }
                     catch (InvalidOperationException) { }

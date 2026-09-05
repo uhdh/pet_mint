@@ -173,7 +173,7 @@ namespace BunnyPet
 
             if (play)
             {
-                // '놀자': 신나서 움직이기 시작
+                // '놀자': 신나서 움직이기 시작 & 감정 표현 활성화
                 DirectionTransform.ScaleX = machine.Direction;
                 SetVisualState(BunnyState.Happy);
                 AddHeart();
@@ -183,10 +183,9 @@ namespace BunnyPet
             }
             else
             {
-                // '나대지마': 얌전히 멈추기 자세(식빵)로 복귀
+                // '나대지마': 얌전히 멈추기 자세(식빵)로 복귀하고 이모티콘 보내는 것도 즉시 중단
+                HideMessage();
                 SetVisualState(BunnyState.Idle);
-                string phrase = scoldPhrases[random.Next(scoldPhrases.Length)];
-                ShowMessage(phrase, 2400);
                 ScheduleBehavior(RandomBetween(4000, 7500));
             }
         }
@@ -306,7 +305,7 @@ namespace BunnyPet
             Focus();
             machine.SetPlayMode(false);
             SetVisualState(BunnyState.Idle);
-            ShowMessage("🍞", 2400);
+            HideMessage();
             clockTimer.Start();
             restTimer.IsEnabled = restRemindersEnabled;
             awarenessTimer.Start();
@@ -328,15 +327,10 @@ namespace BunnyPet
                 SetVisualState(BunnyState.Idle);
 
                 double roll = random.NextDouble();
-                if (roll < 0.35)
+                if (roll < 0.30)
                 {
-                    // 멈추기 자세에서는 가끔 갸르릉 하기
+                    // 멈추기 자세에서는 가끔 갸르릉 하기 (진동 및 하트만, 이모티콘 말풍선 X)
                     TriggerPurring();
-                }
-                else if (roll < 0.75)
-                {
-                    // 멈춰 있을때는 간헐적으로 식빵, zzz 등 이모티콘 보여주기
-                    ShowRestingEmoji();
                 }
                 else
                 {
@@ -477,8 +471,11 @@ namespace BunnyPet
             if (resourcesDisposed || dragging || !IsVisible) return;
             AnimatePurring();
             AddHeart();
-            string phrase = purrPhrases[random.Next(purrPhrases.Length)];
-            ShowMessage(phrase, 2200);
+            if (machine.PlayMode)
+            {
+                string phrase = purrPhrases[random.Next(purrPhrases.Length)];
+                ShowMessage(phrase, 2200);
+            }
             Task.Delay(1800).ContinueWith(_ =>
             {
                 if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
@@ -499,7 +496,7 @@ namespace BunnyPet
 
         private void ShowRestingEmoji()
         {
-            if (resourcesDisposed || dragging || !IsVisible) return;
+            if (resourcesDisposed || dragging || !IsVisible || !machine.PlayMode) return;
             string emoji = restingPhrases[random.Next(restingPhrases.Length)];
             ShowMessage(emoji, 2500);
         }
@@ -532,7 +529,7 @@ namespace BunnyPet
 
             if (!machine.PlayMode)
             {
-                // 멈추기 자세에서 쓰다듬으면 기분 좋게 갸르릉하기!
+                // 멈추기 자세에서 쓰다듬으면 조용히 기분 좋게 갸르릉하기 (하트 띄우기, 이모티콘 말풍선 X)
                 AnimatePurring();
                 AddHeart();
                 Task.Delay(190).ContinueWith(_ =>
@@ -564,8 +561,6 @@ namespace BunnyPet
                     catch (InvalidOperationException) { }
                 });
 
-                string petPhrase = currentItem != BunnyItem.None ? GetItemPetPhrase() : purrPhrases[random.Next(purrPhrases.Length)];
-                ShowMessage(petPhrase, 2200);
                 ScheduleBehavior(RandomBetween(4500, 8000));
                 return;
             }
@@ -672,9 +667,19 @@ namespace BunnyPet
             }
         }
 
+        private void HideMessage()
+        {
+            if (messageTimer != null) messageTimer.Stop();
+            if (MessageBorder != null)
+            {
+                MessageBorder.BeginAnimation(OpacityProperty, null);
+                MessageBorder.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void ShowMessage(string text, int duration)
         {
-            if (resourcesDisposed) return;
+            if (resourcesDisposed || !machine.PlayMode) return;
             messageTimer.Stop();
 
             if (!emojiBitmaps.TryGetValue(text, out var bmp))
@@ -737,7 +742,7 @@ namespace BunnyPet
         private void OnClockTick(object sender, EventArgs e)
         {
             var now = DateTime.Now;
-            if (!IsVisible || dragging || now.Minute != 0 || now.Hour == lastAnnouncedHour) return;
+            if (!IsVisible || dragging || !machine.PlayMode || now.Minute != 0 || now.Hour == lastAnnouncedHour) return;
             lastAnnouncedHour = now.Hour;
             ShowMessage(FormatHourPhrase(now), 2600);
         }
@@ -749,7 +754,7 @@ namespace BunnyPet
 
         private void OnRestTick(object sender, EventArgs e)
         {
-            if (!restRemindersEnabled || !IsVisible || dragging) return;
+            if (!restRemindersEnabled || !IsVisible || dragging || !machine.PlayMode) return;
             ShowMessage("🍵", 3400);
         }
 
@@ -792,8 +797,6 @@ namespace BunnyPet
             if (!machine.PlayMode)
             {
                 SetVisualState(BunnyState.Idle);
-                var phrase = cursorPhrases[random.Next(cursorPhrases.Length)];
-                ShowMessage(phrase, 1800);
                 ScheduleBehavior(3600);
                 return;
             }

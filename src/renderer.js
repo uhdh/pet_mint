@@ -119,7 +119,15 @@ function startWalking() {
   }, 80);
 }
 
+function hideMessage() {
+  if (messageTimer) clearTimeout(messageTimer);
+  messageTimer = null;
+  message.textContent = '';
+  message.classList.remove('visible');
+}
+
 function showMessage(text, duration = 2100) {
+  if (!machine.playMode) return;
   if (messageTimer) clearTimeout(messageTimer);
   message.textContent = text;
   message.classList.add('visible');
@@ -139,11 +147,13 @@ function floatHeart() {
 function triggerPurring() {
   if (dragging) return;
   floatHeart();
-  showMessage(PURR_PHRASES[randomBetween(0, PURR_PHRASES.length - 1)], 2200);
+  if (machine.playMode) {
+    showMessage(PURR_PHRASES[randomBetween(0, PURR_PHRASES.length - 1)], 2200);
+  }
 }
 
 function showRestingEmoji() {
-  if (dragging) return;
+  if (dragging || !machine.playMode) return;
   const emoji = RESTING_PHRASES[randomBetween(0, RESTING_PHRASES.length - 1)];
   showMessage(emoji, 2500);
 }
@@ -158,8 +168,8 @@ function setPlayMode(play) {
     showMessage(PLAY_PHRASES[randomBetween(0, PLAY_PHRASES.length - 1)], 2200);
     scheduleBehavior(1500);
   } else {
+    hideMessage();
     setVisualState('idle');
-    showMessage(SCOLD_PHRASES[randomBetween(0, SCOLD_PHRASES.length - 1)], 2400);
     scheduleBehavior(randomBetween(4000, 7500));
   }
 }
@@ -173,10 +183,8 @@ function scheduleBehavior(delay = randomBetween(3500, 7600)) {
     if (!machine.playMode) {
       setVisualState('idle');
       const roll = Math.random();
-      if (roll < 0.35) {
+      if (roll < 0.30) {
         triggerPurring();
-      } else if (roll < 0.75) {
-        showRestingEmoji();
       }
       scheduleBehavior(randomBetween(4500, 8500));
       return;
@@ -297,8 +305,6 @@ function reactToHover(event) {
 
   if (!machine.playMode) {
     setVisualState('idle');
-    const phrase = CURSOR_PHRASES[randomBetween(0, CURSOR_PHRASES.length - 1)];
-    showMessage(phrase, 1800);
     scheduleBehavior(3600);
     return;
   }
@@ -414,6 +420,6 @@ window.bunnyDesktop.getState().then((state) => {
   machine.setPaused(Boolean(state?.paused));
   machine.setPlayMode(false);
   setVisualState(machine.paused ? 'sleep' : 'idle');
-  showMessage('🍞', 2500);
+  hideMessage();
   scheduleBehavior(2200);
 });

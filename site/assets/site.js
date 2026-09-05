@@ -231,7 +231,7 @@
       simDirection = -1;
       updateSimTransform();
       setSimState('idle');
-      showSimSpeech('🍞', 2500);
+      hideSimSpeech();
     }
 
     function updateSimTransform() {
@@ -249,7 +249,14 @@
       simSprite.className = `sim-bunny-sprite ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' ? 'curious' : next === 'happy' ? 'happy' : ''}`;
     }
 
+    function hideSimSpeech() {
+      if (simSpeechTimer) clearTimeout(simSpeechTimer);
+      simSpeechTimer = null;
+      simSpeech.classList.add('hidden');
+    }
+
     function showSimSpeech(text, duration = 2000) {
+      if (!simPlayMode) return;
       if (simSpeechTimer) clearTimeout(simSpeechTimer);
       simSpeechText.textContent = text;
       simSpeech.classList.remove('hidden');
@@ -315,8 +322,8 @@
         showSimSpeech(randomItem(PLAY_PHRASES), 2200);
         scheduleSimBehavior(1500);
       } else {
+        hideSimSpeech();
         setSimState('idle');
-        showSimSpeech(randomItem(SCOLD_PHRASES), 2400);
         scheduleSimBehavior(randomBetween(4000, 7500));
       }
     }
@@ -331,13 +338,9 @@
         if (!simPlayMode) {
           setSimState('idle');
           const roll = Math.random();
-          if (roll < 0.35) {
-            // 멈추기 자세에서 가끔 갸르릉 하기
+          if (roll < 0.30) {
+            // 멈추기 자세에서 가끔 갸르릉 하기 (하트만, 말풍선 X)
             floatSimHeart();
-            showSimSpeech(randomItem(PURR_PHRASES), 2200);
-          } else if (roll < 0.75) {
-            // 멈춰 있을때는 간헐적으로 식빵, zzz 등 이모티콘 보여주기
-            showSimSpeech(randomItem(RESTING_PHRASES), 2500);
           }
           scheduleSimBehavior(randomBetween(4500, 8500));
           return;
@@ -376,14 +379,6 @@
 
       if (!simPlayMode) {
         floatSimHeart();
-        let phrase;
-        if (simCurrentItem === 'hay') phrase = randomItem(ITEM_PHRASES.hay);
-        else if (simCurrentItem === 'chair') phrase = randomItem(ITEM_PHRASES.chair);
-        else if (simCurrentItem === 'bag') phrase = randomItem(ITEM_PHRASES.bag);
-        else if (simCurrentItem === 'house') phrase = randomItem(ITEM_PHRASES.house);
-        else phrase = randomItem(PURR_PHRASES);
-
-        showSimSpeech(phrase, 2200);
         scheduleSimBehavior(randomBetween(4500, 8000));
         return;
       }
@@ -417,7 +412,6 @@
 
       if (!simPlayMode) {
         setSimState('idle');
-        showSimSpeech(randomItem(CURSOR_PHRASES), 1800);
         scheduleSimBehavior(3600);
         return;
       }

@@ -48,8 +48,13 @@
     confused: 'assets/bunny-confused.gif',
     beg: 'assets/bunny-beg.png',
     angry: 'assets/bunny-angry.png',
-    front: 'assets/bunny-front.png'
+    front: 'assets/bunny-front.png',
+    intro: 'assets/bunny-intro.png'
   };
+
+  const INTRO_PHRASES = [
+    '✨', '🤍', '🕊️', '🐰', '⭐', '🎉', '💖', '🥰'
+  ];
 
   const PET_PHRASES = [
     '💕', '🥰', '💖', '💗', '💓', '💞', '😻', '🌸', '✨', '❤️', '🧡', '💛', '🤍', '😍', '😚', '💘'
@@ -202,8 +207,13 @@
 
       if (item === 'house') {
         simSprite.classList.add('inside-house');
+        simSprite.classList.remove('on-chair');
+      } else if (item === 'chair') {
+        simSprite.classList.add('on-chair');
+        simSprite.classList.remove('inside-house');
       } else {
         simSprite.classList.remove('inside-house');
+        simSprite.classList.remove('on-chair');
       }
 
       stopSimWalking();
@@ -223,12 +233,17 @@
         showSimSpeech(randomItem(ITEM_PHRASES.hay), 2500, true);
         scheduleSimBehavior(2800);
       } else if (item === 'chair') {
+        simDirection = 1;
+        updateSimTransform();
         setSimState('idle');
         floatSimHeart();
         showSimSpeech(randomItem(ITEM_PHRASES.chair), 2500, true);
         scheduleSimBehavior(2800);
       } else if (item === 'bag') {
-        setSimState('happy');
+        simDirection = 1;
+        updateSimTransform();
+        setSimState('idle');
+        floatSimHeart();
         showSimSpeech(randomItem(ITEM_PHRASES.bag), 2500, true);
         scheduleSimBehavior(2800);
       } else if (item === 'house') {
@@ -658,11 +673,16 @@
     function setSandboxState(state, message) {
       currentState = state;
       sandboxImg.src = ASSETS[state] || ASSETS.idle;
-      sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
+      sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry' || state === 'intro') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
 
       stateBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.state === state);
       });
+
+      if (state === 'intro') {
+        floatSandboxHeart();
+        if (!message) showSandboxSpeech(randomItem(INTRO_PHRASES), 2500);
+      }
 
       if (message) {
         showSandboxSpeech(message, 2200);
@@ -683,8 +703,13 @@
 
       if (item === 'house') {
         sandboxPet.classList.add('inside-house');
+        sandboxPet.classList.remove('on-chair');
+      } else if (item === 'chair') {
+        sandboxPet.classList.add('on-chair');
+        sandboxPet.classList.remove('inside-house');
       } else {
         sandboxPet.classList.remove('inside-house');
+        sandboxPet.classList.remove('on-chair');
       }
 
       if (item === 'doll') {
@@ -698,13 +723,14 @@
         floatSandboxHeart();
         showSandboxSpeech(randomItem(ITEM_PHRASES.hay), 2500);
       } else if (item === 'chair') {
-        sandboxImg.style.transform = '';
+        sandboxImg.style.transform = 'scaleX(1)';
         setSandboxState('idle');
         floatSandboxHeart();
         showSandboxSpeech(randomItem(ITEM_PHRASES.chair), 2500);
       } else if (item === 'bag') {
-        sandboxImg.style.transform = '';
-        setSandboxState('happy');
+        sandboxImg.style.transform = 'scaleX(1)';
+        setSandboxState('idle');
+        floatSandboxHeart();
         showSandboxSpeech(randomItem(ITEM_PHRASES.bag), 2500);
       } else if (item === 'house') {
         sandboxImg.style.transform = '';

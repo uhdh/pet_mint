@@ -31,10 +31,10 @@
                IsHitTestVisible="False" />
         <Image x:Name="ItemChair"
                Panel.ZIndex="1"
-               Width="68" Height="74"
+               Width="82" Height="66"
                HorizontalAlignment="Center"
                VerticalAlignment="Bottom"
-               Margin="0,0,0,2"
+               Margin="0,0,0,1"
                Source="/Assets/item-chair.png"
                Visibility="Collapsed"
                IsHitTestVisible="False" />
@@ -55,6 +55,19 @@
                    Source="/Assets/bunny-sleep.png"
                    RenderTransformOrigin="0.5,1"
                    IsHitTestVisible="False" />
+            <Image x:Name="ItemBag"
+                   Width="26" Height="39"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Margin="17,14,0,0"
+                   Source="/Assets/item-bag.png"
+                   Visibility="Collapsed"
+                   IsHitTestVisible="False"
+                   RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform>
+                    <RotateTransform Angle="12" />
+                </Image.RenderTransform>
+            </Image>
         </Grid>
         <Image x:Name="ItemDoll"
                Panel.ZIndex="3"
@@ -72,15 +85,6 @@
                VerticalAlignment="Bottom"
                Margin="0,0,2,2"
                Source="/Assets/item-hay.png"
-               Visibility="Collapsed"
-               IsHitTestVisible="False" />
-        <Image x:Name="ItemBag"
-               Panel.ZIndex="3"
-               Width="34" Height="34"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Bottom"
-               Margin="-18,0,0,16"
-               Source="/Assets/item-bag.png"
                Visibility="Collapsed"
                IsHitTestVisible="False" />
         <Grid x:Name="MessageBorder"

@@ -652,9 +652,12 @@ img {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 64px;
-  height: 70px;
+  width: 76px;
+  height: 61px;
   object-fit: contain;
+}
+.sim-sprite-wrapper.on-chair {
+  transform: translateY(-22px);
 }
 .sim-item-doll {
   z-index: 12;
@@ -676,12 +679,12 @@ img {
 }
 .sim-item-bag {
   z-index: 12;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 32px;
-  height: 32px;
+  top: 14px;
+  left: 20px;
+  width: 26px;
+  height: 39px;
   object-fit: contain;
+  transform: rotate(12deg);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 .mockup-btn--item {
@@ -891,9 +894,12 @@ img {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 80px;
-  height: 88px;
+  width: 96px;
+  height: 77px;
   object-fit: contain;
+}
+.sandbox-pet.on-chair {
+  transform: translateY(-28px);
 }
 .sandbox-item-doll {
   z-index: 4;
@@ -915,12 +921,12 @@ img {
 }
 .sandbox-item-bag {
   z-index: 4;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 38px;
-  height: 38px;
+  top: 20px;
+  left: 28px;
+  width: 34px;
+  height: 51px;
   object-fit: contain;
+  transform: rotate(12deg);
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
 }
 

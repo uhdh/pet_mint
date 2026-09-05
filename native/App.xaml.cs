@@ -206,6 +206,12 @@ namespace BunnyPet
                 });
                 poseMenu.DropDownItems.Add(confusedItem);
 
+                var introItem = new Forms.ToolStripMenuItem("✨ 천사 민트 등장! (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.PlayIntroGreeting();
+                });
+                poseMenu.DropDownItems.Add(introItem);
+
                 menu.Items.Add(poseMenu);
                 menu.Items.Add(new Forms.ToolStripSeparator());
 
@@ -268,7 +274,14 @@ namespace BunnyPet
                 menu.Items.Add(restRemindersItem);
 
                 var resetItem = new Forms.ToolStripMenuItem("↩ 민트 자리로 부르기 (Reset position)");
-                resetItem.Click += delegate { window.ResetPosition(); };
+                resetItem.Click += delegate
+                {
+                    if (window != null)
+                    {
+                        window.ResetPosition();
+                        window.PlayIntroGreeting();
+                    }
+                };
                 menu.Items.Add(resetItem);
 
                 menu.Items.Add(new Forms.ToolStripSeparator());

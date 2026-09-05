@@ -10,7 +10,8 @@ public enum BunnyState
     Drag,
     Beg,
     Angry,
-    Front
+    Front,
+    Intro
 }
 
 public enum BunnyItem

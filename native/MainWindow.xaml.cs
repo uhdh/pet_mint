@@ -89,6 +89,10 @@ namespace BunnyPet
         {
             "🐰", "👀", "✨", "🤍", "🐾", "⭐", "👽", "🛸"
         };
+        private readonly string[] introPhrases =
+        {
+            "✨", "🤍", "🕊️", "🐰", "⭐", "🎉", "💖", "🥰"
+        };
 
         private readonly Dictionary<string, BitmapImage> emojiBitmaps = new Dictionary<string, BitmapImage>();
         private BunnyItem currentItem = BunnyItem.None;
@@ -256,6 +260,13 @@ namespace BunnyPet
                 DirectionLayer.Margin = new Thickness(0, 0, 2, 22);
                 DirectionTransform.ScaleX = 1;
             }
+            else if (item == BunnyItem.Chair)
+            {
+                DirectionLayer.Width = 84;
+                DirectionLayer.Height = 76;
+                DirectionLayer.Margin = new Thickness(0, 0, 0, 26);
+                DirectionTransform.ScaleX = 1;
+            }
             else
             {
                 DirectionLayer.Width = 97;
@@ -292,7 +303,10 @@ namespace BunnyPet
                     break;
 
                 case BunnyItem.Bag:
-                    SetVisualState(BunnyState.Happy);
+                    DirectionTransform.ScaleX = 1;
+                    machine.SetDirection(1);
+                    SetVisualState(BunnyState.Idle);
+                    AddHeart();
                     ShowMessage(bagPhrases[random.Next(bagPhrases.Length)], 2500, true);
                     ScheduleBehavior(2800);
                     break;
@@ -305,6 +319,8 @@ namespace BunnyPet
                     break;
 
                 case BunnyItem.Chair:
+                    DirectionTransform.ScaleX = 1;
+                    machine.SetDirection(1);
                     SetVisualState(BunnyState.Idle);
                     AddHeart();
                     ShowMessage(chairPhrases[random.Next(chairPhrases.Length)], 2500, true);
@@ -341,12 +357,10 @@ namespace BunnyPet
             ResetPosition();
             Focus();
             machine.SetPlayMode(false);
-            SetVisualState(BunnyState.Idle);
-            HideMessage();
             clockTimer.Start();
             restTimer.IsEnabled = restRemindersEnabled;
             awarenessTimer.Start();
-            ScheduleBehavior(RandomBetween(4000, 7500));
+            PlayIntroGreeting();
         }
 
         private void OnBehaviorTick(object sender, EventArgs e)
@@ -511,6 +525,7 @@ namespace BunnyPet
                 case BunnyState.Beg: AnimateCurious(); break;
                 case BunnyState.Angry: AnimatePurring(); break;
                 case BunnyState.Front: AnimateBreathing(); break;
+                case BunnyState.Intro: AnimateHappy(); break;
             }
         }
 
@@ -519,6 +534,10 @@ namespace BunnyPet
             if (currentItem == BunnyItem.House)
             {
                 return "bunny-front.png";
+            }
+            if (state == BunnyState.Intro)
+            {
+                return "bunny-intro.png";
             }
             if (!machine.PlayMode && (state == BunnyState.Idle || state == BunnyState.Sleep))
             {
@@ -534,6 +553,7 @@ namespace BunnyPet
                 case BunnyState.Beg: return "bunny-beg.png";
                 case BunnyState.Angry: return "bunny-angry.png";
                 case BunnyState.Front: return "bunny-front.png";
+                case BunnyState.Intro: return "bunny-intro.png";
                 default: return "bunny-idle.png";
             }
         }
@@ -908,8 +928,19 @@ namespace BunnyPet
                 case BunnyState.Front:
                     ShowMessage(frontPhrases[random.Next(frontPhrases.Length)], 3000, true);
                     break;
+                case BunnyState.Intro:
+                    AddHeart();
+                    ShowMessage(introPhrases[random.Next(introPhrases.Length)], 3000, true);
+                    break;
             }
-            ScheduleBehavior(4000);
+            ScheduleBehavior(3600);
+        }
+
+        public void PlayIntroGreeting()
+        {
+            if (resourcesDisposed) return;
+            DirectionTransform.ScaleX = 1;
+            TriggerPose(BunnyState.Intro);
         }
 
         private void HideMessage()
@@ -1222,6 +1253,10 @@ namespace BunnyPet
             };
             poseMenu.Items.Add(confusedItem);
 
+            var introItem = new MenuItem { Header = "✨ 천사 민트 등장! (실사 포즈)" };
+            introItem.Click += delegate { PlayIntroGreeting(); };
+            poseMenu.Items.Add(introItem);
+
             menu.Items.Add(poseMenu);
             menu.Items.Add(new Separator());
 
@@ -1264,7 +1299,11 @@ namespace BunnyPet
             menu.Items.Add(topItem);
 
             var resetItem = new MenuItem { Header = "↩ 민트 자리로 부르기 (오른쪽 아래)" };
-            resetItem.Click += delegate { ResetPosition(); };
+            resetItem.Click += delegate
+            {
+                ResetPosition();
+                PlayIntroGreeting();
+            };
             menu.Items.Add(resetItem);
 
             menu.Items.Add(new Separator());

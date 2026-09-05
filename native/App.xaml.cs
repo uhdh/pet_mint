@@ -26,38 +26,71 @@ namespace BunnyPet
         private bool quitting;
         private bool showPending;
 
+        public static void Log(string msg)
+        {
+            try
+            {
+                var dir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MyBunnyDesktopPet");
+                System.IO.Directory.CreateDirectory(dir);
+                System.IO.File.AppendAllText(System.IO.Path.Combine(dir, "run.log"), $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {msg}\r\n");
+            }
+            catch { }
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
+            Log("OnStartup begin");
+            AppDomain.CurrentDomain.UnhandledException += (s, ev) => Log("AppDomain UnhandledException: " + ev.ExceptionObject);
+            DispatcherUnhandledException += (s, ev) => { Log("DispatcherUnhandledException: " + ev.Exception); ev.Handled = true; };
+
             base.OnStartup(e);
             EnsureShowEvent();
             bool created;
             try
             {
                 instanceMutex = new Mutex(true, MutexName, out created);
+                Log("Mutex created: " + created);
             }
-            catch (Exception)
+            catch (AbandonedMutexException ame)
             {
-                Shutdown();
-                return;
+                Log("Mutex AbandonedMutexException: " + ame.Message);
+                created = true;
+            }
+            catch (Exception ex)
+            {
+                Log("Mutex Exception: " + ex);
+                created = true;
+                instanceMutex = null;
             }
 
             if (!created)
             {
-                SignalExistingInstance();
-                DisposeShowEvent();
-                Shutdown();
-                return;
+                var others = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
+                if (others.Length > 1)
+                {
+                    Log("SingleInstance: another active process found (" + others.Length + "), signaling and shutting down.");
+                    SignalExistingInstance();
+                    DisposeShowEvent();
+                    Shutdown();
+                    return;
+                }
+                Log("SingleInstance: mutex was locked but no other active process found. Continuing startup.");
             }
 
+            Log("Loading settings");
             settings = AppSettings.Load();
             RegisterShowEvent();
+            Log("Creating MainWindow");
             window = new MainWindow();
             MainWindow = window;
             window.SetAlwaysOnTop(settings.AlwaysOnTop);
             window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
+            Log("Showing window");
             window.Show();
             if (showPending) ShowWindow();
+            Log("Creating Tray");
             CreateTray();
+            Log("OnStartup completed");
         }
 
         private void EnsureShowEvent()
@@ -225,8 +258,9 @@ namespace BunnyPet
                     if (args.Button == Forms.MouseButtons.Left) ToggleWindow();
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log("CreateTray FAILED: " + ex);
                 window.ExitOnClose = true;
                 DisposeTray();
             }
@@ -310,6 +344,7 @@ namespace BunnyPet
 
         private void ShowWindow()
         {
+            Log("ShowWindow called");
             if (quitting) return;
             if (window == null)
             {
@@ -319,10 +354,12 @@ namespace BunnyPet
             showPending = false;
             try
             {
-                window.Show();
+                if (!window.IsVisible) window.Show();
+                window.ResetPosition();
                 window.Activate();
+                if (visibilityItem != null) visibilityItem.Text = "민트 숨기기 (Hide Mint)";
             }
-            catch (Exception) { }
+            catch (Exception ex) { Log("ShowWindow exception: " + ex); }
         }
 
         private static bool IsPackaged()
@@ -373,6 +410,7 @@ namespace BunnyPet
 
         private void Quit(bool requestShutdown)
         {
+            Log("Quit called, requestShutdown=" + requestShutdown + ", stack:\r\n" + Environment.StackTrace);
             if (quitting) return;
             quitting = true;
             SaveSettings();
@@ -429,6 +467,7 @@ namespace BunnyPet
 
         protected override void OnExit(ExitEventArgs e)
         {
+            Log("OnExit called, exitCode=" + e.ApplicationExitCode);
             if (!quitting) Quit(false);
             base.OnExit(e);
         }

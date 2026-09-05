@@ -188,7 +188,7 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel>
                                         <TextBlock Text="📌 항상 위에 표시 (Always on Top)" FontWeight="SemiBold" FontSize="13" Foreground="#2C2623" />
-                                        <TextBlock Text="다른 작업창에 가려지지 않고 언제나 화면 최상단에 민트가 보입니다." FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
+                                        <TextBlock Text="꺼두면 토끼가 다른 데스크탑 창 뒤에 쏙 숨어 지내며, 켜면 언제나 최상단에 보입니다. 🐰" FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
                                     </StackPanel>
                                     <CheckBox Grid.Column="1" x:Name="ChkAlwaysOnTop" VerticalAlignment="Center" Click="OnAlwaysOnTopChanged" />
                                 </Grid>

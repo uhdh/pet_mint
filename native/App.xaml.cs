@@ -101,7 +101,10 @@ namespace BunnyPet
             };
             Log("Showing window");
             window.Show();
-            window.Activate();
+            if (settings.AlwaysOnTop)
+            {
+                window.Activate();
+            }
             if (showPending) ShowWindow();
             Log("Creating Tray");
             CreateTray();
@@ -250,7 +253,19 @@ namespace BunnyPet
                     UpdateGiftItemText(houseItem, BunnyItem.House, aff, "🏠 아늑한 집 (House)", "아늑한 집");
                 };
 
-                menu.Items.Add(new Forms.ToolStripSeparator());
+                var topmostItem = new Forms.ToolStripMenuItem("📌 항상 위에 표시 (Always on Top)")
+                {
+                    CheckOnClick = true,
+                    Checked = settings.AlwaysOnTop
+                };
+                topmostItem.Click += delegate
+                {
+                    settings.AlwaysOnTop = topmostItem.Checked;
+                    window?.SetAlwaysOnTop(settings.AlwaysOnTop);
+                    SaveSettings();
+                };
+                menu.Opening += delegate { topmostItem.Checked = settings.AlwaysOnTop; };
+                menu.Items.Add(topmostItem);
 
                 var dashboardItem = new Forms.ToolStripMenuItem("🌸 민트 대시보드 및 설정...");
                 dashboardItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
@@ -325,7 +340,11 @@ namespace BunnyPet
                 else
                 {
                     window.Show();
-                    window.Activate();
+                    window.SetAlwaysOnTop(settings.AlwaysOnTop);
+                    if (settings.AlwaysOnTop)
+                    {
+                        window.Activate();
+                    }
                 }
                 if (visibilityItem != null) visibilityItem.Text = window.IsVisible ? "민트 숨기기 (Hide Mint)" : "민트 보이기 (Show Mint)";
             }
@@ -372,8 +391,11 @@ namespace BunnyPet
             {
                 if (!window.IsVisible) window.Show();
                 window.ResetPosition();
-                window.Topmost = true;
-                window.Activate();
+                window.SetAlwaysOnTop(settings.AlwaysOnTop);
+                if (settings.AlwaysOnTop)
+                {
+                    window.Activate();
+                }
                 if (visibilityItem != null) visibilityItem.Text = "민트 숨기기 (Hide Mint)";
             }
             catch (Exception ex) { Log("ShowWindow exception: " + ex); }

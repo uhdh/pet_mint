@@ -194,6 +194,15 @@ namespace BunnyPet
             InitConfusedFrames();
             Loaded += OnLoaded;
             Closing += OnClosing;
+            Deactivated += OnDeactivated;
+        }
+
+        private void OnDeactivated(object sender, EventArgs e)
+        {
+            if (!Topmost)
+            {
+                ApplyWindowZOrder();
+            }
         }
 
         public void DisposeResources()
@@ -278,6 +287,26 @@ namespace BunnyPet
         public void SetAlwaysOnTop(bool value)
         {
             Topmost = value;
+            ApplyWindowZOrder();
+        }
+
+        public void ApplyWindowZOrder()
+        {
+            try
+            {
+                var handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+                if (handle == IntPtr.Zero) return;
+
+                if (Topmost)
+                {
+                    SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                }
+                else
+                {
+                    SetWindowPos(handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                }
+            }
+            catch { }
         }
 
         public void SetAffinity(int val)
@@ -494,7 +523,8 @@ namespace BunnyPet
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             ResetPosition();
-            Focus();
+            ApplyWindowZOrder();
+            if (Topmost) Focus();
             machine.SetPlayMode(false);
             clockTimer.Start();
             restTimer.IsEnabled = restRemindersEnabled;
@@ -1554,6 +1584,11 @@ namespace BunnyPet
                 ScheduleBehavior(1700);
             }
             else ReactToPetting();
+
+            if (!Topmost)
+            {
+                ApplyWindowZOrder();
+            }
         }
 
         private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1600,6 +1635,13 @@ namespace BunnyPet
         {
             var menu = new ContextMenu();
             menu.PlacementTarget = this;
+            menu.Closed += delegate
+            {
+                if (!Topmost)
+                {
+                    ApplyWindowZOrder();
+                }
+            };
 
             var playToggleItem = new MenuItem
             {
@@ -1655,7 +1697,24 @@ namespace BunnyPet
             itemsMenu.Items.Add(clearItem);
 
             menu.Items.Add(itemsMenu);
-            menu.Items.Add(new Separator());
+            var topItem = new MenuItem
+            {
+                Header = "📌 항상 위에 표시 (Always on Top)",
+                IsCheckable = true,
+                IsChecked = Topmost
+            };
+            topItem.Click += delegate
+            {
+                var app = Application.Current as App;
+                bool newTop = topItem.IsChecked;
+                SetAlwaysOnTop(newTop);
+                if (app != null && app.CurrentSettings != null)
+                {
+                    app.CurrentSettings.AlwaysOnTop = newTop;
+                    try { app.CurrentSettings.Save(); } catch { }
+                }
+            };
+            menu.Items.Add(topItem);
 
             var dashboardItem = new MenuItem
             {
@@ -1736,6 +1795,10 @@ namespace BunnyPet
             dragging = false;
             dragMoved = false;
             dragDistance = 0;
+            if (!Topmost)
+            {
+                ApplyWindowZOrder();
+            }
         }
 
         private static Matrix GetFromDeviceTransform(IntPtr handle)
@@ -1762,6 +1825,17 @@ namespace BunnyPet
 
         [DllImport("user32.dll")]
         private static extern uint GetDpiForWindow(IntPtr hwnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        private static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+        private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        private static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOACTIVATE = 0x0010;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct RectNative { public int Left; public int Top; public int Right; public int Bottom; }

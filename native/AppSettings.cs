@@ -23,7 +23,7 @@ namespace BunnyPet
 
         public AppSettings()
         {
-            alwaysOnTop = true;
+            alwaysOnTop = false;
             autoStart = false;
             restRemindersEnabled = true;
             affinity = 10;
@@ -32,7 +32,7 @@ namespace BunnyPet
         [IgnoreDataMember]
         public bool AlwaysOnTop
         {
-            get { return alwaysOnTop ?? true; }
+            get { return alwaysOnTop ?? false; }
             set { alwaysOnTop = value; }
         }
 

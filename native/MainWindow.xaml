@@ -8,7 +8,7 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
-        Topmost="True"
+        Topmost="False"
         ShowActivated="False"
         Focusable="True"
         PreviewKeyDown="OnKeyDown"

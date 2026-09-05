@@ -42,6 +42,9 @@
     <Resource Include="Assets\bunny-sleep.png" />
     <Resource Include="Assets\bunny-stand.png" />
     <Resource Include="Assets\bunny-walk.png" />
+    <Resource Include="Assets\bunny-front.png" />
+    <Resource Include="Assets\bunny-beg.png" />
+    <Resource Include="Assets\bunny-angry.png" />
     <Resource Include="Assets\icon.ico" />
     <Resource Include="Assets\item-hay.png" />
     <Resource Include="Assets\item-doll.png" />

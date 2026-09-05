@@ -7,7 +7,10 @@ public enum BunnyState
     Stand,
     Sleep,
     Happy,
-    Drag
+    Drag,
+    Beg,
+    Angry,
+    Front
 }
 
 public enum BunnyItem

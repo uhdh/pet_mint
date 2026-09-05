@@ -77,6 +77,18 @@ namespace BunnyPet
         {
             "🍞", "🥺", "😳", "💤", "🤐", "🤫"
         };
+        private readonly string[] begPhrases =
+        {
+            "🌾", "😋", "🥕", "🤤", "🍽️", "🥺", "👀"
+        };
+        private readonly string[] angryPhrases =
+        {
+            "💢", "😡", "😤", "⚡", "👿", "😾", "😠"
+        };
+        private readonly string[] frontPhrases =
+        {
+            "🐰", "👀", "✨", "🤍", "🐾", "⭐"
+        };
 
         private readonly Dictionary<string, BitmapImage> emojiBitmaps = new Dictionary<string, BitmapImage>();
         private BunnyItem currentItem = BunnyItem.None;
@@ -236,6 +248,21 @@ namespace BunnyPet
             ItemDoll.Visibility = item == BunnyItem.Doll ? Visibility.Visible : Visibility.Collapsed;
             ItemHay.Visibility = item == BunnyItem.Hay ? Visibility.Visible : Visibility.Collapsed;
             ItemBag.Visibility = item == BunnyItem.Bag ? Visibility.Visible : Visibility.Collapsed;
+
+            if (item == BunnyItem.House)
+            {
+                DirectionLayer.Width = 52;
+                DirectionLayer.Height = 58;
+                DirectionLayer.Margin = new Thickness(0, 0, 2, 22);
+                DirectionTransform.ScaleX = 1;
+            }
+            else
+            {
+                DirectionLayer.Width = 97;
+                DirectionLayer.Height = 88;
+                DirectionLayer.Margin = new Thickness(0);
+            }
+
             ReactToItemEquip(item);
         }
 
@@ -250,41 +277,42 @@ namespace BunnyPet
                 case BunnyItem.Doll:
                     DirectionTransform.ScaleX = -1;
                     machine.SetDirection(-1);
-                    SetVisualState(BunnyState.Stand);
-                    ShowMessage(dollPhrases[random.Next(dollPhrases.Length)], 2600);
+                    SetVisualState(BunnyState.Angry);
+                    ShowMessage(dollPhrases[random.Next(dollPhrases.Length)], 2600, true);
                     ScheduleBehavior(3000);
                     break;
 
                 case BunnyItem.Hay:
                     DirectionTransform.ScaleX = 1;
                     machine.SetDirection(1);
-                    SetVisualState(BunnyState.Happy);
+                    SetVisualState(BunnyState.Beg);
                     AddHeart();
-                    ShowMessage(hayPhrases[random.Next(hayPhrases.Length)], 2500);
+                    ShowMessage(hayPhrases[random.Next(hayPhrases.Length)], 2500, true);
                     ScheduleBehavior(2800);
                     break;
 
                 case BunnyItem.Bag:
                     SetVisualState(BunnyState.Happy);
-                    ShowMessage(bagPhrases[random.Next(bagPhrases.Length)], 2500);
+                    ShowMessage(bagPhrases[random.Next(bagPhrases.Length)], 2500, true);
                     ScheduleBehavior(2800);
                     break;
 
                 case BunnyItem.House:
-                    SetVisualState(BunnyState.Idle);
-                    ShowMessage(housePhrases[random.Next(housePhrases.Length)], 2500);
-                    ScheduleBehavior(2800);
+                    SetVisualState(BunnyState.Front);
+                    AddHeart();
+                    ShowMessage(housePhrases[random.Next(housePhrases.Length)], 2500, true);
+                    ScheduleBehavior(3000);
                     break;
 
                 case BunnyItem.Chair:
                     SetVisualState(BunnyState.Idle);
                     AddHeart();
-                    ShowMessage(chairPhrases[random.Next(chairPhrases.Length)], 2500);
+                    ShowMessage(chairPhrases[random.Next(chairPhrases.Length)], 2500, true);
                     ScheduleBehavior(2800);
                     break;
 
                 case BunnyItem.None:
-                    ShowMessage("✨", 1800);
+                    ShowMessage("✨", 1800, true);
                     SetVisualState(BunnyState.Idle);
                     ScheduleBehavior(2000);
                     break;
@@ -330,6 +358,18 @@ namespace BunnyPet
                 return;
             }
 
+            if (currentItem == BunnyItem.House)
+            {
+                StopWalking();
+                SetVisualState(BunnyState.Front);
+                if (random.NextDouble() < 0.25)
+                {
+                    AddHeart();
+                }
+                ScheduleBehavior(RandomBetween(4000, 8000));
+                return;
+            }
+
             if (!machine.PlayMode)
             {
                 StopWalking();
@@ -352,14 +392,42 @@ namespace BunnyPet
 
             StopWalking();
             var next = machine.ChooseNext(random.NextDouble(), DateTime.UtcNow);
-            if (next == BunnyState.Stand && random.NextDouble() < 0.40)
+            if (next == BunnyState.Stand)
             {
-                // '놀자' 상태에서 두리번거릴 때 40% 확률로 실사 어리둥절 애니메이션 재생!
-                PlayConfusedAnimation(() =>
+                double roll = random.NextDouble();
+                if (roll < 0.35)
                 {
-                    ResetVisualToIdle();
-                });
-                return;
+                    // '놀자' 상태에서 두리번거릴 때 실사 어리둥절 애니메이션 재생!
+                    PlayConfusedAnimation(() =>
+                    {
+                        ResetVisualToIdle();
+                    });
+                    return;
+                }
+                else if (roll < 0.60)
+                {
+                    // 실사 내놔! 포즈
+                    SetVisualState(BunnyState.Beg);
+                    ShowMessage(begPhrases[random.Next(begPhrases.Length)], 2600);
+                    ScheduleBehavior(3200);
+                    return;
+                }
+                else if (roll < 0.80)
+                {
+                    // 실사 화났어! 포즈
+                    SetVisualState(BunnyState.Angry);
+                    ShowMessage(angryPhrases[random.Next(angryPhrases.Length)], 2600);
+                    ScheduleBehavior(3200);
+                    return;
+                }
+                else if (roll < 0.90)
+                {
+                    // 정면 똘망 민트
+                    SetVisualState(BunnyState.Front);
+                    ShowMessage(frontPhrases[random.Next(frontPhrases.Length)], 2600);
+                    ScheduleBehavior(3200);
+                    return;
+                }
             }
             SetVisualState(next);
             if (next == BunnyState.Walk) StartWalking();
@@ -378,6 +446,7 @@ namespace BunnyPet
         private void StartWalking()
         {
             StopWalking();
+            if (currentItem == BunnyItem.House) return;
             climbing = false;
             if (random.NextDouble() < 0.24) DirectionTransform.ScaleX = machine.TurnAround();
             walkingTimer.Start();
@@ -423,7 +492,7 @@ namespace BunnyPet
             }
         }
 
-        private void SetVisualState(BunnyState next)
+        public void SetVisualState(BunnyState next)
         {
             machine.SetState(next);
             BunnyImage.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/" + ImageName(next), UriKind.Absolute));
@@ -439,11 +508,18 @@ namespace BunnyPet
                 case BunnyState.Sleep: AnimateSleeping(); break;
                 case BunnyState.Happy: AnimateHappy(); break;
                 case BunnyState.Drag: AnimateDangling(); break;
+                case BunnyState.Beg: AnimateCurious(); break;
+                case BunnyState.Angry: AnimatePurring(); break;
+                case BunnyState.Front: AnimateBreathing(); break;
             }
         }
 
         private string ImageName(BunnyState state)
         {
+            if (currentItem == BunnyItem.House)
+            {
+                return "bunny-front.png";
+            }
             if (!machine.PlayMode && (state == BunnyState.Idle || state == BunnyState.Sleep))
             {
                 return "bunny-sleep.png";
@@ -455,6 +531,9 @@ namespace BunnyPet
                 case BunnyState.Sleep: return "bunny-sleep.png";
                 case BunnyState.Happy: return "bunny-happy.png";
                 case BunnyState.Drag: return "bunny-stand.png";
+                case BunnyState.Beg: return "bunny-beg.png";
+                case BunnyState.Angry: return "bunny-angry.png";
+                case BunnyState.Front: return "bunny-front.png";
                 default: return "bunny-idle.png";
             }
         }
@@ -535,14 +614,35 @@ namespace BunnyPet
             machine.Touch(DateTime.UtcNow);
             StopWalking();
 
+            if (currentItem == BunnyItem.House)
+            {
+                AddHeart();
+                string housePhrase = housePhrases[random.Next(housePhrases.Length)];
+                ShowMessage(housePhrase, 2500, true);
+                ScheduleBehavior(3000);
+                return;
+            }
+
             if (currentItem == BunnyItem.Doll)
             {
                 DirectionTransform.ScaleX = -1;
                 machine.SetDirection(-1);
-                SetVisualState(BunnyState.Stand);
+                SetVisualState(BunnyState.Angry);
                 string dollPhrase = dollPhrases[random.Next(dollPhrases.Length)];
-                ShowMessage(dollPhrase, 2800);
+                ShowMessage(dollPhrase, 2800, true);
                 ScheduleBehavior(3000);
+                return;
+            }
+
+            if (currentItem == BunnyItem.Hay)
+            {
+                DirectionTransform.ScaleX = 1;
+                machine.SetDirection(1);
+                SetVisualState(BunnyState.Beg);
+                AddHeart();
+                string hayPhrase = hayPhrases[random.Next(hayPhrases.Length)];
+                ShowMessage(hayPhrase, 2500, true);
+                ScheduleBehavior(2800);
                 return;
             }
 
@@ -665,6 +765,9 @@ namespace BunnyPet
                 .Concat(purrPhrases)
                 .Concat(playPhrases)
                 .Concat(scoldPhrases)
+                .Concat(begPhrases)
+                .Concat(angryPhrases)
+                .Concat(frontPhrases)
                 .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤" })
                 .Distinct();
 
@@ -781,6 +884,31 @@ namespace BunnyPet
             ScheduleBehavior(RandomBetween(2500, 5000));
         }
 
+        public void TriggerPose(BunnyState state)
+        {
+            if (resourcesDisposed) return;
+            StopAnimation();
+            StopWalking();
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+            SetVisualState(state);
+            switch (state)
+            {
+                case BunnyState.Beg:
+                    ShowMessage(begPhrases[random.Next(begPhrases.Length)], 3000, true);
+                    break;
+                case BunnyState.Angry:
+                    ShowMessage(angryPhrases[random.Next(angryPhrases.Length)], 3000, true);
+                    break;
+                case BunnyState.Front:
+                    ShowMessage(frontPhrases[random.Next(frontPhrases.Length)], 3000, true);
+                    break;
+            }
+            ScheduleBehavior(4000);
+        }
+
         private void HideMessage()
         {
             if (messageTimer != null) messageTimer.Stop();
@@ -791,9 +919,9 @@ namespace BunnyPet
             }
         }
 
-        private void ShowMessage(string text, int duration)
+        public void ShowMessage(string text, int duration, bool force = false)
         {
-            if (resourcesDisposed || !machine.PlayMode) return;
+            if (resourcesDisposed || (!machine.PlayMode && !force)) return;
             messageTimer.Stop();
 
             if (!emojiBitmaps.TryGetValue(text, out var bmp))
@@ -1066,15 +1194,32 @@ namespace BunnyPet
             petItem.Click += delegate { ReactToPetting(); };
             menu.Items.Add(petItem);
 
-            var confusedItem = new MenuItem { Header = "👀 어리둥절 민트 보기 (실사 영상)" };
+            var poseMenu = new MenuItem { Header = "📸 민트 특별 포즈" };
+
+            var begItem = new MenuItem { Header = "🌾 간식 내놔! 민트 (실사 포즈)" };
+            begItem.Click += delegate { TriggerPose(BunnyState.Beg); };
+            poseMenu.Items.Add(begItem);
+
+            var angryItem = new MenuItem { Header = "💢 화났어! 민트 (실사 포즈)" };
+            angryItem.Click += delegate { TriggerPose(BunnyState.Angry); };
+            poseMenu.Items.Add(angryItem);
+
+            var frontItem = new MenuItem { Header = "🐰 똘망똘망 민트 (정면 포즈)" };
+            frontItem.Click += delegate { TriggerPose(BunnyState.Front); };
+            poseMenu.Items.Add(frontItem);
+
+            var confusedItem = new MenuItem { Header = "👀 어리둥절 민트 (실사 영상)" };
             confusedItem.Click += delegate
             {
+                if (currentItem == BunnyItem.House) SetItem(BunnyItem.None);
                 PlayConfusedAnimation(() =>
                 {
                     ResetVisualToIdle();
                 });
             };
-            menu.Items.Add(confusedItem);
+            poseMenu.Items.Add(confusedItem);
+
+            menu.Items.Add(poseMenu);
             menu.Items.Add(new Separator());
 
             var itemsMenu = new MenuItem { Header = "🎁 민트에게 선물하기" };

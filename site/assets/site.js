@@ -45,7 +45,10 @@
     stand: 'assets/bunny-stand.png',
     sleep: 'assets/bunny-sleep.png',
     happy: 'assets/bunny-happy.png',
-    confused: 'assets/bunny-confused.gif'
+    confused: 'assets/bunny-confused.gif',
+    beg: 'assets/bunny-beg.png',
+    angry: 'assets/bunny-angry.png',
+    front: 'assets/bunny-front.png'
   };
 
   const PET_PHRASES = [
@@ -73,6 +76,18 @@
       '🏠', '💤', '🛋️', '🌙', '⭐', '🕯️', '🏡', '🛌', '😴', '☁️', '🛏️', '🪵'
     ]
   };
+
+  const BEG_PHRASES = [
+    '🌾', '😋', '🥕', '🤤', '🍽️', '🥺', '👀'
+  ];
+
+  const ANGRY_PHRASES = [
+    '💢', '😡', '😤', '⚡', '👿', '😾', '😠'
+  ];
+
+  const FRONT_PHRASES = [
+    '🐰', '👀', '✨', '🤍', '🐾', '⭐'
+  ];
 
   const RESTING_PHRASES = [
     '🍞', '🍞', '💤', '💤', '😴', '☁️', '🥐', '🥱', '🌾', '🌙', '✨'
@@ -185,38 +200,47 @@
       if (simHayBtn) simHayBtn.classList.toggle('active', item === 'hay');
       if (simChairBtn) simChairBtn.classList.toggle('active', item === 'chair');
 
+      if (item === 'house') {
+        simSprite.classList.add('inside-house');
+      } else {
+        simSprite.classList.remove('inside-house');
+      }
+
       stopSimWalking();
 
       if (item === 'doll') {
         simDirection = -1;
         updateSimTransform();
-        setSimState('stand');
+        setSimState('angry');
         playPopSound();
-        showSimSpeech(randomItem(ITEM_PHRASES.doll), 2600);
+        showSimSpeech(randomItem(ITEM_PHRASES.doll), 2600, true);
         scheduleSimBehavior(3000);
       } else if (item === 'hay') {
         simDirection = 1;
         updateSimTransform();
-        setSimState('happy');
+        setSimState('beg');
         floatSimHeart();
-        showSimSpeech(randomItem(ITEM_PHRASES.hay), 2500);
+        showSimSpeech(randomItem(ITEM_PHRASES.hay), 2500, true);
         scheduleSimBehavior(2800);
       } else if (item === 'chair') {
         setSimState('idle');
         floatSimHeart();
-        showSimSpeech(randomItem(ITEM_PHRASES.chair), 2500);
+        showSimSpeech(randomItem(ITEM_PHRASES.chair), 2500, true);
         scheduleSimBehavior(2800);
       } else if (item === 'bag') {
         setSimState('happy');
-        showSimSpeech(randomItem(ITEM_PHRASES.bag), 2500);
+        showSimSpeech(randomItem(ITEM_PHRASES.bag), 2500, true);
         scheduleSimBehavior(2800);
       } else if (item === 'house') {
-        setSimState('idle');
-        showSimSpeech(randomItem(ITEM_PHRASES.house), 2500);
-        scheduleSimBehavior(2800);
+        simDirection = 1;
+        updateSimTransform();
+        setSimState('front');
+        floatSimHeart();
+        showSimSpeech(randomItem(ITEM_PHRASES.house), 2500, true);
+        scheduleSimBehavior(3200);
       } else {
         setSimState('idle');
-        showSimSpeech('✨', 1800);
+        showSimSpeech('✨', 1800, true);
         scheduleSimBehavior(2000);
       }
     }
@@ -243,11 +267,16 @@
 
     function setSimState(next) {
       simState = next;
-      const assetKey = (!simPlayMode && (next === 'idle' || next === 'sleep')) ? 'sleep' : next;
+      let assetKey = next;
+      if (simCurrentItem === 'house') {
+        assetKey = 'front';
+      } else if (!simPlayMode && (next === 'idle' || next === 'sleep')) {
+        assetKey = 'sleep';
+      }
       if (ASSETS[assetKey]) {
         simImg.src = ASSETS[assetKey];
       }
-      simSprite.className = `sim-bunny-sprite ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' ? 'curious' : next === 'happy' ? 'happy' : ''}`;
+      simSprite.className = `sim-bunny-sprite ${simCurrentItem === 'house' ? 'inside-house' : ''} ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' || next === 'beg' ? 'curious' : next === 'happy' ? 'happy' : next === 'angry' ? 'angry' : ''}`;
     }
 
     function hideSimSpeech() {
@@ -256,8 +285,8 @@
       simSpeech.classList.add('hidden');
     }
 
-    function showSimSpeech(text, duration = 2000) {
-      if (!simPlayMode) return;
+    function showSimSpeech(text, duration = 2000, force = false) {
+      if (!simPlayMode && !force) return;
       if (simSpeechTimer) clearTimeout(simSpeechTimer);
       simSpeechText.textContent = text;
       simSpeech.classList.remove('hidden');
@@ -285,6 +314,7 @@
     }
 
     function startSimWalking() {
+      if (simCurrentItem === 'house') return;
       stopSimWalking();
       if (Math.random() < 0.3) {
         simDirection *= -1;
@@ -336,6 +366,13 @@
 
         stopSimWalking();
 
+        if (simCurrentItem === 'house') {
+          setSimState('front');
+          if (Math.random() < 0.25) floatSimHeart();
+          scheduleSimBehavior(randomBetween(4000, 8000));
+          return;
+        }
+
         if (!simPlayMode) {
           setSimState('idle');
           const roll = Math.random();
@@ -348,17 +385,25 @@
         }
 
         const roll = Math.random();
-        if (roll < 0.38) {
+        if (roll < 0.35) {
           setSimState('idle');
           scheduleSimBehavior(randomBetween(3500, 6000));
-        } else if (roll < 0.68) {
+        } else if (roll < 0.65) {
           setSimState('walk');
           startSimWalking();
           scheduleSimBehavior(randomBetween(3500, 7000));
-        } else if (roll < 0.82) {
+        } else if (roll < 0.77) {
           setSimState('stand');
           scheduleSimBehavior(randomBetween(2500, 4500));
-        } else if (roll < 0.94) {
+        } else if (roll < 0.86) {
+          setSimState('beg');
+          showSimSpeech(randomItem(BEG_PHRASES), 2600);
+          scheduleSimBehavior(3200);
+        } else if (roll < 0.93) {
+          setSimState('angry');
+          showSimSpeech(randomItem(ANGRY_PHRASES), 2600);
+          scheduleSimBehavior(3200);
+        } else if (roll < 0.97) {
           // 실사 어리둥절 민트!
           setSimState('confused');
           showSimSpeech('❓', 2200);
@@ -373,13 +418,30 @@
     function reactSimPetting() {
       stopSimWalking();
 
+      if (simCurrentItem === 'house') {
+        floatSimHeart();
+        showSimSpeech(randomItem(ITEM_PHRASES.house), 2500, true);
+        scheduleSimBehavior(3000);
+        return;
+      }
+
       if (simCurrentItem === 'doll') {
         simDirection = -1;
         updateSimTransform();
-        setSimState('stand');
+        setSimState('angry');
         playPopSound();
-        showSimSpeech(randomItem(ITEM_PHRASES.doll), 2600);
+        showSimSpeech(randomItem(ITEM_PHRASES.doll), 2600, true);
         scheduleSimBehavior(3000);
+        return;
+      }
+
+      if (simCurrentItem === 'hay') {
+        simDirection = 1;
+        updateSimTransform();
+        setSimState('beg');
+        floatSimHeart();
+        showSimSpeech(randomItem(ITEM_PHRASES.hay), 2500, true);
+        scheduleSimBehavior(2800);
         return;
       }
 
@@ -394,10 +456,8 @@
       setTimeout(floatSimHeart, 180);
 
       let phrase;
-      if (simCurrentItem === 'hay') phrase = randomItem(ITEM_PHRASES.hay);
-      else if (simCurrentItem === 'chair') phrase = randomItem(ITEM_PHRASES.chair);
+      if (simCurrentItem === 'chair') phrase = randomItem(ITEM_PHRASES.chair);
       else if (simCurrentItem === 'bag') phrase = randomItem(ITEM_PHRASES.bag);
-      else if (simCurrentItem === 'house') phrase = randomItem(ITEM_PHRASES.house);
       else phrase = randomItem(PET_PHRASES);
 
       showSimSpeech(phrase, 2200);
@@ -598,7 +658,7 @@
     function setSandboxState(state, message) {
       currentState = state;
       sandboxImg.src = ASSETS[state] || ASSETS.idle;
-      sandboxImg.className = state === 'confused' ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
+      sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
 
       stateBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.state === state);
@@ -621,14 +681,20 @@
         btn.classList.toggle('active', btn.dataset.item === item);
       });
 
+      if (item === 'house') {
+        sandboxPet.classList.add('inside-house');
+      } else {
+        sandboxPet.classList.remove('inside-house');
+      }
+
       if (item === 'doll') {
         sandboxImg.style.transform = 'scaleX(-1)';
-        setSandboxState('stand');
+        setSandboxState('angry');
         playPopSound();
         showSandboxSpeech(randomItem(ITEM_PHRASES.doll), 2600);
       } else if (item === 'hay') {
         sandboxImg.style.transform = 'scaleX(1)';
-        setSandboxState('happy');
+        setSandboxState('beg');
         floatSandboxHeart();
         showSandboxSpeech(randomItem(ITEM_PHRASES.hay), 2500);
       } else if (item === 'chair') {
@@ -642,7 +708,8 @@
         showSandboxSpeech(randomItem(ITEM_PHRASES.bag), 2500);
       } else if (item === 'house') {
         sandboxImg.style.transform = '';
-        setSandboxState('idle');
+        setSandboxState('front');
+        floatSandboxHeart();
         showSandboxSpeech(randomItem(ITEM_PHRASES.house), 2500);
       } else {
         sandboxImg.style.transform = '';
@@ -675,11 +742,24 @@
     }
 
     function triggerSandboxPetting() {
+      if (sandboxCurrentItem === 'house') {
+        floatSandboxHeart();
+        showSandboxSpeech(randomItem(ITEM_PHRASES.house), 2500);
+        return;
+      }
       if (sandboxCurrentItem === 'doll') {
         sandboxImg.style.transform = 'scaleX(-1)';
-        setSandboxState('stand');
+        setSandboxState('angry');
         playPopSound();
         showSandboxSpeech(randomItem(ITEM_PHRASES.doll), 2600);
+        if (sandboxHint) sandboxHint.style.opacity = '0';
+        return;
+      }
+      if (sandboxCurrentItem === 'hay') {
+        sandboxImg.style.transform = 'scaleX(1)';
+        setSandboxState('beg');
+        floatSandboxHeart();
+        showSandboxSpeech(randomItem(ITEM_PHRASES.hay), 2500);
         if (sandboxHint) sandboxHint.style.opacity = '0';
         return;
       }
@@ -688,10 +768,8 @@
       setTimeout(floatSandboxHeart, 190);
 
       let phrase;
-      if (sandboxCurrentItem === 'hay') phrase = randomItem(ITEM_PHRASES.hay);
-      else if (sandboxCurrentItem === 'chair') phrase = randomItem(ITEM_PHRASES.chair);
+      if (sandboxCurrentItem === 'chair') phrase = randomItem(ITEM_PHRASES.chair);
       else if (sandboxCurrentItem === 'bag') phrase = randomItem(ITEM_PHRASES.bag);
-      else if (sandboxCurrentItem === 'house') phrase = randomItem(ITEM_PHRASES.house);
       else phrase = randomItem(PET_PHRASES);
 
       showSandboxSpeech(phrase, 2200);
@@ -740,6 +818,9 @@
       walk: '🐾',
       stand: '❓',
       confused: '👀',
+      beg: '🌾',
+      angry: '💢',
+      front: '🐰',
       happy: '💖',
       sleep: '💤'
     };

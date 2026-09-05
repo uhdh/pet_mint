@@ -173,17 +173,40 @@ namespace BunnyPet
                 var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window.ReactToPetting(); });
                 menu.Items.Add(petItem);
 
-                var confusedItem = new Forms.ToolStripMenuItem("👀 어리둥절 민트 보기 (실사 영상)", null, delegate
+                var poseMenu = new Forms.ToolStripMenuItem("📸 민트 특별 포즈 (Special Poses)");
+
+                var begItem = new Forms.ToolStripMenuItem("🌾 간식 내놔! 민트 (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Beg);
+                });
+                poseMenu.DropDownItems.Add(begItem);
+
+                var angryItem = new Forms.ToolStripMenuItem("💢 화났어! 민트 (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Angry);
+                });
+                poseMenu.DropDownItems.Add(angryItem);
+
+                var frontItem = new Forms.ToolStripMenuItem("🐰 똘망똘망 민트 (정면 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Front);
+                });
+                poseMenu.DropDownItems.Add(frontItem);
+
+                var confusedItem = new Forms.ToolStripMenuItem("👀 어리둥절 민트 (실사 영상)", null, delegate
                 {
                     if (window != null)
                     {
+                        if (window.CurrentItem == BunnyItem.House) window.SetItem(BunnyItem.None);
                         window.PlayConfusedAnimation(() =>
                         {
                             window.ResetVisualToIdle();
                         });
                     }
                 });
-                menu.Items.Add(confusedItem);
+                poseMenu.DropDownItems.Add(confusedItem);
+
+                menu.Items.Add(poseMenu);
                 menu.Items.Add(new Forms.ToolStripSeparator());
 
                 var itemsMenu = new Forms.ToolStripMenuItem("🎁 민트에게 선물하기");

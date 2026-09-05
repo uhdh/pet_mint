@@ -48,10 +48,10 @@
                 <ScaleTransform x:Name="DirectionTransform" ScaleX="-1" ScaleY="1" />
             </Grid.RenderTransform>
             <Image x:Name="BunnyImage"
-                   Width="97" Height="88"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Bottom"
                    Stretch="Uniform"
                    StretchDirection="Both"
-                   VerticalAlignment="Bottom"
                    Source="/Assets/bunny-sleep.png"
                    RenderTransformOrigin="0.5,1"
                    IsHitTestVisible="False" />

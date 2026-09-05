@@ -575,6 +575,16 @@ img {
 .sim-bunny-sprite.facing-left {
   transform: scaleX(-1);
 }
+.sim-bunny-sprite.inside-house {
+  width: 48px;
+  height: 54px;
+  margin: 0 auto 19px auto;
+}
+.sandbox-pet.inside-house {
+  width: 58px;
+  height: 64px;
+  margin: 0 auto 23px auto;
+}
 
 /* 시뮬레이터 말풍선 */
 .sim-speech {

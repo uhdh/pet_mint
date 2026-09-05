@@ -1,0 +1,267 @@
+<Window x:Class="BunnyPet.DashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🌸 민트 케어 대시보드 &amp; 설정"
+        Width="540" Height="680"
+        MinWidth="500" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="#FAF7F2"
+        Icon="/Assets/icon.ico"
+        ShowInTaskbar="True"
+        FontFamily="Malgun Gothic, Segoe UI, sans-serif">
+
+    <Window.Resources>
+        <!-- 부드러운 탭 스타일 -->
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabBorder" CornerRadius="8,8,0,0" Padding="14,8" Margin="0,0,4,0" Background="#ECE7DF" BorderBrush="#DFD8CE" BorderThickness="1,1,1,0">
+                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="#FFFFFF" />
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#E2DACF" />
+                                <Setter Property="Foreground" Value="#D85A6E" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="Foreground" Value="#6B635C" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 세련된 버튼 스타일 -->
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Background" Value="#FFF0F2" />
+            <Setter Property="Foreground" Value="#C03A50" />
+            <Setter Property="BorderBrush" Value="#F7BDC6" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#FFE0E5" />
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#F28C9D" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#FCD2D8" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#F5F3EF" />
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#E5E0D8" />
+                                <Setter Property="Foreground" Value="#AFA9A0" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 보조 버튼 스타일 -->
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="#F4EFEA" />
+            <Setter Property="Foreground" Value="#524A42" />
+            <Setter Property="BorderBrush" Value="#DCD5CC" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- 상단 프로필 & 호감도 게이지 카드 -->
+            <RowDefinition Height="*" />    <!-- 메인 탭 컨텐츠 -->
+            <RowDefinition Height="Auto" /> <!-- 하단 정보 & 닫기 바 -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. 프로필 & 호감도 대시보드 카드 -->
+        <Border Grid.Row="0" Background="#FFFFFF" CornerRadius="14" BorderBrush="#EFE7DD" BorderThickness="1" Padding="16" Margin="0,0,0,14">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="12" Direction="270" ShadowDepth="2" Opacity="0.05" Color="#4A3B32" />
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 아바타 원형 -->
+                <Border Grid.Column="0" Width="72" Height="72" CornerRadius="36" Background="#FFF2F4" BorderBrush="#FCD5DB" BorderThickness="2" Margin="0,0,16,0" VerticalAlignment="Center">
+                    <Image x:Name="ImgAvatar" Source="/Assets/bunny-happy.png" Width="56" Height="56" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+                </Border>
+
+                <!-- 상태 및 게이지 -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="민트 (Mint 🐰)" FontSize="17" FontWeight="Bold" Foreground="#2C2623" VerticalAlignment="Center" />
+                            <Border Margin="8,0,0,0" Background="#E7F7F0" CornerRadius="6" Padding="6,2">
+                                <TextBlock x:Name="TxtModeStatus" Text="멈춤 상태 🍞" FontSize="11" FontWeight="Bold" Foreground="#257B57" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" x:Name="TxtLevelName" Text="Lv.2 마음을 여는 민트 🌸" FontSize="12" FontWeight="SemiBold" Foreground="#D85A6E" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- 호감도 바 & 점수 -->
+                    <Grid Margin="0,2,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="💖 친밀도 / 호감도" FontSize="11.5" Foreground="#6E645D" />
+                        <TextBlock Grid.Column="1" x:Name="TxtAffinityScore" Text="15 / 100점" FontSize="12" FontWeight="Bold" Foreground="#D85A6E" />
+                    </Grid>
+
+                    <Border Height="14" CornerRadius="7" Background="#F0ECE4" BorderBrush="#E5DFD5" BorderThickness="1" Margin="0,0,0,6" ClipToBounds="True">
+                        <ProgressBar x:Name="ProgressAffinity" Minimum="0" Maximum="100" Value="15" BorderThickness="0" Background="Transparent" Foreground="#F2778A" />
+                    </Border>
+
+                    <!-- 다음 해금 알림 -->
+                    <Border Background="#FFF9F5" CornerRadius="6" Padding="8,4" BorderBrush="#FEEADF" BorderThickness="1">
+                        <TextBlock x:Name="TxtNextUnlock" Text="💡 다음 해금: 세수하기 (15점) 🧼" FontSize="11.5" Foreground="#7D5F4A" TextTrimming="CharacterEllipsis" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. 메인 탭 컨텐츠 -->
+        <Border Grid.Row="1" Background="#FFFFFF" CornerRadius="12" BorderBrush="#EFE7DD" BorderThickness="1" Padding="10">
+            <TabControl Background="Transparent" BorderThickness="0">
+                <!-- 탭 1: 특별 포즈 도감 -->
+                <TabItem Header="📸 특별 포즈 도감">
+                    <Grid Margin="4,10,4,4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="호감도를 올려 민트의 귀여운 실사 행동들을 해금하고 감상해보세요!" FontSize="12" Foreground="#857C74" Margin="2,0,0,10" />
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="PanelPoses" />
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <!-- 탭 2: 선물 보관함 -->
+                <TabItem Header="🎁 선물 보관함">
+                    <Grid Margin="4,10,4,4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="민트에게 맛있는 간식이나 편안한 소품을 선물하고 반응을 살펴보세요!" FontSize="12" Foreground="#857C74" Margin="2,0,0,10" />
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="PanelItems" />
+                        </ScrollViewer>
+                        <Border Grid.Row="2" Margin="0,10,0,0" Padding="0,8,0,0" BorderBrush="#F0ECE4" BorderThickness="0,1,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="❌ 장착 중인 모든 아이템 치우기" HorizontalAlignment="Right" Click="OnClearItemClick" />
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <!-- 탭 3: 시스템 설정 -->
+                <TabItem Header="⚙️ 시스템 설정">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="6,10,6,6">
+                        <StackPanel>
+                            <TextBlock Text="🖥️ 화면 및 실행 옵션" FontSize="14" FontWeight="Bold" Foreground="#3B342E" Margin="0,0,0,12" />
+
+                            <Border Background="#FAF7F2" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="📌 항상 위에 표시 (Always on Top)" FontWeight="SemiBold" FontSize="13" Foreground="#2C2623" />
+                                        <TextBlock Text="다른 작업창에 가려지지 않고 언제나 화면 최상단에 민트가 보입니다." FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" x:Name="ChkAlwaysOnTop" VerticalAlignment="Center" Click="OnAlwaysOnTopChanged" />
+                                </Grid>
+                            </Border>
+
+                            <Border Background="#FAF7F2" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="🚀 윈도우 시작 시 자동 실행 (Auto Start)" FontWeight="SemiBold" FontSize="13" Foreground="#2C2623" />
+                                        <TextBlock Text="컴퓨터를 켤 때 자동으로 민트 키우기 앱을 실행합니다." FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" x:Name="ChkAutoStart" VerticalAlignment="Center" Click="OnAutoStartChanged" />
+                                </Grid>
+                            </Border>
+
+                            <Border Background="#FAF7F2" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="🍵 20분마다 눈/목 휴식 알림 (Rest Reminders)" FontWeight="SemiBold" FontSize="13" Foreground="#2C2623" />
+                                        <TextBlock Text="장시간 컴퓨터 작업 시 민트가 기지개를 켜며 가벼운 휴식을 권장합니다." FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" x:Name="ChkRestReminders" VerticalAlignment="Center" Click="OnRestRemindersChanged" />
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="🔧 간편 조작 및 데이터" FontSize="14" FontWeight="Bold" Foreground="#3B342E" Margin="0,10,0,12" />
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Style="{StaticResource SecondaryButton}" Content="↩ 오른쪽 아래로 부르기" Margin="0,0,5,0" Click="OnResetPositionClick" />
+                                <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" x:Name="BtnTogglePlay" Content="🎉 놀자! 모드 전환" Margin="5,0,0,0" Click="OnTogglePlayModeClick" />
+                            </Grid>
+
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Style="{StaticResource SecondaryButton}" Content="💾 설정 백업하기..." Margin="0,0,5,0" Click="OnBackupSettingsClick" />
+                                <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="📂 설정 복원하기..." Margin="5,0,0,0" Click="OnRestoreSettingsClick" />
+                            </Grid>
+
+                            <!-- 단축키 가이드 -->
+                            <Border Background="#F9F6F0" CornerRadius="8" Padding="12" BorderBrush="#EAE3D8" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="⌨️ 주요 조작 단축키" FontWeight="Bold" FontSize="12" Foreground="#4A3F35" Margin="0,0,0,6" />
+                                    <TextBlock Text="• 클릭 / 문지르기 : 민트 쓰다듬기 (호감도 +1, 하트 퐁퐁)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="• 마우스 더블클릭 : 놀자! (움직이기) / 나대지마 (멈추기) 토글" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="• 드래그 : 원하는 화면 위치로 이동" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="• Esc 키 : 화면 오른쪽 아래 기본 위치로 즉시 복귀" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </Border>
+
+        <!-- 3. 하단 바 -->
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+            <TextBlock Text="💖 민트와 함께하는 힐링 데스크톱 친구" FontSize="11.5" Foreground="#9C938A" VerticalAlignment="Center" />
+            <Button Style="{StaticResource ActionButton}" Content="창 닫기" Width="76" Height="30" HorizontalAlignment="Right" Click="OnCloseClick" />
+        </Grid>
+    </Grid>
+</Window>

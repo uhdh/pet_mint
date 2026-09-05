@@ -139,6 +139,7 @@ namespace BunnyPet
         private int confusedFrameIndex = 0;
         private bool isPlayingConfusedAnim = false;
         private Action confusedCompletedCallback = null;
+        private DashboardWindow dashboardWindow;
 
         public bool ExitOnClose { get; set; }
 
@@ -213,6 +214,11 @@ namespace BunnyPet
             StopConfusedAnimation();
             confusedFrames.Clear();
             Hearts.Children.Clear();
+            if (dashboardWindow != null)
+            {
+                try { dashboardWindow.Close(); } catch { }
+                dashboardWindow = null;
+            }
         }
 
         public bool IsPlayMode => machine.PlayMode;
@@ -277,6 +283,26 @@ namespace BunnyPet
         public void SetAffinity(int val)
         {
             affinity = Math.Max(0, Math.Min(100, val));
+        }
+
+        public void OpenDashboard()
+        {
+            if (dashboardWindow != null && dashboardWindow.IsLoaded)
+            {
+                if (dashboardWindow.WindowState == WindowState.Minimized)
+                {
+                    dashboardWindow.WindowState = WindowState.Normal;
+                }
+                dashboardWindow.Activate();
+                dashboardWindow.RefreshAll();
+                return;
+            }
+
+            var app = Application.Current as App;
+            var appSettings = app != null ? app.CurrentSettings : AppSettings.Load();
+            dashboardWindow = new DashboardWindow(this, appSettings);
+            dashboardWindow.Show();
+            dashboardWindow.Activate();
         }
 
         public void AddAffinity(int delta)
@@ -1575,23 +1601,6 @@ namespace BunnyPet
             var menu = new ContextMenu();
             menu.PlacementTarget = this;
 
-            var affinityHeaderItem = new MenuItem
-            {
-                Header = $"💖 민트와의 호감도: {affinity}점 ({BunnyProgression.GetLevelName(affinity)})",
-                FontWeight = FontWeights.Bold,
-                IsEnabled = false
-            };
-            menu.Items.Add(affinityHeaderItem);
-
-            var nextUnlockItem = new MenuItem
-            {
-                Header = $"💡 {BunnyProgression.GetNextUnlockDescription(affinity)}",
-                FontStyle = FontStyles.Italic,
-                IsEnabled = false
-            };
-            menu.Items.Add(nextUnlockItem);
-            menu.Items.Add(new Separator());
-
             var playToggleItem = new MenuItem
             {
                 Header = machine.PlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)",
@@ -1602,35 +1611,42 @@ namespace BunnyPet
                 TogglePlayMode();
             };
             menu.Items.Add(playToggleItem);
-            menu.Items.Add(new Separator());
 
             var petItem = new MenuItem { Header = "🖐️ 민트 쓰다듬기" };
             petItem.Click += delegate { ReactToPetting(); };
             menu.Items.Add(petItem);
 
-            var poseMenu = new MenuItem { Header = "📸 민트 특별 포즈" };
-            AddPoseMenuItem(poseMenu, BunnyState.Binky, "🤸 기분 최고 점프! 빙키 (실사 포즈)", "빙키 점프");
-            AddPoseMenuItem(poseMenu, BunnyState.Kiss, "💋 뽀뽀해주는 래빗키스 (실사 포즈)", "래빗키스");
-            AddPoseMenuItem(poseMenu, BunnyState.Wash, "🧼 손으로 쓱싹 세수하기 (실사 포즈)", "세수하기");
-            AddPoseMenuItem(poseMenu, BunnyState.Flop, "🛌 안심하고 벌러덩 눕기 (실사 포즈)", "벌러덩 눕기");
-            AddPoseMenuItem(poseMenu, BunnyState.Beg, "🌾 간식 내놔! 민트 (실사 포즈)", "간식 내놔");
-            AddPoseMenuItem(poseMenu, BunnyState.Angry, "💢 화났어! 민트 (실사 포즈)", "화났어");
-            AddPoseMenuItem(poseMenu, BunnyState.Front, "🐰 똘망똘망 민트 (정면 포즈)", "정면 포즈");
-            AddPoseMenuItem(poseMenu, BunnyState.Confused, "👀 어리둥절 민트 (실사 영상)", "어리둥절 영상");
+            var hayQuickItem = new MenuItem { Header = "🌾 맛있는 건초 주기 (+2)" };
+            hayQuickItem.Click += delegate
+            {
+                SetItem(BunnyItem.Hay);
+            };
+            menu.Items.Add(hayQuickItem);
 
-            var introItem = new MenuItem { Header = "✨ 천사 민트 등장! (실사 포즈)" };
+            menu.Items.Add(new Separator());
+
+            var poseMenu = new MenuItem { Header = "📸 특별 포즈 ▶" };
+            AddPoseMenuItem(poseMenu, BunnyState.Binky, "🤸 빙키 점프", "빙키 점프");
+            AddPoseMenuItem(poseMenu, BunnyState.Kiss, "💋 래빗키스 뽀뽀", "래빗키스");
+            AddPoseMenuItem(poseMenu, BunnyState.Wash, "🧼 세수하기", "세수하기");
+            AddPoseMenuItem(poseMenu, BunnyState.Flop, "🛌 벌러덩 눕기", "벌러덩");
+            AddPoseMenuItem(poseMenu, BunnyState.Beg, "🌾 간식 내놔!", "간식 내놔");
+            AddPoseMenuItem(poseMenu, BunnyState.Angry, "💢 화났어!", "화났어");
+            AddPoseMenuItem(poseMenu, BunnyState.Front, "🐰 똘망똘망 정면", "정면");
+            AddPoseMenuItem(poseMenu, BunnyState.Confused, "👀 어리둥절 영상", "어리둥절");
+
+            var introItem = new MenuItem { Header = "✨ 천사 민트 등장" };
             introItem.Click += delegate { PlayIntroGreeting(); };
             poseMenu.Items.Add(introItem);
 
             menu.Items.Add(poseMenu);
-            menu.Items.Add(new Separator());
 
-            var itemsMenu = new MenuItem { Header = "🎁 민트에게 선물하기" };
-            AddGiftMenuItem(itemsMenu, BunnyItem.Hay, "🌾 맛있는 건초 주기", "건초");
-            AddGiftMenuItem(itemsMenu, BunnyItem.Chair, "🪑 작은 의자 놓기", "작은 의자");
-            AddGiftMenuItem(itemsMenu, BunnyItem.Doll, "🧸 토끼 인형 놓기", "토끼 인형");
-            AddGiftMenuItem(itemsMenu, BunnyItem.Bag, "🎒 소풍 가방 메어주기", "소풍 가방");
-            AddGiftMenuItem(itemsMenu, BunnyItem.House, "🏠 아늑한 집 지어주기", "아늑한 집");
+            var itemsMenu = new MenuItem { Header = "🎁 아이템 선물 ▶" };
+            AddGiftMenuItem(itemsMenu, BunnyItem.Hay, "🌾 맛있는 건초", "건초");
+            AddGiftMenuItem(itemsMenu, BunnyItem.Chair, "🪑 작은 의자", "작은 의자");
+            AddGiftMenuItem(itemsMenu, BunnyItem.Doll, "🧸 토끼 인형", "토끼 인형");
+            AddGiftMenuItem(itemsMenu, BunnyItem.Bag, "🎒 소풍 가방", "소풍 가방");
+            AddGiftMenuItem(itemsMenu, BunnyItem.House, "🏠 아늑한 집", "아늑한 집");
 
             itemsMenu.Items.Add(new Separator());
 
@@ -1641,12 +1657,18 @@ namespace BunnyPet
             menu.Items.Add(itemsMenu);
             menu.Items.Add(new Separator());
 
-            var topItem = new MenuItem { Header = "📌 항상 위에 표시", IsCheckable = true, IsChecked = Topmost };
-            topItem.Click += delegate
+            var dashboardItem = new MenuItem
             {
-                SetAlwaysOnTop(topItem.IsChecked);
+                Header = "🌸 민트 대시보드 및 설정...",
+                FontWeight = FontWeights.SemiBold
             };
-            menu.Items.Add(topItem);
+            dashboardItem.Click += delegate
+            {
+                OpenDashboard();
+            };
+            menu.Items.Add(dashboardItem);
+
+            menu.Items.Add(new Separator());
 
             var resetItem = new MenuItem { Header = "↩ 민트 자리로 부르기 (오른쪽 아래)" };
             resetItem.Click += delegate
@@ -1655,8 +1677,6 @@ namespace BunnyPet
                 PlayIntroGreeting();
             };
             menu.Items.Add(resetItem);
-
-            menu.Items.Add(new Separator());
 
             var quitItem = new MenuItem { Header = "👋 민트 재우기 (종료)" };
             quitItem.Click += delegate

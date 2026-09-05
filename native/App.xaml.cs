@@ -22,6 +22,7 @@ namespace BunnyPet
         private Forms.ToolStripMenuItem playToggleItem;
         private Forms.ToolStripMenuItem visibilityItem;
         private AppSettings settings;
+        public AppSettings CurrentSettings => settings;
         private bool quitting;
         private bool showPending;
 
@@ -166,12 +167,6 @@ namespace BunnyPet
             {
                 var menu = new Forms.ContextMenuStrip();
 
-                var affinityItem = new Forms.ToolStripMenuItem { Enabled = false };
-                var nextUnlockItem = new Forms.ToolStripMenuItem { Enabled = false };
-                menu.Items.Add(affinityItem);
-                menu.Items.Add(nextUnlockItem);
-                menu.Items.Add(new Forms.ToolStripSeparator());
-
                 playToggleItem = new Forms.ToolStripMenuItem(window != null && window.IsPlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)");
                 playToggleItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
                 playToggleItem.Click += delegate
@@ -179,80 +174,53 @@ namespace BunnyPet
                     if (window != null) window.TogglePlayMode();
                 };
                 menu.Items.Add(playToggleItem);
-                menu.Items.Add(new Forms.ToolStripSeparator());
 
-                var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window.ReactToPetting(); });
+                var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window?.ReactToPetting(); });
                 menu.Items.Add(petItem);
+
+                var hayQuickItem = new Forms.ToolStripMenuItem("🌾 맛있는 건초 주기 (+2)", null, delegate { window?.SetItem(BunnyItem.Hay); });
+                menu.Items.Add(hayQuickItem);
+
+                menu.Items.Add(new Forms.ToolStripSeparator());
 
                 var poseMenu = new Forms.ToolStripMenuItem("📸 민트 특별 포즈 (Special Poses)");
 
-                var binkyItem = new Forms.ToolStripMenuItem("🤸 기분 최고 점프! 빙키 (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Binky);
-                });
+                var binkyItem = new Forms.ToolStripMenuItem("🤸 기분 최고 점프! 빙키", null, delegate { window?.TriggerPose(BunnyState.Binky); });
                 poseMenu.DropDownItems.Add(binkyItem);
 
-                var kissItem = new Forms.ToolStripMenuItem("💋 뽀뽀해주는 래빗키스 (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Kiss);
-                });
+                var kissItem = new Forms.ToolStripMenuItem("💋 뽀뽀해주는 래빗키스", null, delegate { window?.TriggerPose(BunnyState.Kiss); });
                 poseMenu.DropDownItems.Add(kissItem);
 
-                var washItem = new Forms.ToolStripMenuItem("🧼 손으로 쓱싹 세수하기 (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Wash);
-                });
+                var washItem = new Forms.ToolStripMenuItem("🧼 손으로 쓱싹 세수하기", null, delegate { window?.TriggerPose(BunnyState.Wash); });
                 poseMenu.DropDownItems.Add(washItem);
 
-                var flopItem = new Forms.ToolStripMenuItem("🛌 안심하고 벌러덩 눕기 (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Flop);
-                });
+                var flopItem = new Forms.ToolStripMenuItem("🛌 안심하고 벌러덩 눕기", null, delegate { window?.TriggerPose(BunnyState.Flop); });
                 poseMenu.DropDownItems.Add(flopItem);
 
-                var begItem = new Forms.ToolStripMenuItem("🌾 간식 내놔! 민트 (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Beg);
-                });
+                var begItem = new Forms.ToolStripMenuItem("🌾 간식 내놔!", null, delegate { window?.TriggerPose(BunnyState.Beg); });
                 poseMenu.DropDownItems.Add(begItem);
 
-                var angryItem = new Forms.ToolStripMenuItem("💢 화났어! 민트 (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Angry);
-                });
+                var angryItem = new Forms.ToolStripMenuItem("💢 화났어!", null, delegate { window?.TriggerPose(BunnyState.Angry); });
                 poseMenu.DropDownItems.Add(angryItem);
 
-                var frontItem = new Forms.ToolStripMenuItem("🐰 똘망똘망 민트 (정면 포즈)", null, delegate
-                {
-                    if (window != null) window.TriggerPose(BunnyState.Front);
-                });
+                var frontItem = new Forms.ToolStripMenuItem("🐰 똘망똘망 정면 포즈", null, delegate { window?.TriggerPose(BunnyState.Front); });
                 poseMenu.DropDownItems.Add(frontItem);
 
-                var confusedItem = new Forms.ToolStripMenuItem("👀 어리둥절 민트 (실사 영상)", null, delegate
-                {
-                    if (window != null)
-                    {
-                        window.TriggerPose(BunnyState.Confused);
-                    }
-                });
+                var confusedItem = new Forms.ToolStripMenuItem("👀 어리둥절 실사 영상", null, delegate { window?.TriggerPose(BunnyState.Confused); });
                 poseMenu.DropDownItems.Add(confusedItem);
 
-                var introItem = new Forms.ToolStripMenuItem("✨ 천사 민트 등장! (실사 포즈)", null, delegate
-                {
-                    if (window != null) window.PlayIntroGreeting();
-                });
+                var introItem = new Forms.ToolStripMenuItem("✨ 천사 민트 등장", null, delegate { window?.PlayIntroGreeting(); });
                 poseMenu.DropDownItems.Add(introItem);
 
                 menu.Items.Add(poseMenu);
-                menu.Items.Add(new Forms.ToolStripSeparator());
 
                 var itemsMenu = new Forms.ToolStripMenuItem("🎁 민트에게 선물하기");
-                var hayItem = new Forms.ToolStripMenuItem("🌾 맛있는 건초 (Hay)", null, delegate { window.SetItem(BunnyItem.Hay); });
-                var chairItem = new Forms.ToolStripMenuItem("🪑 작은 의자 (Chair)", null, delegate { window.SetItem(BunnyItem.Chair); });
-                var dollItem = new Forms.ToolStripMenuItem("🧸 토끼 인형 (Plush Doll)", null, delegate { window.SetItem(BunnyItem.Doll); });
-                var bagItem = new Forms.ToolStripMenuItem("🎒 소풍 가방 (Backpack)", null, delegate { window.SetItem(BunnyItem.Bag); });
-                var houseItem = new Forms.ToolStripMenuItem("🏠 아늑한 집 (House)", null, delegate { window.SetItem(BunnyItem.House); });
-                var clearItem = new Forms.ToolStripMenuItem("❌ 아이템 치우기 (Remove Item)", null, delegate { window.SetItem(BunnyItem.None); });
+                var hayItem = new Forms.ToolStripMenuItem("🌾 맛있는 건초 (Hay)", null, delegate { window?.SetItem(BunnyItem.Hay); });
+                var chairItem = new Forms.ToolStripMenuItem("🪑 작은 의자 (Chair)", null, delegate { window?.SetItem(BunnyItem.Chair); });
+                var dollItem = new Forms.ToolStripMenuItem("🧸 토끼 인형 (Plush Doll)", null, delegate { window?.SetItem(BunnyItem.Doll); });
+                var bagItem = new Forms.ToolStripMenuItem("🎒 소풍 가방 (Backpack)", null, delegate { window?.SetItem(BunnyItem.Bag); });
+                var houseItem = new Forms.ToolStripMenuItem("🏠 아늑한 집 (House)", null, delegate { window?.SetItem(BunnyItem.House); });
+                var clearItem = new Forms.ToolStripMenuItem("❌ 아이템 치우기 (Remove Item)", null, delegate { window?.SetItem(BunnyItem.None); });
 
                 itemsMenu.DropDownItems.Add(hayItem);
                 itemsMenu.DropDownItems.Add(chairItem);
@@ -262,22 +230,18 @@ namespace BunnyPet
                 itemsMenu.DropDownItems.Add(new Forms.ToolStripSeparator());
                 itemsMenu.DropDownItems.Add(clearItem);
                 menu.Items.Add(itemsMenu);
-                menu.Items.Add(new Forms.ToolStripSeparator());
 
                 menu.Opening += delegate
                 {
                     int aff = window != null ? window.Affinity : settings.Affinity;
-                    affinityItem.Text = $"💖 민트와의 호감도: {aff}점 ({BunnyProgression.GetLevelName(aff)})";
-                    nextUnlockItem.Text = $"💡 {BunnyProgression.GetNextUnlockDescription(aff)}";
-
-                    UpdatePoseItemText(binkyItem, BunnyState.Binky, aff, "🤸 기분 최고 점프! 빙키 (실사 포즈)", "빙키 점프");
-                    UpdatePoseItemText(kissItem, BunnyState.Kiss, aff, "💋 뽀뽀해주는 래빗키스 (실사 포즈)", "래빗키스");
-                    UpdatePoseItemText(washItem, BunnyState.Wash, aff, "🧼 손으로 쓱싹 세수하기 (실사 포즈)", "세수하기");
-                    UpdatePoseItemText(flopItem, BunnyState.Flop, aff, "🛌 안심하고 벌러덩 눕기 (실사 포즈)", "벌러덩 눕기");
-                    UpdatePoseItemText(begItem, BunnyState.Beg, aff, "🌾 간식 내놔! 민트 (실사 포즈)", "간식 내놔");
-                    UpdatePoseItemText(angryItem, BunnyState.Angry, aff, "💢 화났어! 민트 (실사 포즈)", "화났어");
-                    UpdatePoseItemText(frontItem, BunnyState.Front, aff, "🐰 똘망똘망 민트 (정면 포즈)", "정면 포즈");
-                    UpdatePoseItemText(confusedItem, BunnyState.Confused, aff, "👀 어리둥절 민트 (실사 영상)", "어리둥절 영상");
+                    UpdatePoseItemText(binkyItem, BunnyState.Binky, aff, "🤸 기분 최고 점프! 빙키", "빙키 점프");
+                    UpdatePoseItemText(kissItem, BunnyState.Kiss, aff, "💋 뽀뽀해주는 래빗키스", "래빗키스");
+                    UpdatePoseItemText(washItem, BunnyState.Wash, aff, "🧼 손으로 쓱싹 세수하기", "세수하기");
+                    UpdatePoseItemText(flopItem, BunnyState.Flop, aff, "🛌 안심하고 벌러덩 눕기", "벌러덩 눕기");
+                    UpdatePoseItemText(begItem, BunnyState.Beg, aff, "🌾 간식 내놔!", "간식 내놔");
+                    UpdatePoseItemText(angryItem, BunnyState.Angry, aff, "💢 화났어!", "화났어");
+                    UpdatePoseItemText(frontItem, BunnyState.Front, aff, "🐰 똘망똘망 정면 포즈", "정면 포즈");
+                    UpdatePoseItemText(confusedItem, BunnyState.Confused, aff, "👀 어리둥절 실사 영상", "어리둥절 영상");
 
                     UpdateGiftItemText(hayItem, BunnyItem.Hay, aff, "🌾 맛있는 건초 (Hay)", "건초");
                     UpdateGiftItemText(chairItem, BunnyItem.Chair, aff, "🪑 작은 의자 (Chair)", "작은 의자");
@@ -286,45 +250,17 @@ namespace BunnyPet
                     UpdateGiftItemText(houseItem, BunnyItem.House, aff, "🏠 아늑한 집 (House)", "아늑한 집");
                 };
 
-                var topmostItem = new Forms.ToolStripMenuItem("📌 항상 위에 표시 (Always on top)")
-                {
-                    CheckOnClick = true,
-                    Checked = settings.AlwaysOnTop
-                };
-                topmostItem.Click += delegate
-                {
-                    settings.AlwaysOnTop = topmostItem.Checked;
-                    window.SetAlwaysOnTop(settings.AlwaysOnTop);
-                    SaveSettings();
-                };
-                menu.Items.Add(topmostItem);
+                menu.Items.Add(new Forms.ToolStripSeparator());
 
-                var autoStartItem = new Forms.ToolStripMenuItem("🚀 윈도우 시작 시 자동 실행 (Start with Windows)")
+                var dashboardItem = new Forms.ToolStripMenuItem("🌸 민트 대시보드 및 설정...");
+                dashboardItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
+                dashboardItem.Click += delegate
                 {
-                    CheckOnClick = true,
-                    Checked = settings.AutoStart,
-                    Enabled = !IsPackaged()
+                    window?.OpenDashboard();
                 };
-                autoStartItem.Click += delegate
-                {
-                    settings.AutoStart = autoStartItem.Checked;
-                    SetAutoStart(settings.AutoStart);
-                    SaveSettings();
-                };
-                menu.Items.Add(autoStartItem);
+                menu.Items.Add(dashboardItem);
 
-                var restRemindersItem = new Forms.ToolStripMenuItem("🍵 휴식 알림 받기 (Rest reminders)")
-                {
-                    CheckOnClick = true,
-                    Checked = settings.RestRemindersEnabled
-                };
-                restRemindersItem.Click += delegate
-                {
-                    settings.RestRemindersEnabled = restRemindersItem.Checked;
-                    window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
-                    SaveSettings();
-                };
-                menu.Items.Add(restRemindersItem);
+                menu.Items.Add(new Forms.ToolStripSeparator());
 
                 var resetItem = new Forms.ToolStripMenuItem("↩ 민트 자리로 부르기 (Reset position)");
                 resetItem.Click += delegate
@@ -337,19 +273,9 @@ namespace BunnyPet
                 };
                 menu.Items.Add(resetItem);
 
-                menu.Items.Add(new Forms.ToolStripSeparator());
                 visibilityItem = new Forms.ToolStripMenuItem("민트 숨기기 (Hide Mint)");
                 visibilityItem.Click += delegate { ToggleWindow(); };
                 menu.Items.Add(visibilityItem);
-
-                menu.Items.Add(new Forms.ToolStripSeparator());
-                var backupItem = new Forms.ToolStripMenuItem("설정 백업하기 (Backup settings)...");
-                backupItem.Click += delegate { BackupSettings(); };
-                menu.Items.Add(backupItem);
-
-                var restoreItem = new Forms.ToolStripMenuItem("설정 복원하기 (Restore settings)...");
-                restoreItem.Click += delegate { RestoreSettings(topmostItem, autoStartItem, restRemindersItem); };
-                menu.Items.Add(restoreItem);
 
                 menu.Items.Add(new Forms.ToolStripSeparator());
                 var quitItem = new Forms.ToolStripMenuItem("👋 민트 재우기 / 종료 (Quit)");
@@ -406,52 +332,7 @@ namespace BunnyPet
             catch (Exception) { }
         }
 
-        private void BackupSettings()
-        {
-            using (var dialog = new Forms.SaveFileDialog
-            {
-                FileName = "mint-settings.json",
-                Filter = "JSON (*.json)|*.json",
-                DefaultExt = "json"
-            })
-            {
-                if (dialog.ShowDialog() != Forms.DialogResult.OK) return;
-                try { settings.SaveTo(dialog.FileName); }
-                catch (Exception)
-                {
-                    System.Windows.MessageBox.Show("설정을 내보내지 못했습니다.", "민트 키우기");
-                }
-            }
-        }
 
-        private void RestoreSettings(Forms.ToolStripMenuItem topmostItem, Forms.ToolStripMenuItem autoStartItem, Forms.ToolStripMenuItem restRemindersItem)
-        {
-            using (var dialog = new Forms.OpenFileDialog
-            {
-                Filter = "JSON (*.json)|*.json",
-                DefaultExt = "json"
-            })
-            {
-                if (dialog.ShowDialog() != Forms.DialogResult.OK) return;
-                try
-                {
-                    settings = AppSettings.LoadFrom(dialog.FileName);
-                }
-                catch (Exception)
-                {
-                    System.Windows.MessageBox.Show("설정 파일을 읽지 못했습니다.", "민트 키우기");
-                    return;
-                }
-                window.SetAlwaysOnTop(settings.AlwaysOnTop);
-                window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
-                window.SetAffinity(settings.Affinity);
-                if (!IsPackaged()) SetAutoStart(settings.AutoStart);
-                topmostItem.Checked = settings.AlwaysOnTop;
-                autoStartItem.Checked = settings.AutoStart;
-                restRemindersItem.Checked = settings.RestRemindersEnabled;
-                SaveSettings();
-            }
-        }
 
         private static void UpdatePoseItemText(Forms.ToolStripMenuItem item, BunnyState state, int affinity, string fullTitle, string shortTitle)
         {
@@ -498,7 +379,7 @@ namespace BunnyPet
             catch (Exception ex) { Log("ShowWindow exception: " + ex); }
         }
 
-        private static bool IsPackaged()
+        public static bool IsPackagedApp()
         {
             try
             {
@@ -511,9 +392,9 @@ namespace BunnyPet
             }
         }
 
-        private static void SetAutoStart(bool enabled)
+        public static void SetAutoStart(bool enabled)
         {
-            if (IsPackaged()) return;
+            if (IsPackagedApp()) return;
             try
             {
                 using (var key = Registry.CurrentUser.CreateSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run"))

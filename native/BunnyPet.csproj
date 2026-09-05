@@ -30,11 +30,13 @@
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml" />
     <Page Include="MainWindow.xaml" />
+    <Page Include="DashboardWindow.xaml" />
     <Compile Include="BunnyStateMachine.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="GlobalInputWatcher.cs" />
     <Compile Include="App.xaml.cs" />
     <Compile Include="MainWindow.xaml.cs" />
+    <Compile Include="DashboardWindow.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\bunny-happy.png" />

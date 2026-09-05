@@ -96,6 +96,12 @@ namespace BunnyPet
         private DateTime lastCursorReactionUtc = DateTime.MinValue;
         private DateTime lastKeyReactionUtc = DateTime.MinValue;
 
+        private readonly List<BitmapImage> confusedFrames = new List<BitmapImage>();
+        private DispatcherTimer confusedAnimTimer;
+        private int confusedFrameIndex = 0;
+        private bool isPlayingConfusedAnim = false;
+        private Action confusedCompletedCallback = null;
+
         public bool ExitOnClose { get; set; }
 
         public MainWindow()
@@ -137,6 +143,7 @@ namespace BunnyPet
             inputWatcher = new GlobalInputWatcher();
             inputWatcher.KeyPressed += OnGlobalKeyPressed;
             InitEmojiBitmaps();
+            InitConfusedFrames();
             Loaded += OnLoaded;
             Closing += OnClosing;
         }
@@ -155,6 +162,8 @@ namespace BunnyPet
             inputWatcher.KeyPressed -= OnGlobalKeyPressed;
             inputWatcher.Dispose();
             StopAnimation();
+            StopConfusedAnimation();
+            confusedFrames.Clear();
             Hearts.Children.Clear();
         }
 
@@ -315,7 +324,7 @@ namespace BunnyPet
         private void OnBehaviorTick(object sender, EventArgs e)
         {
             behaviorTimer.Stop();
-            if (dragging)
+            if (dragging || isPlayingConfusedAnim)
             {
                 ScheduleBehavior(900);
                 return;
@@ -343,6 +352,15 @@ namespace BunnyPet
 
             StopWalking();
             var next = machine.ChooseNext(random.NextDouble(), DateTime.UtcNow);
+            if (next == BunnyState.Stand && random.NextDouble() < 0.40)
+            {
+                // '놀자' 상태에서 두리번거릴 때 40% 확률로 실사 어리둥절 애니메이션 재생!
+                PlayConfusedAnimation(() =>
+                {
+                    ResetVisualToIdle();
+                });
+                return;
+            }
             SetVisualState(next);
             if (next == BunnyState.Walk) StartWalking();
             ScheduleBehavior(next == BunnyState.Sleep
@@ -443,6 +461,7 @@ namespace BunnyPet
 
         private void StopAnimation()
         {
+            StopConfusedAnimation();
             translate.BeginAnimation(TranslateTransform.YProperty, null);
             rotate.BeginAnimation(RotateTransform.AngleProperty, null);
             scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
@@ -665,6 +684,101 @@ namespace BunnyPet
                 }
                 catch { }
             }
+        }
+
+        private void InitConfusedFrames()
+        {
+            for (int i = 0; i < 46; i++)
+            {
+                try
+                {
+                    var uri = new Uri($"pack://application:,,,/Assets/confused/confused_{i:03d}.png", UriKind.Absolute);
+                    var bmp = new BitmapImage();
+                    bmp.BeginInit();
+                    bmp.UriSource = uri;
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.EndInit();
+                    bmp.Freeze();
+                    confusedFrames.Add(bmp);
+                }
+                catch { }
+            }
+        }
+
+        public void PlayConfusedAnimation(Action onCompleted = null)
+        {
+            if (confusedFrames.Count == 0 || resourcesDisposed)
+            {
+                onCompleted?.Invoke();
+                return;
+            }
+
+            StopAnimation();
+            StopWalking();
+            isPlayingConfusedAnim = true;
+            confusedFrameIndex = 0;
+            confusedCompletedCallback = onCompleted;
+
+            BunnyImage.Source = confusedFrames[0];
+
+            if (machine.PlayMode)
+            {
+                string[] confusedEmojis = { "👀", "❓", "🤔", "😳", "🐰" };
+                ShowMessage(confusedEmojis[random.Next(confusedEmojis.Length)], 3200);
+            }
+
+            if (confusedAnimTimer == null)
+            {
+                confusedAnimTimer = new DispatcherTimer(DispatcherPriority.Render);
+                confusedAnimTimer.Interval = TimeSpan.FromMilliseconds(66);
+                confusedAnimTimer.Tick += OnConfusedAnimTick;
+            }
+            else
+            {
+                confusedAnimTimer.Stop();
+            }
+
+            confusedAnimTimer.Start();
+        }
+
+        private void OnConfusedAnimTick(object sender, EventArgs e)
+        {
+            if (resourcesDisposed || !isPlayingConfusedAnim)
+            {
+                confusedAnimTimer?.Stop();
+                isPlayingConfusedAnim = false;
+                return;
+            }
+
+            confusedFrameIndex++;
+            if (confusedFrameIndex < confusedFrames.Count)
+            {
+                BunnyImage.Source = confusedFrames[confusedFrameIndex];
+            }
+            else
+            {
+                confusedAnimTimer.Stop();
+                isPlayingConfusedAnim = false;
+                var cb = confusedCompletedCallback;
+                confusedCompletedCallback = null;
+                cb?.Invoke();
+            }
+        }
+
+        private void StopConfusedAnimation()
+        {
+            if (isPlayingConfusedAnim)
+            {
+                confusedAnimTimer?.Stop();
+                isPlayingConfusedAnim = false;
+                confusedCompletedCallback = null;
+            }
+        }
+
+        public void ResetVisualToIdle()
+        {
+            SetVisualState(BunnyState.Idle);
+            ScheduleBehavior(RandomBetween(2500, 5000));
         }
 
         private void HideMessage()
@@ -951,6 +1065,16 @@ namespace BunnyPet
             var petItem = new MenuItem { Header = "🖐️ 민트 쓰다듬기" };
             petItem.Click += delegate { ReactToPetting(); };
             menu.Items.Add(petItem);
+
+            var confusedItem = new MenuItem { Header = "👀 어리둥절 민트 보기 (실사 영상)" };
+            confusedItem.Click += delegate
+            {
+                PlayConfusedAnimation(() =>
+                {
+                    ResetVisualToIdle();
+                });
+            };
+            menu.Items.Add(confusedItem);
             menu.Items.Add(new Separator());
 
             var itemsMenu = new MenuItem { Header = "🎁 민트에게 선물하기" };

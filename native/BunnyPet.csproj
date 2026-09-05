@@ -49,6 +49,7 @@
     <Resource Include="Assets\item-house.png" />
     <Resource Include="Assets\item-chair.png" />
     <Resource Include="Assets\emojis\*.png" />
+    <Resource Include="Assets\confused\*.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

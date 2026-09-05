@@ -172,6 +172,18 @@ namespace BunnyPet
 
                 var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window.ReactToPetting(); });
                 menu.Items.Add(petItem);
+
+                var confusedItem = new Forms.ToolStripMenuItem("👀 어리둥절 민트 보기 (실사 영상)", null, delegate
+                {
+                    if (window != null)
+                    {
+                        window.PlayConfusedAnimation(() =>
+                        {
+                            window.ResetVisualToIdle();
+                        });
+                    }
+                });
+                menu.Items.Add(confusedItem);
                 menu.Items.Add(new Forms.ToolStripSeparator());
 
                 var itemsMenu = new Forms.ToolStripMenuItem("🎁 민트에게 선물하기");

@@ -44,7 +44,8 @@
     walk: 'assets/bunny-walk.png',
     stand: 'assets/bunny-stand.png',
     sleep: 'assets/bunny-sleep.png',
-    happy: 'assets/bunny-happy.png'
+    happy: 'assets/bunny-happy.png',
+    confused: 'assets/bunny-confused.gif'
   };
 
   const PET_PHRASES = [
@@ -311,11 +312,11 @@
     function setSimPlayMode(play) {
       simPlayMode = Boolean(play);
       stopSimWalking();
-      const playBtn = document.querySelector('#sim-play-toggle-btn');
-      if (playBtn) {
+      const playBtns = document.querySelectorAll('#sim-play-toggle-btn, #sim-mock-play-btn');
+      playBtns.forEach(playBtn => {
         playBtn.textContent = simPlayMode ? '🛑 나대지마 (멈추기)' : '🎉 놀자! (움직이기)';
         playBtn.classList.toggle('active', simPlayMode);
-      }
+      });
       if (simPlayMode) {
         setSimState('happy');
         floatSimHeart();
@@ -347,16 +348,21 @@
         }
 
         const roll = Math.random();
-        if (roll < 0.45) {
+        if (roll < 0.38) {
           setSimState('idle');
           scheduleSimBehavior(randomBetween(3500, 6000));
-        } else if (roll < 0.78) {
+        } else if (roll < 0.68) {
           setSimState('walk');
           startSimWalking();
           scheduleSimBehavior(randomBetween(3500, 7000));
-        } else if (roll < 0.92) {
+        } else if (roll < 0.82) {
           setSimState('stand');
           scheduleSimBehavior(randomBetween(2500, 4500));
+        } else if (roll < 0.94) {
+          // 실사 어리둥절 민트!
+          setSimState('confused');
+          showSimSpeech('❓', 2200);
+          scheduleSimBehavior(3300);
         } else {
           setSimState('sleep');
           scheduleSimBehavior(randomBetween(7000, 12000));
@@ -537,12 +543,22 @@
       setSimPlayMode(!simPlayMode);
     });
 
-    const simPlayBtn = document.querySelector('#sim-play-toggle-btn');
-    if (simPlayBtn) {
-      simPlayBtn.addEventListener('click', () => {
+    const playBtns = document.querySelectorAll('#sim-play-toggle-btn, #sim-mock-play-btn');
+    playBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
         setSimPlayMode(!simPlayMode);
       });
-    }
+    });
+
+    const confusedBtns = document.querySelectorAll('#sim-confused-btn, #sim-mock-confused-btn');
+    confusedBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('confused');
+        showSimSpeech('❓', 2200);
+        scheduleSimBehavior(3300);
+      });
+    });
 
     // 초기화
     setTimeout(initSimPosition, 300);
@@ -582,7 +598,7 @@
     function setSandboxState(state, message) {
       currentState = state;
       sandboxImg.src = ASSETS[state] || ASSETS.idle;
-      sandboxImg.className = `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
+      sandboxImg.className = state === 'confused' ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
 
       stateBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.state === state);
@@ -723,6 +739,7 @@
       idle: '🤍',
       walk: '🐾',
       stand: '❓',
+      confused: '👀',
       happy: '💖',
       sleep: '💤'
     };

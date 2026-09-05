@@ -221,11 +221,7 @@ namespace BunnyPet
                 {
                     if (window != null)
                     {
-                        if (window.CurrentItem == BunnyItem.House) window.SetItem(BunnyItem.None);
-                        window.PlayConfusedAnimation(() =>
-                        {
-                            window.ResetVisualToIdle();
-                        });
+                        window.TriggerPose(BunnyState.Confused);
                     }
                 });
                 poseMenu.DropDownItems.Add(confusedItem);

@@ -568,6 +568,7 @@ namespace BunnyPet
                 case BunnyState.Kiss: AnimateKiss(); break;
                 case BunnyState.Wash: AnimateWashing(); break;
                 case BunnyState.Flop: AnimateSleeping(); break;
+                case BunnyState.Confused: break;
             }
         }
 
@@ -576,6 +577,10 @@ namespace BunnyPet
             if (currentItem == BunnyItem.House)
             {
                 return "bunny-front.png";
+            }
+            if (state == BunnyState.Confused)
+            {
+                return "confused/confused_000.png";
             }
             if (state == BunnyState.Intro)
             {
@@ -616,6 +621,7 @@ namespace BunnyPet
                 case BunnyState.Kiss: return "bunny-kiss.png";
                 case BunnyState.Wash: return "bunny-wash.png";
                 case BunnyState.Flop: return "bunny-flop.png";
+                case BunnyState.Confused: return "confused/confused_000.png";
                 default: return "bunny-idle.png";
             }
         }
@@ -906,7 +912,7 @@ namespace BunnyPet
             {
                 try
                 {
-                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/confused/confused_{i:03d}.png", UriKind.Absolute);
+                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/confused/confused_{i:D3}.png", UriKind.Absolute);
                     var bmp = new BitmapImage();
                     bmp.BeginInit();
                     bmp.UriSource = uri;
@@ -915,8 +921,12 @@ namespace BunnyPet
                     bmp.Freeze();
                     confusedFrames.Add(bmp);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    App.Log($"InitConfusedFrames frame {i} failed: {ex.Message}");
+                }
             }
+            App.Log($"InitConfusedFrames loaded: {confusedFrames.Count} frames");
         }
 
         public void PlayConfusedAnimation(Action onCompleted = null)
@@ -927,11 +937,13 @@ namespace BunnyPet
                 return;
             }
 
-            if (currentItem == BunnyItem.House)
+            if (currentItem != BunnyItem.None)
             {
                 SetItem(BunnyItem.None);
             }
 
+            machine.SetState(BunnyState.Confused);
+            behaviorTimer.Stop();
             StopAnimation();
             StopWalking();
             DirectionTransform.ScaleX = 1;
@@ -942,7 +954,7 @@ namespace BunnyPet
             BunnyImage.Source = confusedFrames[0];
 
             string[] confusedEmojis = { "👀", "❓", "🤔", "😳", "🐰", "👽" };
-            ShowMessage(confusedEmojis[random.Next(confusedEmojis.Length)], 3200, true);
+            ShowMessage(confusedEmojis[random.Next(confusedEmojis.Length)], 3500, true);
 
             if (confusedAnimTimer == null)
             {
@@ -1006,6 +1018,14 @@ namespace BunnyPet
             if (currentItem == BunnyItem.House)
             {
                 SetItem(BunnyItem.None);
+            }
+            if (state == BunnyState.Confused)
+            {
+                PlayConfusedAnimation(() =>
+                {
+                    ResetVisualToIdle();
+                });
+                return;
             }
             SetVisualState(state);
             switch (state)
@@ -1235,7 +1255,7 @@ namespace BunnyPet
 
         private void OnAwarenessTick(object sender, EventArgs e)
         {
-            if (dragging || !IsVisible || machine.Paused || machine.State == BunnyState.Happy || machine.State == BunnyState.Drag) return;
+            if (dragging || !IsVisible || machine.Paused || machine.State == BunnyState.Happy || machine.State == BunnyState.Drag || machine.State == BunnyState.Confused || isPlayingConfusedAnim) return;
             try
             {
                 var cursorScreen = Forms.Cursor.Position;
@@ -1254,7 +1274,7 @@ namespace BunnyPet
 
         private void CheckAndReactToCursor(double localX, double localY)
         {
-            if (resourcesDisposed || dragging || !IsVisible) return;
+            if (resourcesDisposed || dragging || !IsVisible || isPlayingConfusedAnim || machine.State == BunnyState.Confused) return;
             if (machine.Paused || machine.State == BunnyState.Happy || machine.State == BunnyState.Drag) return;
 
             var now = DateTime.UtcNow;
@@ -1284,6 +1304,7 @@ namespace BunnyPet
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
+            if (isPlayingConfusedAnim || machine.State == BunnyState.Confused) return;
             var pos = e.GetPosition(this);
             CheckAndReactToCursor(pos.X, pos.Y);
         }
@@ -1302,7 +1323,7 @@ namespace BunnyPet
         {
             // ponytail: only Idle/Sleep don't loop-animate the rotate transform,
             // so a twitch there can't fight Walk/Stand/Happy's own rotate animation.
-            if (resourcesDisposed || dragging || !IsVisible) return;
+            if (resourcesDisposed || dragging || !IsVisible || isPlayingConfusedAnim || machine.State == BunnyState.Confused) return;
             if (machine.State != BunnyState.Idle && machine.State != BunnyState.Sleep) return;
             if (DateTime.UtcNow - lastKeyReactionUtc < TimeSpan.FromSeconds(6)) return;
             lastKeyReactionUtc = DateTime.UtcNow;
@@ -1313,6 +1334,14 @@ namespace BunnyPet
         {
             if (e.ChangedButton != MouseButton.Left) return;
             machine.Touch(DateTime.UtcNow);
+
+            if (isPlayingConfusedAnim || machine.State == BunnyState.Confused)
+            {
+                StopConfusedAnimation();
+                ResetVisualToIdle();
+                e.Handled = true;
+                return;
+            }
 
             // 짧은 시간 안에 민트를 많이 눌렀을 때 (연타/괴롭힘) 화난 제스처 발동!
             var now = DateTime.UtcNow;
@@ -1338,6 +1367,7 @@ namespace BunnyPet
 
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
+            if (isPlayingConfusedAnim || machine.State == BunnyState.Confused) return;
             if (!dragging)
             {
                 var pos = e.GetPosition(this);
@@ -1474,11 +1504,7 @@ namespace BunnyPet
             var confusedItem = new MenuItem { Header = "👀 어리둥절 민트 (실사 영상)" };
             confusedItem.Click += delegate
             {
-                if (currentItem == BunnyItem.House) SetItem(BunnyItem.None);
-                PlayConfusedAnimation(() =>
-                {
-                    ResetVisualToIdle();
-                });
+                TriggerPose(BunnyState.Confused);
             };
             poseMenu.Items.Add(confusedItem);
 

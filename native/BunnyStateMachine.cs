@@ -15,7 +15,8 @@ public enum BunnyState
     Binky,
     Kiss,
     Wash,
-    Flop
+    Flop,
+    Confused
 }
 
 public enum BunnyItem

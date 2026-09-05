@@ -110,7 +110,10 @@ namespace BunnyPet
             "🛌", "💤", "🤍", "안전해~ ☁️", "벌러덩~ 😴", "편안해요 🤍", "나른해~ 🌾"
         };
 
-        private int affinity = 15;
+        private int affinity = 10;
+        private readonly DispatcherTimer companionTimer;
+        public event Action<int> AffinityChanged;
+        public int Affinity => affinity;
         private readonly List<DateTime> clickHistory = new List<DateTime>();
 
         private readonly Dictionary<string, BitmapImage> emojiBitmaps = new Dictionary<string, BitmapImage>();
@@ -175,6 +178,15 @@ namespace BunnyPet
             awarenessTimer.Tick += OnAwarenessTick;
             messageTimer = new DispatcherTimer(DispatcherPriority.Normal);
             messageTimer.Tick += OnMessageTimerTick;
+            companionTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromSeconds(120)
+            };
+            companionTimer.Tick += (s, e) =>
+            {
+                if (!resourcesDisposed) AddAffinity(1);
+            };
+            companionTimer.Start();
             inputWatcher = new GlobalInputWatcher();
             inputWatcher.KeyPressed += OnGlobalKeyPressed;
             InitEmojiBitmaps();
@@ -194,6 +206,7 @@ namespace BunnyPet
             restTimer.Stop();
             awarenessTimer.Stop();
             messageTimer.Stop();
+            companionTimer?.Stop();
             inputWatcher.KeyPressed -= OnGlobalKeyPressed;
             inputWatcher.Dispose();
             StopAnimation();
@@ -261,10 +274,82 @@ namespace BunnyPet
             Topmost = value;
         }
 
+        public void SetAffinity(int val)
+        {
+            affinity = Math.Max(0, Math.Min(100, val));
+        }
+
+        public void AddAffinity(int delta)
+        {
+            int oldVal = affinity;
+            affinity = Math.Max(0, Math.Min(100, affinity + delta));
+            if (oldVal != affinity)
+            {
+                CheckUnlockMilestones(oldVal, affinity);
+                AffinityChanged?.Invoke(affinity);
+            }
+        }
+
+        private void CheckUnlockMilestones(int oldVal, int newVal)
+        {
+            if (newVal <= oldVal) return;
+            var milestones = new (int Threshold, string Name)[]
+            {
+                (5, "간식 내놔! 포즈 🌾"),
+                (10, "작은 의자 선물 🪑"),
+                (15, "손으로 세수하기 포즈 🧼"),
+                (20, "화났어! 포즈 💢"),
+                (25, "토끼 인형 선물 🧸"),
+                (30, "래빗키스 뽀뽀 포즈 💋"),
+                (40, "소풍 가방 선물 🎒"),
+                (50, "신나는 점프 빙키 포즈 🤸"),
+                (60, "아늑한 집 선물 🏠"),
+                (70, "어리둥절 실사 영상 포즈 👀"),
+                (85, "안심 벌러덩 눕기 포즈 🛌")
+            };
+
+            string newlyUnlocked = null;
+            foreach (var m in milestones)
+            {
+                if (oldVal < m.Threshold && newVal >= m.Threshold)
+                {
+                    newlyUnlocked = m.Name;
+                }
+            }
+            if (newlyUnlocked != null)
+            {
+                TriggerUnlockCelebration(newlyUnlocked, newVal);
+            }
+        }
+
+        private void TriggerUnlockCelebration(string unlockedName, int currentAffinity)
+        {
+            if (resourcesDisposed) return;
+            AnimateHappy();
+            for (int i = 0; i < 5; i++)
+            {
+                int delay = i * 140;
+                Task.Delay(delay).ContinueWith(_ =>
+                {
+                    if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                    try { Dispatcher.BeginInvoke(new Action(delegate { if (!resourcesDisposed) AddHeart(); })); }
+                    catch (InvalidOperationException) { }
+                });
+            }
+            ShowMessage($"🎉 호감도 {currentAffinity}점 달성! 🎉\n✨ {unlockedName} 해금! ✨", 3800, true);
+        }
+
         public BunnyItem CurrentItem => currentItem;
 
         public void SetItem(BunnyItem item)
         {
+            if (item != BunnyItem.None && !BunnyProgression.IsUnlocked(item, affinity))
+            {
+                int req = BunnyProgression.GetRequiredAffinity(item);
+                ShowMessage($"아직 덜 친해요... 🔒\n(호감도 {req}점 필요! 🥺)", 3000, true);
+                return;
+            }
+
             currentItem = item;
             ItemHouse.Visibility = item == BunnyItem.House ? Visibility.Visible : Visibility.Collapsed;
             ItemChair.Visibility = item == BunnyItem.Chair ? Visibility.Visible : Visibility.Collapsed;
@@ -291,6 +376,15 @@ namespace BunnyPet
                 DirectionLayer.Width = 97;
                 DirectionLayer.Height = 88;
                 DirectionLayer.Margin = new Thickness(0);
+            }
+
+            if (item == BunnyItem.Hay)
+            {
+                AddAffinity(2);
+            }
+            else if (item != BunnyItem.None)
+            {
+                AddAffinity(1);
             }
 
             ReactToItemEquip(item);
@@ -408,14 +502,14 @@ namespace BunnyPet
                 StopWalking();
 
                 // 호감도가 쌓였을 때 편안하게 벌러덩 눕기 포즈!
-                if (affinity >= 25 && random.NextDouble() < 0.28)
+                if (BunnyProgression.IsUnlocked(BunnyState.Flop, affinity) && random.NextDouble() < 0.28)
                 {
                     TriggerFlop();
                     return;
                 }
 
                 // 가끔 손으로 싹싹 세수하기
-                if (random.NextDouble() < 0.22)
+                if (BunnyProgression.IsUnlocked(BunnyState.Wash, affinity) && random.NextDouble() < 0.22)
                 {
                     TriggerWash();
                     return;
@@ -443,19 +537,19 @@ namespace BunnyPet
             if (next == BunnyState.Stand)
             {
                 double roll = random.NextDouble();
-                if (roll < 0.24)
+                if (roll < 0.24 && BunnyProgression.IsUnlocked(BunnyState.Binky, affinity))
                 {
                     // 기분 좋아서 점프! 빙키!
                     TriggerBinky();
                     return;
                 }
-                else if (roll < 0.44)
+                else if (roll < 0.44 && BunnyProgression.IsUnlocked(BunnyState.Wash, affinity))
                 {
                     // 손으로 세수하기
                     TriggerWash();
                     return;
                 }
-                else if (roll < 0.62)
+                else if (roll < 0.62 && BunnyProgression.IsUnlocked(BunnyState.Confused, affinity))
                 {
                     // '놀자' 상태에서 두리번거릴 때 실사 어리둥절 애니메이션 재생!
                     PlayConfusedAnimation(() =>
@@ -464,7 +558,7 @@ namespace BunnyPet
                     });
                     return;
                 }
-                else if (roll < 0.78)
+                else if (roll < 0.78 && BunnyProgression.IsUnlocked(BunnyState.Beg, affinity))
                 {
                     // 실사 내놔! 포즈
                     SetVisualState(BunnyState.Beg);
@@ -718,7 +812,7 @@ namespace BunnyPet
         {
             machine.Touch(DateTime.UtcNow);
             StopWalking();
-            affinity = Math.Min(100, affinity + 1);
+            AddAffinity(1);
 
             if (currentItem == BunnyItem.House)
             {
@@ -753,7 +847,7 @@ namespace BunnyPet
             }
 
             // 호감도가 쌓인 상태에서 쓰다듬으면 뽀뽀(래빗키스) 발동!
-            if (affinity >= 20 && random.NextDouble() < 0.42)
+            if (BunnyProgression.IsUnlocked(BunnyState.Kiss, affinity) && random.NextDouble() < 0.42)
             {
                 TriggerRabbitKiss();
                 return;
@@ -1013,6 +1107,12 @@ namespace BunnyPet
         public void TriggerPose(BunnyState state)
         {
             if (resourcesDisposed) return;
+            if (!BunnyProgression.IsUnlocked(state, affinity))
+            {
+                int req = BunnyProgression.GetRequiredAffinity(state);
+                ShowMessage($"아직 덜 친해요... 🔒\n(호감도 {req}점 필요! 🥺)", 3000, true);
+                return;
+            }
             StopAnimation();
             StopWalking();
             if (currentItem == BunnyItem.House)
@@ -1073,7 +1173,7 @@ namespace BunnyPet
             }
             SetVisualState(BunnyState.Angry);
             AnimatePurring();
-            affinity = Math.Max(0, affinity - 2);
+            AddAffinity(-2);
 
             string[] spamAngryPhrases = { "그만 찔러! 😤", "민트 뿔났다! ⚡", "발로 쿵쿵! 😾", "아야! 괴롭히지 마! 💢", "화났어! 😡" };
             ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
@@ -1450,10 +1550,47 @@ namespace BunnyPet
             e.Handled = true;
         }
 
+        private void AddPoseMenuItem(MenuItem parent, BunnyState state, string title, string shortName)
+        {
+            bool unlocked = BunnyProgression.IsUnlocked(state, affinity);
+            int req = BunnyProgression.GetRequiredAffinity(state);
+            string header = unlocked ? title : $"🔒 {shortName} (호감도 {req}점 필요)";
+            var item = new MenuItem { Header = header };
+            item.Click += delegate { TriggerPose(state); };
+            parent.Items.Add(item);
+        }
+
+        private void AddGiftMenuItem(MenuItem parent, BunnyItem itemType, string title, string shortName)
+        {
+            bool unlocked = BunnyProgression.IsUnlocked(itemType, affinity);
+            int req = BunnyProgression.GetRequiredAffinity(itemType);
+            string header = unlocked ? title : $"🔒 {shortName} (호감도 {req}점 필요)";
+            var item = new MenuItem { Header = header };
+            item.Click += delegate { SetItem(itemType); };
+            parent.Items.Add(item);
+        }
+
         private void ShowContextMenu()
         {
             var menu = new ContextMenu();
             menu.PlacementTarget = this;
+
+            var affinityHeaderItem = new MenuItem
+            {
+                Header = $"💖 민트와의 호감도: {affinity}점 ({BunnyProgression.GetLevelName(affinity)})",
+                FontWeight = FontWeights.Bold,
+                IsEnabled = false
+            };
+            menu.Items.Add(affinityHeaderItem);
+
+            var nextUnlockItem = new MenuItem
+            {
+                Header = $"💡 {BunnyProgression.GetNextUnlockDescription(affinity)}",
+                FontStyle = FontStyles.Italic,
+                IsEnabled = false
+            };
+            menu.Items.Add(nextUnlockItem);
+            menu.Items.Add(new Separator());
 
             var playToggleItem = new MenuItem
             {
@@ -1472,41 +1609,14 @@ namespace BunnyPet
             menu.Items.Add(petItem);
 
             var poseMenu = new MenuItem { Header = "📸 민트 특별 포즈" };
-
-            var binkyItem = new MenuItem { Header = "🤸 기분 최고 점프! 빙키 (실사 포즈)" };
-            binkyItem.Click += delegate { TriggerPose(BunnyState.Binky); };
-            poseMenu.Items.Add(binkyItem);
-
-            var kissItem = new MenuItem { Header = "💋 뽀뽀해주는 래빗키스 (실사 포즈)" };
-            kissItem.Click += delegate { TriggerPose(BunnyState.Kiss); };
-            poseMenu.Items.Add(kissItem);
-
-            var washItem = new MenuItem { Header = "🧼 손으로 쓱싹 세수하기 (실사 포즈)" };
-            washItem.Click += delegate { TriggerPose(BunnyState.Wash); };
-            poseMenu.Items.Add(washItem);
-
-            var flopItem = new MenuItem { Header = "🛌 안심하고 벌러덩 눕기 (실사 포즈)" };
-            flopItem.Click += delegate { TriggerPose(BunnyState.Flop); };
-            poseMenu.Items.Add(flopItem);
-
-            var begItem = new MenuItem { Header = "🌾 간식 내놔! 민트 (실사 포즈)" };
-            begItem.Click += delegate { TriggerPose(BunnyState.Beg); };
-            poseMenu.Items.Add(begItem);
-
-            var angryItem = new MenuItem { Header = "💢 화났어! 민트 (실사 포즈)" };
-            angryItem.Click += delegate { TriggerPose(BunnyState.Angry); };
-            poseMenu.Items.Add(angryItem);
-
-            var frontItem = new MenuItem { Header = "🐰 똘망똘망 민트 (정면 포즈)" };
-            frontItem.Click += delegate { TriggerPose(BunnyState.Front); };
-            poseMenu.Items.Add(frontItem);
-
-            var confusedItem = new MenuItem { Header = "👀 어리둥절 민트 (실사 영상)" };
-            confusedItem.Click += delegate
-            {
-                TriggerPose(BunnyState.Confused);
-            };
-            poseMenu.Items.Add(confusedItem);
+            AddPoseMenuItem(poseMenu, BunnyState.Binky, "🤸 기분 최고 점프! 빙키 (실사 포즈)", "빙키 점프");
+            AddPoseMenuItem(poseMenu, BunnyState.Kiss, "💋 뽀뽀해주는 래빗키스 (실사 포즈)", "래빗키스");
+            AddPoseMenuItem(poseMenu, BunnyState.Wash, "🧼 손으로 쓱싹 세수하기 (실사 포즈)", "세수하기");
+            AddPoseMenuItem(poseMenu, BunnyState.Flop, "🛌 안심하고 벌러덩 눕기 (실사 포즈)", "벌러덩 눕기");
+            AddPoseMenuItem(poseMenu, BunnyState.Beg, "🌾 간식 내놔! 민트 (실사 포즈)", "간식 내놔");
+            AddPoseMenuItem(poseMenu, BunnyState.Angry, "💢 화났어! 민트 (실사 포즈)", "화났어");
+            AddPoseMenuItem(poseMenu, BunnyState.Front, "🐰 똘망똘망 민트 (정면 포즈)", "정면 포즈");
+            AddPoseMenuItem(poseMenu, BunnyState.Confused, "👀 어리둥절 민트 (실사 영상)", "어리둥절 영상");
 
             var introItem = new MenuItem { Header = "✨ 천사 민트 등장! (실사 포즈)" };
             introItem.Click += delegate { PlayIntroGreeting(); };
@@ -1516,26 +1626,11 @@ namespace BunnyPet
             menu.Items.Add(new Separator());
 
             var itemsMenu = new MenuItem { Header = "🎁 민트에게 선물하기" };
-
-            var hayItem = new MenuItem { Header = "🌾 맛있는 건초 주기" };
-            hayItem.Click += delegate { SetItem(BunnyItem.Hay); };
-            itemsMenu.Items.Add(hayItem);
-
-            var chairItem = new MenuItem { Header = "🪑 작은 의자 놓기" };
-            chairItem.Click += delegate { SetItem(BunnyItem.Chair); };
-            itemsMenu.Items.Add(chairItem);
-
-            var dollItem = new MenuItem { Header = "🧸 토끼 인형 놓기" };
-            dollItem.Click += delegate { SetItem(BunnyItem.Doll); };
-            itemsMenu.Items.Add(dollItem);
-
-            var bagItem = new MenuItem { Header = "🎒 소풍 가방 메어주기" };
-            bagItem.Click += delegate { SetItem(BunnyItem.Bag); };
-            itemsMenu.Items.Add(bagItem);
-
-            var houseItem = new MenuItem { Header = "🏠 아늑한 집 지어주기" };
-            houseItem.Click += delegate { SetItem(BunnyItem.House); };
-            itemsMenu.Items.Add(houseItem);
+            AddGiftMenuItem(itemsMenu, BunnyItem.Hay, "🌾 맛있는 건초 주기", "건초");
+            AddGiftMenuItem(itemsMenu, BunnyItem.Chair, "🪑 작은 의자 놓기", "작은 의자");
+            AddGiftMenuItem(itemsMenu, BunnyItem.Doll, "🧸 토끼 인형 놓기", "토끼 인형");
+            AddGiftMenuItem(itemsMenu, BunnyItem.Bag, "🎒 소풍 가방 메어주기", "소풍 가방");
+            AddGiftMenuItem(itemsMenu, BunnyItem.House, "🏠 아늑한 집 지어주기", "아늑한 집");
 
             itemsMenu.Items.Add(new Separator());
 

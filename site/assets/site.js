@@ -171,6 +171,149 @@
   }
 
   /* ==========================================================================
+     호감도 및 해금 시스템 (Bunny Progression System)
+     ========================================================================== */
+  const BUNNY_PROGRESSION = {
+    items: {
+      hay: 0,
+      chair: 10,
+      doll: 25,
+      bag: 40,
+      house: 60
+    },
+    states: {
+      intro: 0,
+      front: 0,
+      idle: 0,
+      walk: 0,
+      stand: 0,
+      sleep: 0,
+      happy: 0,
+      beg: 5,
+      wash: 15,
+      angry: 20,
+      kiss: 30,
+      binky: 50,
+      confused: 70,
+      flop: 85
+    },
+    milestones: [
+      { threshold: 5, name: '간식 내놔! 포즈 🌾' },
+      { threshold: 10, name: '작은 의자 선물 🪑' },
+      { threshold: 15, name: '손으로 세수하기 포즈 🧼' },
+      { threshold: 20, name: '화났어! 포즈 💢' },
+      { threshold: 25, name: '토끼 인형 선물 🧸' },
+      { threshold: 30, name: '래빗키스 뽀뽀 포즈 💋' },
+      { threshold: 40, name: '소풍 가방 선물 🎒' },
+      { threshold: 50, name: '신나는 점프 빙키 포즈 🤸' },
+      { threshold: 60, name: '아늑한 집 선물 🏠' },
+      { threshold: 70, name: '어리둥절 실사 영상 포즈 👀' },
+      { threshold: 85, name: '안심 벌러덩 눕기 포즈 🛌' }
+    ],
+    getLevelName(aff) {
+      if (aff >= 85) return 'Lv.5 가족이 된 민트 💖';
+      if (aff >= 60) return 'Lv.4 무한 애정 민트 💕';
+      if (aff >= 30) return 'Lv.3 단짝 친구 민트 🥰';
+      if (aff >= 10) return 'Lv.2 마음을 여는 민트 🌸';
+      return 'Lv.1 낯가리는 민트 🌱';
+    },
+    getNextUnlock(aff) {
+      if (aff < 5) return '다음 해금: 간식 내놔! (5점) 🌾';
+      if (aff < 10) return '다음 해금: 작은 의자 (10점) 🪑';
+      if (aff < 15) return '다음 해금: 세수하기 (15점) 🧼';
+      if (aff < 20) return '다음 해금: 화났어! (20점) 💢';
+      if (aff < 25) return '다음 해금: 토끼 인형 (25점) 🧸';
+      if (aff < 30) return '다음 해금: 래빗키스 뽀뽀 (30점) 💋';
+      if (aff < 40) return '다음 해금: 소풍 가방 (40점) 🎒';
+      if (aff < 50) return '다음 해금: 신나는 점프 빙키 (50점) 🤸';
+      if (aff < 60) return '다음 해금: 아늑한 집 (60점) 🏠';
+      if (aff < 70) return '다음 해금: 어리둥절 실사 영상 (70점) 👀';
+      if (aff < 85) return '다음 해금: 안심 벌러덩 눕기 (85점) 🛌';
+      return '모든 특별 포즈와 선물 해금 완료! 👑';
+    },
+    isItemUnlocked(item, aff) {
+      return aff >= (this.items[item] ?? 0);
+    },
+    isStateUnlocked(state, aff) {
+      return aff >= (this.states[state] ?? 0);
+    }
+  };
+
+  let globalAffinity = parseInt(localStorage.getItem('mint-affinity') || '10', 10);
+  if (isNaN(globalAffinity)) globalAffinity = 10;
+
+  function updateAffinityUI() {
+    const levelName = BUNNY_PROGRESSION.getLevelName(globalAffinity);
+    const nextDesc = BUNNY_PROGRESSION.getNextUnlock(globalAffinity);
+
+    const simBadge = document.getElementById('sim-affinity-badge');
+    if (simBadge) {
+      simBadge.textContent = `💖 ${globalAffinity}점 (${levelName.split(' ')[0]} 🌸)`;
+    }
+
+    const sbVal = document.getElementById('sandbox-affinity-val');
+    if (sbVal) sbVal.textContent = `💖 민트와의 호감도: ${globalAffinity}점`;
+    const sbLevel = document.getElementById('sandbox-affinity-level');
+    if (sbLevel) sbLevel.textContent = `(${levelName})`;
+    const sbNext = document.getElementById('sandbox-affinity-next');
+    if (sbNext) sbNext.textContent = `💡 ${nextDesc}`;
+
+    // Update buttons in demo mockup
+    const binkyBtn = document.getElementById('sim-mock-binky-btn');
+    if (binkyBtn) binkyBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('binky', globalAffinity) ? '🤸 빙키' : '🔒 빙키(50)';
+    const kissBtn = document.getElementById('sim-mock-kiss-btn');
+    if (kissBtn) kissBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity) ? '💋 뽀뽀' : '🔒 뽀뽀(30)';
+    const washBtn = document.getElementById('sim-mock-wash-btn');
+    if (washBtn) washBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity) ? '🧼 세수' : '🔒 세수(15)';
+    const flopBtn = document.getElementById('sim-mock-flop-btn');
+    if (flopBtn) flopBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('flop', globalAffinity) ? '🛌 벌러덩' : '🔒 벌러덩(85)';
+    const confusedBtn = document.getElementById('sim-mock-confused-btn');
+    if (confusedBtn) confusedBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('confused', globalAffinity) ? '👀 어리둥절' : '🔒 어리둥절(70)';
+
+    const chairBtn = document.getElementById('sim-chair-btn');
+    if (chairBtn) chairBtn.textContent = BUNNY_PROGRESSION.isItemUnlocked('chair', globalAffinity) ? '🪑 의자' : '🔒 의자(10)';
+    const dollBtn = document.getElementById('sim-doll-btn');
+    if (dollBtn) dollBtn.textContent = BUNNY_PROGRESSION.isItemUnlocked('doll', globalAffinity) ? '🧸 인형' : '🔒 인형(25)';
+    const hayBtn = document.getElementById('sim-hay-btn');
+    if (hayBtn) hayBtn.textContent = '🌾 건초';
+
+    // Update sandbox buttons
+    document.querySelectorAll('.state-btn').forEach(btn => {
+      const st = btn.dataset.state;
+      if (st && BUNNY_PROGRESSION.states[st] > 0) {
+        const unl = BUNNY_PROGRESSION.isStateUnlocked(st, globalAffinity);
+        btn.classList.toggle('locked-btn', !unl);
+      }
+    });
+    document.querySelectorAll('.item-btn').forEach(btn => {
+      const it = btn.dataset.item;
+      if (it && it !== 'none' && BUNNY_PROGRESSION.items[it] > 0) {
+        const unl = BUNNY_PROGRESSION.isItemUnlocked(it, globalAffinity);
+        btn.classList.toggle('locked-btn', !unl);
+      }
+    });
+  }
+
+  function changeAffinity(delta, onCelebration) {
+    const oldAff = globalAffinity;
+    globalAffinity = Math.max(0, Math.min(100, globalAffinity + delta));
+    localStorage.setItem('mint-affinity', String(globalAffinity));
+    updateAffinityUI();
+
+    if (delta > 0) {
+      let newlyUnlocked = null;
+      for (const m of BUNNY_PROGRESSION.milestones) {
+        if (oldAff < m.threshold && globalAffinity >= m.threshold) {
+          newlyUnlocked = m.name;
+        }
+      }
+      if (newlyUnlocked && onCelebration) {
+        onCelebration(newlyUnlocked, globalAffinity);
+      }
+    }
+  }
+
+  /* ==========================================================================
      3. 미니 데스크톱 시뮬레이터 (#demo)
      ========================================================================== */
   const simScreen = document.getElementById('sim-screen');
@@ -217,7 +360,20 @@
     let simLastReactionTime = 0;
     let simCurrentItem = 'none';
 
+    function triggerSimCelebration(name, aff) {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(floatSimHeart, i * 140);
+      }
+      showSimSpeech(`🎉 호감도 ${aff}점 달성! 🎉\n✨ ${name} 해금! ✨`, 3800, true);
+    }
+
     function setSimItem(item) {
+      if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
+        const req = BUNNY_PROGRESSION.items[item] || 0;
+        showSimSpeech(`아직 덜 친해요... 🔒\n(호감도 ${req}점 필요! 🥺)`, 3000, true);
+        return;
+      }
+
       simCurrentItem = item || 'none';
       if (simItemHouse) simItemHouse.classList.toggle('hidden', item !== 'house');
       if (simItemChair) simItemChair.classList.toggle('hidden', item !== 'chair');
@@ -241,6 +397,12 @@
       }
 
       stopSimWalking();
+
+      if (item === 'hay') {
+        changeAffinity(2, triggerSimCelebration);
+      } else if (item && item !== 'none') {
+        changeAffinity(1, triggerSimCelebration);
+      }
 
       if (item === 'doll') {
         simDirection = -1;
@@ -413,14 +575,14 @@
         }
 
         if (!simPlayMode) {
-          if (simAffinity >= 25 && Math.random() < 0.28) {
+          if (BUNNY_PROGRESSION.isStateUnlocked('flop', globalAffinity) && Math.random() < 0.28) {
             setSimState('flop');
             floatSimHeart();
             showSimSpeech(randomItem(FLOP_PHRASES), 3000, true);
             scheduleSimBehavior(randomBetween(4500, 7500));
             return;
           }
-          if (Math.random() < 0.22) {
+          if (BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity) && Math.random() < 0.22) {
             setSimState('wash');
             showSimSpeech(randomItem(WASH_PHRASES), 2600, true);
             scheduleSimBehavior(randomBetween(4000, 6500));
@@ -447,20 +609,20 @@
         } else if (roll < 0.64) {
           setSimState('stand');
           scheduleSimBehavior(randomBetween(2500, 4500));
-        } else if (roll < 0.74) {
+        } else if (roll < 0.74 && BUNNY_PROGRESSION.isStateUnlocked('binky', globalAffinity)) {
           setSimState('binky');
           floatSimHeart();
           showSimSpeech(randomItem(BINKY_PHRASES), 2600);
           scheduleSimBehavior(3200);
-        } else if (roll < 0.82) {
+        } else if (roll < 0.82 && BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity)) {
           setSimState('wash');
           showSimSpeech(randomItem(WASH_PHRASES), 2600);
           scheduleSimBehavior(3200);
-        } else if (roll < 0.89) {
+        } else if (roll < 0.89 && BUNNY_PROGRESSION.isStateUnlocked('beg', globalAffinity)) {
           setSimState('beg');
           showSimSpeech(randomItem(BEG_PHRASES), 2600);
           scheduleSimBehavior(3200);
-        } else if (roll < 0.95) {
+        } else if (roll < 0.95 && BUNNY_PROGRESSION.isStateUnlocked('confused', globalAffinity)) {
           // 실사 어리둥절 민트!
           setSimState('confused');
           showSimSpeech('❓', 2200);
@@ -472,7 +634,6 @@
       }, delay);
     }
 
-    let simAffinity = 15;
     const simClickHistory = [];
 
     function reactSimPetting() {
@@ -485,7 +646,7 @@
       }
       if (simClickHistory.length >= 4) {
         simClickHistory.length = 0;
-        simAffinity = Math.max(0, simAffinity - 2);
+        changeAffinity(-2);
         setSimState('angry');
         playPopSound();
         showSimSpeech(randomItem(SPAM_ANGRY_PHRASES), 2600, true);
@@ -493,7 +654,7 @@
         return;
       }
 
-      simAffinity = Math.min(100, simAffinity + 1);
+      changeAffinity(1, triggerSimCelebration);
 
       if (simCurrentItem === 'house') {
         floatSimHeart();
@@ -522,7 +683,7 @@
         return;
       }
 
-      if (simAffinity >= 20 && Math.random() < 0.42) {
+      if (BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity) && Math.random() < 0.42) {
         setSimState('kiss');
         floatSimHeart();
         setTimeout(floatSimHeart, 180);
@@ -699,6 +860,10 @@
     const confusedBtns = document.querySelectorAll('#sim-confused-btn, #sim-mock-confused-btn');
     confusedBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!BUNNY_PROGRESSION.isStateUnlocked('confused', globalAffinity)) {
+          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 70점 필요! 🥺)', 3000, true);
+          return;
+        }
         stopSimWalking();
         setSimState('confused');
         showSimSpeech('👽', 2200, true);
@@ -709,6 +874,10 @@
     const binkyBtns = document.querySelectorAll('#sim-mock-binky-btn');
     binkyBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!BUNNY_PROGRESSION.isStateUnlocked('binky', globalAffinity)) {
+          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 50점 필요! 🥺)', 3000, true);
+          return;
+        }
         stopSimWalking();
         setSimState('binky');
         floatSimHeart();
@@ -720,6 +889,10 @@
     const kissBtns = document.querySelectorAll('#sim-mock-kiss-btn');
     kissBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity)) {
+          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 30점 필요! 🥺)', 3000, true);
+          return;
+        }
         stopSimWalking();
         setSimState('kiss');
         floatSimHeart();
@@ -731,6 +904,10 @@
     const washBtns = document.querySelectorAll('#sim-mock-wash-btn');
     washBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity)) {
+          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 15점 필요! 🥺)', 3000, true);
+          return;
+        }
         stopSimWalking();
         setSimState('wash');
         showSimSpeech(randomItem(WASH_PHRASES), 2600, true);
@@ -741,6 +918,10 @@
     const flopBtns = document.querySelectorAll('#sim-mock-flop-btn');
     flopBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!BUNNY_PROGRESSION.isStateUnlocked('flop', globalAffinity)) {
+          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 85점 필요! 🥺)', 3000, true);
+          return;
+        }
         stopSimWalking();
         setSimState('flop');
         floatSimHeart();
@@ -784,7 +965,20 @@
     let sandboxSpeechTimer = null;
     let currentState = 'idle';
 
+    function triggerSandboxCelebration(name, aff) {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(floatSandboxHeart, i * 140);
+      }
+      showSandboxSpeech(`🎉 호감도 ${aff}점 달성! 🎉\n✨ ${name} 해금! ✨`, 3800);
+    }
+
     function setSandboxState(state, message) {
+      if (!BUNNY_PROGRESSION.isStateUnlocked(state, globalAffinity)) {
+        const req = BUNNY_PROGRESSION.states[state] || 0;
+        showSandboxSpeech(`아직 덜 친해요... 🔒\n(호감도 ${req}점 필요! 🥺)`, 3000);
+        return;
+      }
+
       currentState = state;
       sandboxImg.src = ASSETS[state] || ASSETS.idle;
       sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry' || state === 'intro' || state === 'binky' || state === 'kiss' || state === 'wash' || state === 'flop') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
@@ -810,6 +1004,12 @@
     }
 
     function setSandboxItem(item) {
+      if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
+        const req = BUNNY_PROGRESSION.items[item] || 0;
+        showSandboxSpeech(`아직 덜 친해요... 🔒\n(호감도 ${req}점 필요! 🥺)`, 3000);
+        return;
+      }
+
       sandboxCurrentItem = item || 'none';
       if (sandboxItemHouse) sandboxItemHouse.classList.toggle('hidden', item !== 'house');
       if (sandboxItemChair) sandboxItemChair.classList.toggle('hidden', item !== 'chair');
@@ -820,6 +1020,12 @@
       itemBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.item === item);
       });
+
+      if (item === 'hay') {
+        changeAffinity(2, triggerSandboxCelebration);
+      } else if (item && item !== 'none') {
+        changeAffinity(1, triggerSandboxCelebration);
+      }
 
       if (item === 'house') {
         sandboxPet.classList.add('inside-house');
@@ -887,7 +1093,6 @@
       setTimeout(() => heart.remove(), 1350);
     }
 
-    let sandboxAffinity = 15;
     const sandboxClickHistory = [];
 
     function triggerSandboxPetting() {
@@ -898,7 +1103,7 @@
       }
       if (sandboxClickHistory.length >= 4) {
         sandboxClickHistory.length = 0;
-        sandboxAffinity = Math.max(0, sandboxAffinity - 2);
+        changeAffinity(-2);
         setSandboxState('angry');
         playPopSound();
         showSandboxSpeech(randomItem(SPAM_ANGRY_PHRASES), 2600);
@@ -906,7 +1111,7 @@
         return;
       }
 
-      sandboxAffinity = Math.min(100, sandboxAffinity + 1);
+      changeAffinity(1, triggerSandboxCelebration);
 
       if (sandboxCurrentItem === 'house') {
         floatSandboxHeart();
@@ -930,7 +1135,7 @@
         return;
       }
 
-      if (sandboxAffinity >= 20 && Math.random() < 0.42) {
+      if (BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity) && Math.random() < 0.42) {
         setSandboxState('kiss');
         floatSandboxHeart();
         setTimeout(floatSandboxHeart, 180);
@@ -1018,6 +1223,13 @@
 
     // 초기 상태
     setSandboxState('idle', '👋');
+
+    // 호감도 UI 초기 동기화 및 2분마다 동반 보너스 +1
+    updateAffinityUI();
+    setInterval(() => {
+      changeAffinity(1, triggerSandboxCelebration);
+    }, 120000);
   }
 
 })();
+

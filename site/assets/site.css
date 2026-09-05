@@ -1423,3 +1423,13 @@ img {
     align-items: flex-start;
   }
 }
+
+.locked-btn {
+  opacity: 0.65;
+  position: relative;
+}
+.locked-btn::after {
+  content: " 🔒";
+  font-size: 0.8em;
+}
+

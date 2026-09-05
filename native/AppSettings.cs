@@ -18,11 +18,15 @@ namespace BunnyPet
         [DataMember(Name = "restRemindersEnabled", EmitDefaultValue = false)]
         private bool? restRemindersEnabled;
 
+        [DataMember(Name = "affinity", EmitDefaultValue = false)]
+        private int? affinity;
+
         public AppSettings()
         {
             alwaysOnTop = true;
             autoStart = false;
             restRemindersEnabled = true;
+            affinity = 10;
         }
 
         [IgnoreDataMember]
@@ -44,6 +48,13 @@ namespace BunnyPet
         {
             get { return restRemindersEnabled ?? true; }
             set { restRemindersEnabled = value; }
+        }
+
+        [IgnoreDataMember]
+        public int Affinity
+        {
+            get { return affinity ?? 10; }
+            set { affinity = value; }
         }
 
         public static string FilePath

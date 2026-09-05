@@ -88,11 +88,16 @@ namespace BunnyPet
             Log("Loading settings");
             settings = AppSettings.Load();
             RegisterShowEvent();
-            Log("Creating MainWindow");
             window = new MainWindow();
             MainWindow = window;
             window.SetAlwaysOnTop(settings.AlwaysOnTop);
             window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
+            window.SetAffinity(settings.Affinity);
+            window.AffinityChanged += (newAffinity) =>
+            {
+                settings.Affinity = newAffinity;
+                SaveSettings();
+            };
             Log("Showing window");
             window.Show();
             window.Activate();
@@ -160,6 +165,12 @@ namespace BunnyPet
             try
             {
                 var menu = new Forms.ContextMenuStrip();
+
+                var affinityItem = new Forms.ToolStripMenuItem { Enabled = false };
+                var nextUnlockItem = new Forms.ToolStripMenuItem { Enabled = false };
+                menu.Items.Add(affinityItem);
+                menu.Items.Add(nextUnlockItem);
+                menu.Items.Add(new Forms.ToolStripSeparator());
 
                 playToggleItem = new Forms.ToolStripMenuItem(window != null && window.IsPlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)");
                 playToggleItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
@@ -252,6 +263,28 @@ namespace BunnyPet
                 itemsMenu.DropDownItems.Add(clearItem);
                 menu.Items.Add(itemsMenu);
                 menu.Items.Add(new Forms.ToolStripSeparator());
+
+                menu.Opening += delegate
+                {
+                    int aff = window != null ? window.Affinity : settings.Affinity;
+                    affinityItem.Text = $"💖 민트와의 호감도: {aff}점 ({BunnyProgression.GetLevelName(aff)})";
+                    nextUnlockItem.Text = $"💡 {BunnyProgression.GetNextUnlockDescription(aff)}";
+
+                    UpdatePoseItemText(binkyItem, BunnyState.Binky, aff, "🤸 기분 최고 점프! 빙키 (실사 포즈)", "빙키 점프");
+                    UpdatePoseItemText(kissItem, BunnyState.Kiss, aff, "💋 뽀뽀해주는 래빗키스 (실사 포즈)", "래빗키스");
+                    UpdatePoseItemText(washItem, BunnyState.Wash, aff, "🧼 손으로 쓱싹 세수하기 (실사 포즈)", "세수하기");
+                    UpdatePoseItemText(flopItem, BunnyState.Flop, aff, "🛌 안심하고 벌러덩 눕기 (실사 포즈)", "벌러덩 눕기");
+                    UpdatePoseItemText(begItem, BunnyState.Beg, aff, "🌾 간식 내놔! 민트 (실사 포즈)", "간식 내놔");
+                    UpdatePoseItemText(angryItem, BunnyState.Angry, aff, "💢 화났어! 민트 (실사 포즈)", "화났어");
+                    UpdatePoseItemText(frontItem, BunnyState.Front, aff, "🐰 똘망똘망 민트 (정면 포즈)", "정면 포즈");
+                    UpdatePoseItemText(confusedItem, BunnyState.Confused, aff, "👀 어리둥절 민트 (실사 영상)", "어리둥절 영상");
+
+                    UpdateGiftItemText(hayItem, BunnyItem.Hay, aff, "🌾 맛있는 건초 (Hay)", "건초");
+                    UpdateGiftItemText(chairItem, BunnyItem.Chair, aff, "🪑 작은 의자 (Chair)", "작은 의자");
+                    UpdateGiftItemText(dollItem, BunnyItem.Doll, aff, "🧸 토끼 인형 (Plush Doll)", "토끼 인형");
+                    UpdateGiftItemText(bagItem, BunnyItem.Bag, aff, "🎒 소풍 가방 (Backpack)", "소풍 가방");
+                    UpdateGiftItemText(houseItem, BunnyItem.House, aff, "🏠 아늑한 집 (House)", "아늑한 집");
+                };
 
                 var topmostItem = new Forms.ToolStripMenuItem("📌 항상 위에 표시 (Always on top)")
                 {
@@ -411,11 +444,36 @@ namespace BunnyPet
                 }
                 window.SetAlwaysOnTop(settings.AlwaysOnTop);
                 window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
+                window.SetAffinity(settings.Affinity);
                 if (!IsPackaged()) SetAutoStart(settings.AutoStart);
                 topmostItem.Checked = settings.AlwaysOnTop;
                 autoStartItem.Checked = settings.AutoStart;
                 restRemindersItem.Checked = settings.RestRemindersEnabled;
                 SaveSettings();
+            }
+        }
+
+        private static void UpdatePoseItemText(Forms.ToolStripMenuItem item, BunnyState state, int affinity, string fullTitle, string shortTitle)
+        {
+            if (BunnyProgression.IsUnlocked(state, affinity))
+            {
+                item.Text = fullTitle;
+            }
+            else
+            {
+                item.Text = $"🔒 {shortTitle} (호감도 {BunnyProgression.GetRequiredAffinity(state)}점 필요)";
+            }
+        }
+
+        private static void UpdateGiftItemText(Forms.ToolStripMenuItem item, BunnyItem itemType, int affinity, string fullTitle, string shortTitle)
+        {
+            if (BunnyProgression.IsUnlocked(itemType, affinity))
+            {
+                item.Text = fullTitle;
+            }
+            else
+            {
+                item.Text = $"🔒 {shortTitle} (호감도 {BunnyProgression.GetRequiredAffinity(itemType)}점 필요)";
             }
         }
 

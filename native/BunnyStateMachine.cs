@@ -29,6 +29,87 @@ public enum BunnyItem
     Chair
 }
 
+public static class BunnyProgression
+{
+    public const int AffinityHay = 0;
+    public const int AffinityChair = 10;
+    public const int AffinityDoll = 25;
+    public const int AffinityBag = 40;
+    public const int AffinityHouse = 60;
+
+    public const int AffinityIntro = 0;
+    public const int AffinityFront = 0;
+    public const int AffinityBeg = 5;
+    public const int AffinityWash = 15;
+    public const int AffinityAngry = 20;
+    public const int AffinityKiss = 30;
+    public const int AffinityBinky = 50;
+    public const int AffinityConfused = 70;
+    public const int AffinityFlop = 85;
+
+    public static int GetRequiredAffinity(BunnyItem item)
+    {
+        switch (item)
+        {
+            case BunnyItem.Chair: return AffinityChair;
+            case BunnyItem.Doll: return AffinityDoll;
+            case BunnyItem.Bag: return AffinityBag;
+            case BunnyItem.House: return AffinityHouse;
+            default: return 0;
+        }
+    }
+
+    public static int GetRequiredAffinity(BunnyState state)
+    {
+        switch (state)
+        {
+            case BunnyState.Beg: return AffinityBeg;
+            case BunnyState.Wash: return AffinityWash;
+            case BunnyState.Angry: return AffinityAngry;
+            case BunnyState.Kiss: return AffinityKiss;
+            case BunnyState.Binky: return AffinityBinky;
+            case BunnyState.Confused: return AffinityConfused;
+            case BunnyState.Flop: return AffinityFlop;
+            default: return 0;
+        }
+    }
+
+    public static bool IsUnlocked(BunnyItem item, int affinity)
+    {
+        return affinity >= GetRequiredAffinity(item);
+    }
+
+    public static bool IsUnlocked(BunnyState state, int affinity)
+    {
+        return affinity >= GetRequiredAffinity(state);
+    }
+
+    public static string GetLevelName(int affinity)
+    {
+        if (affinity >= 85) return "Lv.5 가족이 된 민트 💖";
+        if (affinity >= 60) return "Lv.4 무한 애정 민트 💕";
+        if (affinity >= 30) return "Lv.3 단짝 친구 민트 🥰";
+        if (affinity >= 10) return "Lv.2 마음을 여는 민트 🌸";
+        return "Lv.1 낯가리는 민트 🌱";
+    }
+
+    public static string GetNextUnlockDescription(int affinity)
+    {
+        if (affinity < 5) return "다음 해금: 간식 내놔! (5점) 🌾";
+        if (affinity < 10) return "다음 해금: 작은 의자 (10점) 🪑";
+        if (affinity < 15) return "다음 해금: 세수하기 (15점) 🧼";
+        if (affinity < 20) return "다음 해금: 화났어! (20점) 💢";
+        if (affinity < 25) return "다음 해금: 토끼 인형 (25점) 🧸";
+        if (affinity < 30) return "다음 해금: 래빗키스 뽀뽀 (30점) 💋";
+        if (affinity < 40) return "다음 해금: 소풍 가방 (40점) 🎒";
+        if (affinity < 50) return "다음 해금: 신나는 점프 빙키 (50점) 🤸";
+        if (affinity < 60) return "다음 해금: 아늑한 집 (60점) 🏠";
+        if (affinity < 70) return "다음 해금: 어리둥절 실사 영상 (70점) 👀";
+        if (affinity < 85) return "다음 해금: 안심 벌러덩 눕기 (85점) 🛌";
+        return "모든 특별 포즈와 선물 해금 완료! 👑";
+    }
+}
+
 public sealed class BunnyStateMachine
 {
     private DateTime lastInteraction;

@@ -175,6 +175,30 @@ namespace BunnyPet
 
                 var poseMenu = new Forms.ToolStripMenuItem("📸 민트 특별 포즈 (Special Poses)");
 
+                var binkyItem = new Forms.ToolStripMenuItem("🤸 기분 최고 점프! 빙키 (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Binky);
+                });
+                poseMenu.DropDownItems.Add(binkyItem);
+
+                var kissItem = new Forms.ToolStripMenuItem("💋 뽀뽀해주는 래빗키스 (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Kiss);
+                });
+                poseMenu.DropDownItems.Add(kissItem);
+
+                var washItem = new Forms.ToolStripMenuItem("🧼 손으로 쓱싹 세수하기 (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Wash);
+                });
+                poseMenu.DropDownItems.Add(washItem);
+
+                var flopItem = new Forms.ToolStripMenuItem("🛌 안심하고 벌러덩 눕기 (실사 포즈)", null, delegate
+                {
+                    if (window != null) window.TriggerPose(BunnyState.Flop);
+                });
+                poseMenu.DropDownItems.Add(flopItem);
+
                 var begItem = new Forms.ToolStripMenuItem("🌾 간식 내놔! 민트 (실사 포즈)", null, delegate
                 {
                     if (window != null) window.TriggerPose(BunnyState.Beg);

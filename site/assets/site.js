@@ -49,11 +49,35 @@
     beg: 'assets/bunny-beg.png',
     angry: 'assets/bunny-angry.png',
     front: 'assets/bunny-front.png',
-    intro: 'assets/bunny-intro.png'
+    intro: 'assets/bunny-intro.png',
+    binky: 'assets/bunny-binky.png',
+    kiss: 'assets/bunny-kiss.png',
+    wash: 'assets/bunny-wash.png',
+    flop: 'assets/bunny-flop.png'
   };
 
   const INTRO_PHRASES = [
     '✨', '🤍', '🕊️', '🐰', '⭐', '🎉', '💖', '🥰'
+  ];
+
+  const BINKY_PHRASES = [
+    '🤸', '🎉', '✨', '신나! 🐾', '너무 좋아! 🎈', '폴짝! 🐇', '빙키! 💫'
+  ];
+
+  const KISS_PHRASES = [
+    '💋', '💖', '쪽! 💋', '사랑해! 🤍', '친해져서 좋아! 💕', '뽀뽀~ 😚', '헤헤 🥰'
+  ];
+
+  const WASH_PHRASES = [
+    '🧼', '✨', '🌸', '쓱싹쓱싹 🧼', '세수하는 중 🫧', '개운해! 🤍', '단장 완료 ✨'
+  ];
+
+  const FLOP_PHRASES = [
+    '🛌', '💤', '🤍', '안전해~ ☁️', '벌러덩~ 😴', '편안해요 🤍', '나른해~ 🌾'
+  ];
+
+  const SPAM_ANGRY_PHRASES = [
+    '그만 찔러! 😤', '민트 뿔났다! ⚡', '발로 쿵쿵! 😾', '아야! 괴롭히지 마! 💢', '화났어! 😡'
   ];
 
   const PET_PHRASES = [
@@ -389,6 +413,19 @@
         }
 
         if (!simPlayMode) {
+          if (simAffinity >= 25 && Math.random() < 0.28) {
+            setSimState('flop');
+            floatSimHeart();
+            showSimSpeech(randomItem(FLOP_PHRASES), 3000, true);
+            scheduleSimBehavior(randomBetween(4500, 7500));
+            return;
+          }
+          if (Math.random() < 0.22) {
+            setSimState('wash');
+            showSimSpeech(randomItem(WASH_PHRASES), 2600, true);
+            scheduleSimBehavior(randomBetween(4000, 6500));
+            return;
+          }
           setSimState('idle');
           const roll = Math.random();
           if (roll < 0.30) {
@@ -400,25 +437,30 @@
         }
 
         const roll = Math.random();
-        if (roll < 0.35) {
+        if (roll < 0.28) {
           setSimState('idle');
           scheduleSimBehavior(randomBetween(3500, 6000));
-        } else if (roll < 0.65) {
+        } else if (roll < 0.52) {
           setSimState('walk');
           startSimWalking();
           scheduleSimBehavior(randomBetween(3500, 7000));
-        } else if (roll < 0.77) {
+        } else if (roll < 0.64) {
           setSimState('stand');
           scheduleSimBehavior(randomBetween(2500, 4500));
-        } else if (roll < 0.86) {
+        } else if (roll < 0.74) {
+          setSimState('binky');
+          floatSimHeart();
+          showSimSpeech(randomItem(BINKY_PHRASES), 2600);
+          scheduleSimBehavior(3200);
+        } else if (roll < 0.82) {
+          setSimState('wash');
+          showSimSpeech(randomItem(WASH_PHRASES), 2600);
+          scheduleSimBehavior(3200);
+        } else if (roll < 0.89) {
           setSimState('beg');
           showSimSpeech(randomItem(BEG_PHRASES), 2600);
           scheduleSimBehavior(3200);
-        } else if (roll < 0.93) {
-          setSimState('angry');
-          showSimSpeech(randomItem(ANGRY_PHRASES), 2600);
-          scheduleSimBehavior(3200);
-        } else if (roll < 0.97) {
+        } else if (roll < 0.95) {
           // 실사 어리둥절 민트!
           setSimState('confused');
           showSimSpeech('❓', 2200);
@@ -430,8 +472,28 @@
       }, delay);
     }
 
+    let simAffinity = 15;
+    const simClickHistory = [];
+
     function reactSimPetting() {
       stopSimWalking();
+
+      const now = Date.now();
+      simClickHistory.push(now);
+      while (simClickHistory.length && now - simClickHistory[0] > 1800) {
+        simClickHistory.shift();
+      }
+      if (simClickHistory.length >= 4) {
+        simClickHistory.length = 0;
+        simAffinity = Math.max(0, simAffinity - 2);
+        setSimState('angry');
+        playPopSound();
+        showSimSpeech(randomItem(SPAM_ANGRY_PHRASES), 2600, true);
+        scheduleSimBehavior(3500);
+        return;
+      }
+
+      simAffinity = Math.min(100, simAffinity + 1);
 
       if (simCurrentItem === 'house') {
         floatSimHeart();
@@ -457,6 +519,15 @@
         floatSimHeart();
         showSimSpeech(randomItem(ITEM_PHRASES.hay), 2500, true);
         scheduleSimBehavior(2800);
+        return;
+      }
+
+      if (simAffinity >= 20 && Math.random() < 0.42) {
+        setSimState('kiss');
+        floatSimHeart();
+        setTimeout(floatSimHeart, 180);
+        showSimSpeech(randomItem(KISS_PHRASES), 2800, true);
+        scheduleSimBehavior(3400);
         return;
       }
 
@@ -635,6 +706,49 @@
       });
     });
 
+    const binkyBtns = document.querySelectorAll('#sim-mock-binky-btn');
+    binkyBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('binky');
+        floatSimHeart();
+        showSimSpeech(randomItem(BINKY_PHRASES), 2600, true);
+        scheduleSimBehavior(3200);
+      });
+    });
+
+    const kissBtns = document.querySelectorAll('#sim-mock-kiss-btn');
+    kissBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('kiss');
+        floatSimHeart();
+        showSimSpeech(randomItem(KISS_PHRASES), 2600, true);
+        scheduleSimBehavior(3200);
+      });
+    });
+
+    const washBtns = document.querySelectorAll('#sim-mock-wash-btn');
+    washBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('wash');
+        showSimSpeech(randomItem(WASH_PHRASES), 2600, true);
+        scheduleSimBehavior(3200);
+      });
+    });
+
+    const flopBtns = document.querySelectorAll('#sim-mock-flop-btn');
+    flopBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('flop');
+        floatSimHeart();
+        showSimSpeech(randomItem(FLOP_PHRASES), 3000, true);
+        scheduleSimBehavior(4500);
+      });
+    });
+
     // 초기화
     setTimeout(initSimPosition, 300);
     scheduleSimBehavior(3500);
@@ -673,15 +787,21 @@
     function setSandboxState(state, message) {
       currentState = state;
       sandboxImg.src = ASSETS[state] || ASSETS.idle;
-      sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry' || state === 'intro') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
+      sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry' || state === 'intro' || state === 'binky' || state === 'kiss' || state === 'wash' || state === 'flop') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
 
       stateBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.state === state);
       });
 
-      if (state === 'intro') {
+      if (state === 'intro' || state === 'binky' || state === 'kiss' || state === 'flop') {
         floatSandboxHeart();
-        if (!message) showSandboxSpeech(randomItem(INTRO_PHRASES), 2500);
+        if (!message) {
+          if (state === 'binky') showSandboxSpeech(randomItem(BINKY_PHRASES), 2500);
+          else if (state === 'kiss') showSandboxSpeech(randomItem(KISS_PHRASES), 2500);
+          else if (state === 'wash') showSandboxSpeech(randomItem(WASH_PHRASES), 2500);
+          else if (state === 'flop') showSandboxSpeech(randomItem(FLOP_PHRASES), 2500);
+          else showSandboxSpeech(randomItem(INTRO_PHRASES), 2500);
+        }
       }
 
       if (message) {
@@ -767,7 +887,27 @@
       setTimeout(() => heart.remove(), 1350);
     }
 
+    let sandboxAffinity = 15;
+    const sandboxClickHistory = [];
+
     function triggerSandboxPetting() {
+      const now = Date.now();
+      sandboxClickHistory.push(now);
+      while (sandboxClickHistory.length && now - sandboxClickHistory[0] > 1800) {
+        sandboxClickHistory.shift();
+      }
+      if (sandboxClickHistory.length >= 4) {
+        sandboxClickHistory.length = 0;
+        sandboxAffinity = Math.max(0, sandboxAffinity - 2);
+        setSandboxState('angry');
+        playPopSound();
+        showSandboxSpeech(randomItem(SPAM_ANGRY_PHRASES), 2600);
+        if (sandboxHint) sandboxHint.style.opacity = '0';
+        return;
+      }
+
+      sandboxAffinity = Math.min(100, sandboxAffinity + 1);
+
       if (sandboxCurrentItem === 'house') {
         floatSandboxHeart();
         showSandboxSpeech(randomItem(ITEM_PHRASES.house), 2500);
@@ -789,6 +929,16 @@
         if (sandboxHint) sandboxHint.style.opacity = '0';
         return;
       }
+
+      if (sandboxAffinity >= 20 && Math.random() < 0.42) {
+        setSandboxState('kiss');
+        floatSandboxHeart();
+        setTimeout(floatSandboxHeart, 180);
+        showSandboxSpeech(randomItem(KISS_PHRASES), 2800);
+        if (sandboxHint) sandboxHint.style.opacity = '0';
+        return;
+      }
+
       setSandboxState('happy');
       floatSandboxHeart();
       setTimeout(floatSandboxHeart, 190);
@@ -848,14 +998,18 @@
       angry: '💢',
       front: '🐰',
       happy: '💖',
-      sleep: '💤'
+      sleep: '💤',
+      binky: '🤸',
+      kiss: '💋',
+      wash: '🧼',
+      flop: '🛌'
     };
 
     stateBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const state = btn.dataset.state;
         setSandboxState(state, STATE_PHRASES[state]);
-        if (state === 'happy') {
+        if (state === 'happy' || state === 'binky' || state === 'kiss' || state === 'flop') {
           floatSandboxHeart();
         }
         if (sandboxHint) sandboxHint.style.opacity = '0';

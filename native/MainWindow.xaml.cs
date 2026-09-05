@@ -93,6 +93,25 @@ namespace BunnyPet
         {
             "✨", "🤍", "🕊️", "🐰", "⭐", "🎉", "💖", "🥰"
         };
+        private readonly string[] kissPhrases =
+        {
+            "💋", "💖", "쪽! 💋", "사랑해! 🤍", "친해져서 좋아! 💕", "뽀뽀~ 😚", "헤헤 🥰"
+        };
+        private readonly string[] binkyPhrases =
+        {
+            "🤸", "🎉", "✨", "신나! 🐾", "너무 좋아! 🎈", "폴짝! 🐇", "빙키! 💫"
+        };
+        private readonly string[] washPhrases =
+        {
+            "🧼", "✨", "🌸", "쓱싹쓱싹 🧼", "세수하는 중 🫧", "개운해! 🤍", "단장 완료 ✨"
+        };
+        private readonly string[] flopPhrases =
+        {
+            "🛌", "💤", "🤍", "안전해~ ☁️", "벌러덩~ 😴", "편안해요 🤍", "나른해~ 🌾"
+        };
+
+        private int affinity = 15;
+        private readonly List<DateTime> clickHistory = new List<DateTime>();
 
         private readonly Dictionary<string, BitmapImage> emojiBitmaps = new Dictionary<string, BitmapImage>();
         private BunnyItem currentItem = BunnyItem.None;
@@ -387,6 +406,21 @@ namespace BunnyPet
             if (!machine.PlayMode)
             {
                 StopWalking();
+
+                // 호감도가 쌓였을 때 편안하게 벌러덩 눕기 포즈!
+                if (affinity >= 25 && random.NextDouble() < 0.28)
+                {
+                    TriggerFlop();
+                    return;
+                }
+
+                // 가끔 손으로 싹싹 세수하기
+                if (random.NextDouble() < 0.22)
+                {
+                    TriggerWash();
+                    return;
+                }
+
                 SetVisualState(BunnyState.Idle);
 
                 double roll = random.NextDouble();
@@ -409,7 +443,19 @@ namespace BunnyPet
             if (next == BunnyState.Stand)
             {
                 double roll = random.NextDouble();
-                if (roll < 0.35)
+                if (roll < 0.24)
+                {
+                    // 기분 좋아서 점프! 빙키!
+                    TriggerBinky();
+                    return;
+                }
+                else if (roll < 0.44)
+                {
+                    // 손으로 세수하기
+                    TriggerWash();
+                    return;
+                }
+                else if (roll < 0.62)
                 {
                     // '놀자' 상태에서 두리번거릴 때 실사 어리둥절 애니메이션 재생!
                     PlayConfusedAnimation(() =>
@@ -418,19 +464,11 @@ namespace BunnyPet
                     });
                     return;
                 }
-                else if (roll < 0.60)
+                else if (roll < 0.78)
                 {
                     // 실사 내놔! 포즈
                     SetVisualState(BunnyState.Beg);
                     ShowMessage(begPhrases[random.Next(begPhrases.Length)], 2600);
-                    ScheduleBehavior(3200);
-                    return;
-                }
-                else if (roll < 0.80)
-                {
-                    // 실사 화났어! 포즈
-                    SetVisualState(BunnyState.Angry);
-                    ShowMessage(angryPhrases[random.Next(angryPhrases.Length)], 2600);
                     ScheduleBehavior(3200);
                     return;
                 }
@@ -526,6 +564,10 @@ namespace BunnyPet
                 case BunnyState.Angry: AnimatePurring(); break;
                 case BunnyState.Front: AnimateBreathing(); break;
                 case BunnyState.Intro: AnimateHappy(); break;
+                case BunnyState.Binky: AnimateBinky(); break;
+                case BunnyState.Kiss: AnimateKiss(); break;
+                case BunnyState.Wash: AnimateWashing(); break;
+                case BunnyState.Flop: AnimateSleeping(); break;
             }
         }
 
@@ -538,6 +580,22 @@ namespace BunnyPet
             if (state == BunnyState.Intro)
             {
                 return "bunny-intro.png";
+            }
+            if (state == BunnyState.Binky)
+            {
+                return "bunny-binky.png";
+            }
+            if (state == BunnyState.Kiss)
+            {
+                return "bunny-kiss.png";
+            }
+            if (state == BunnyState.Wash)
+            {
+                return "bunny-wash.png";
+            }
+            if (state == BunnyState.Flop)
+            {
+                return "bunny-flop.png";
             }
             if (!machine.PlayMode && (state == BunnyState.Idle || state == BunnyState.Sleep))
             {
@@ -554,6 +612,10 @@ namespace BunnyPet
                 case BunnyState.Angry: return "bunny-angry.png";
                 case BunnyState.Front: return "bunny-front.png";
                 case BunnyState.Intro: return "bunny-intro.png";
+                case BunnyState.Binky: return "bunny-binky.png";
+                case BunnyState.Kiss: return "bunny-kiss.png";
+                case BunnyState.Wash: return "bunny-wash.png";
+                case BunnyState.Flop: return "bunny-flop.png";
                 default: return "bunny-idle.png";
             }
         }
@@ -562,9 +624,11 @@ namespace BunnyPet
         {
             StopConfusedAnimation();
             translate.BeginAnimation(TranslateTransform.YProperty, null);
+            translate.BeginAnimation(TranslateTransform.XProperty, null);
             rotate.BeginAnimation(RotateTransform.AngleProperty, null);
             scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
             scale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            translate.X = 0;
             translate.Y = 0;
             rotate.Angle = 0;
             scale.ScaleX = 1;
@@ -583,6 +647,21 @@ namespace BunnyPet
         private void AnimateSleeping() { Animate(scale, ScaleTransform.ScaleXProperty, 1, 1.012, 3400); Animate(scale, ScaleTransform.ScaleYProperty, 1, 0.992, 3400); }
         private void AnimateHappy() { Animate(translate, TranslateTransform.YProperty, 0, -4, 420, 4); Animate(rotate, RotateTransform.AngleProperty, 0, 2, 420, 4); }
         private void AnimateDangling() { Animate(rotate, RotateTransform.AngleProperty, -2, 2, 620); }
+        private void AnimateBinky()
+        {
+            Animate(translate, TranslateTransform.YProperty, 0, -18, 300, 3);
+            Animate(rotate, RotateTransform.AngleProperty, 0, -8, 300, 3);
+        }
+        private void AnimateKiss()
+        {
+            Animate(scale, ScaleTransform.ScaleXProperty, 1.0, 1.05, 360, 2);
+            Animate(scale, ScaleTransform.ScaleYProperty, 1.0, 0.97, 360, 2);
+        }
+        private void AnimateWashing()
+        {
+            Animate(translate, TranslateTransform.YProperty, 0, -2, 160, 8);
+            Animate(rotate, RotateTransform.AngleProperty, -2, 2, 160, 8);
+        }
 
         public void TriggerPurring()
         {
@@ -633,6 +712,7 @@ namespace BunnyPet
         {
             machine.Touch(DateTime.UtcNow);
             StopWalking();
+            affinity = Math.Min(100, affinity + 1);
 
             if (currentItem == BunnyItem.House)
             {
@@ -663,6 +743,13 @@ namespace BunnyPet
                 string hayPhrase = hayPhrases[random.Next(hayPhrases.Length)];
                 ShowMessage(hayPhrase, 2500, true);
                 ScheduleBehavior(2800);
+                return;
+            }
+
+            // 호감도가 쌓인 상태에서 쓰다듬으면 뽀뽀(래빗키스) 발동!
+            if (affinity >= 20 && random.NextDouble() < 0.42)
+            {
+                TriggerRabbitKiss();
                 return;
             }
 
@@ -788,7 +875,11 @@ namespace BunnyPet
                 .Concat(begPhrases)
                 .Concat(angryPhrases)
                 .Concat(frontPhrases)
-                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸" })
+                .Concat(kissPhrases)
+                .Concat(binkyPhrases)
+                .Concat(washPhrases)
+                .Concat(flopPhrases)
+                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸", "💋", "🧼", "🛌", "🤸" })
                 .Distinct();
 
             foreach (var em in allEmojis)
@@ -932,8 +1023,116 @@ namespace BunnyPet
                     AddHeart();
                     ShowMessage(introPhrases[random.Next(introPhrases.Length)], 3000, true);
                     break;
+                case BunnyState.Binky:
+                    AddHeart();
+                    ShowMessage(binkyPhrases[random.Next(binkyPhrases.Length)], 3000, true);
+                    break;
+                case BunnyState.Kiss:
+                    AddHeart();
+                    ShowMessage(kissPhrases[random.Next(kissPhrases.Length)], 3000, true);
+                    break;
+                case BunnyState.Wash:
+                    ShowMessage(washPhrases[random.Next(washPhrases.Length)], 3000, true);
+                    break;
+                case BunnyState.Flop:
+                    AddHeart();
+                    ShowMessage(flopPhrases[random.Next(flopPhrases.Length)], 3200, true);
+                    break;
             }
             ScheduleBehavior(3600);
+        }
+
+        public void TriggerAngrySpamReaction()
+        {
+            if (resourcesDisposed) return;
+            StopAnimation();
+            StopWalking();
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+            SetVisualState(BunnyState.Angry);
+            AnimatePurring();
+            affinity = Math.Max(0, affinity - 2);
+
+            string[] spamAngryPhrases = { "그만 찔러! 😤", "민트 뿔났다! ⚡", "발로 쿵쿵! 😾", "아야! 괴롭히지 마! 💢", "화났어! 😡" };
+            ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
+            ScheduleBehavior(3500);
+        }
+
+        public void TriggerRabbitKiss()
+        {
+            if (resourcesDisposed) return;
+            StopAnimation();
+            StopWalking();
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+            SetVisualState(BunnyState.Kiss);
+            AddHeart();
+            Task.Delay(180).ContinueWith(_ =>
+            {
+                if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                try
+                {
+                    Dispatcher.BeginInvoke(new Action(delegate
+                    {
+                        if (!resourcesDisposed) AddHeart();
+                    }));
+                }
+                catch (InvalidOperationException) { }
+            });
+            string kiss = kissPhrases[random.Next(kissPhrases.Length)];
+            ShowMessage(kiss, 2800, true);
+            ScheduleBehavior(3400);
+        }
+
+        public void TriggerBinky()
+        {
+            if (resourcesDisposed) return;
+            StopAnimation();
+            StopWalking();
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+            SetVisualState(BunnyState.Binky);
+            AddHeart();
+            string binky = binkyPhrases[random.Next(binkyPhrases.Length)];
+            ShowMessage(binky, 2600, true);
+            ScheduleBehavior(3200);
+        }
+
+        public void TriggerWash()
+        {
+            if (resourcesDisposed) return;
+            StopAnimation();
+            StopWalking();
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+            SetVisualState(BunnyState.Wash);
+            string wash = washPhrases[random.Next(washPhrases.Length)];
+            ShowMessage(wash, 2800, true);
+            ScheduleBehavior(3400);
+        }
+
+        public void TriggerFlop()
+        {
+            if (resourcesDisposed) return;
+            StopAnimation();
+            StopWalking();
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+            SetVisualState(BunnyState.Flop);
+            AddHeart();
+            string flop = flopPhrases[random.Next(flopPhrases.Length)];
+            ShowMessage(flop, 3200, true);
+            ScheduleBehavior(4500);
         }
 
         public void PlayIntroGreeting()
@@ -1114,6 +1313,20 @@ namespace BunnyPet
         {
             if (e.ChangedButton != MouseButton.Left) return;
             machine.Touch(DateTime.UtcNow);
+
+            // 짧은 시간 안에 민트를 많이 눌렀을 때 (연타/괴롭힘) 화난 제스처 발동!
+            var now = DateTime.UtcNow;
+            clickHistory.Add(now);
+            clickHistory.RemoveAll(t => (now - t).TotalMilliseconds > 1800);
+            if (clickHistory.Count >= 4)
+            {
+                clickHistory.Clear();
+                CancelPointer();
+                TriggerAngrySpamReaction();
+                e.Handled = true;
+                return;
+            }
+
             dragging = true;
             dragMoved = false;
             dragDistance = 0;
@@ -1229,6 +1442,22 @@ namespace BunnyPet
             menu.Items.Add(petItem);
 
             var poseMenu = new MenuItem { Header = "📸 민트 특별 포즈" };
+
+            var binkyItem = new MenuItem { Header = "🤸 기분 최고 점프! 빙키 (실사 포즈)" };
+            binkyItem.Click += delegate { TriggerPose(BunnyState.Binky); };
+            poseMenu.Items.Add(binkyItem);
+
+            var kissItem = new MenuItem { Header = "💋 뽀뽀해주는 래빗키스 (실사 포즈)" };
+            kissItem.Click += delegate { TriggerPose(BunnyState.Kiss); };
+            poseMenu.Items.Add(kissItem);
+
+            var washItem = new MenuItem { Header = "🧼 손으로 쓱싹 세수하기 (실사 포즈)" };
+            washItem.Click += delegate { TriggerPose(BunnyState.Wash); };
+            poseMenu.Items.Add(washItem);
+
+            var flopItem = new MenuItem { Header = "🛌 안심하고 벌러덩 눕기 (실사 포즈)" };
+            flopItem.Click += delegate { TriggerPose(BunnyState.Flop); };
+            poseMenu.Items.Add(flopItem);
 
             var begItem = new MenuItem { Header = "🌾 간식 내놔! 민트 (실사 포즈)" };
             begItem.Click += delegate { TriggerPose(BunnyState.Beg); };

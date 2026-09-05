@@ -11,7 +11,11 @@ public enum BunnyState
     Beg,
     Angry,
     Front,
-    Intro
+    Intro,
+    Binky,
+    Kiss,
+    Wash,
+    Flop
 }
 
 public enum BunnyItem

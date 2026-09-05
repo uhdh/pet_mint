@@ -46,6 +46,10 @@
     <Resource Include="Assets\bunny-beg.png" />
     <Resource Include="Assets\bunny-angry.png" />
     <Resource Include="Assets\bunny-intro.png" />
+    <Resource Include="Assets\bunny-binky.png" />
+    <Resource Include="Assets\bunny-kiss.png" />
+    <Resource Include="Assets\bunny-wash.png" />
+    <Resource Include="Assets\bunny-flop.png" />
     <Resource Include="Assets\icon.ico" />
     <Resource Include="Assets\item-hay.png" />
     <Resource Include="Assets\item-doll.png" />

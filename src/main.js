@@ -104,7 +104,25 @@ function refreshTrayMenu() {
 function buildMenu() {
   return Menu.buildFromTemplate([
     {
-      label: isPaused ? '다시 움직이기' : '잠깐 멈추기',
+      label: '🖐️ 민트 쓰다듬기',
+      click: () => petWindow?.webContents.send('pet:pet-requested')
+    },
+    { type: 'separator' },
+    {
+      label: '🎁 민트에게 선물하기',
+      submenu: [
+        { label: '🌾 맛있는 건초 주기', click: () => petWindow?.webContents.send('pet:item-changed', 'hay') },
+        { label: '🪑 작은 의자 놓기', click: () => petWindow?.webContents.send('pet:item-changed', 'chair') },
+        { label: '🧸 토끼 인형 놓기', click: () => petWindow?.webContents.send('pet:item-changed', 'doll') },
+        { label: '🎒 소풍 가방 메어주기', click: () => petWindow?.webContents.send('pet:item-changed', 'bag') },
+        { label: '🏠 아늑한 집 지어주기', click: () => petWindow?.webContents.send('pet:item-changed', 'house') },
+        { type: 'separator' },
+        { label: '❌ 아이템 치우기', click: () => petWindow?.webContents.send('pet:item-changed', 'none') }
+      ]
+    },
+    { type: 'separator' },
+    {
+      label: isPaused ? '▶ 민트 다시 움직이기' : '⏸ 민트 잠깐 멈추기',
       click: () => {
         isPaused = !isPaused;
         sendPauseState();
@@ -135,9 +153,9 @@ function buildMenu() {
         refreshTrayMenu();
       }
     },
-    { label: '오른쪽 아래로 돌아가기', click: resetPosition },
+    { label: '↩ 민트 자리로 부르기 (오른쪽 아래)', click: resetPosition },
     { type: 'separator' },
-    { label: '토끼 보내기', role: 'quit' }
+    { label: '👋 민트 재우기 (종료)', role: 'quit' }
   ]);
 }
 
@@ -145,7 +163,7 @@ function createTray() {
   const trayPath = path.join(__dirname, '..', 'assets', 'icon.png');
   const trayImage = nativeImage.createFromPath(trayPath).resize({ width: 32, height: 32 });
   tray = new Tray(trayImage);
-  tray.setToolTip('내 토끼 데스크톱 펫');
+  tray.setToolTip('민트 키우기');
   tray.setContextMenu(buildMenu());
   tray.on('click', () => {
     if (!petWindow) {

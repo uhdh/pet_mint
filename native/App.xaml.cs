@@ -20,6 +20,7 @@ namespace BunnyPet
         private MainWindow window;
         private Forms.NotifyIcon tray;
         private Forms.ToolStripMenuItem pauseItem;
+        private Forms.ToolStripMenuItem visibilityItem;
         private AppSettings settings;
         private bool paused;
         private bool quitting;
@@ -53,6 +54,7 @@ namespace BunnyPet
             window = new MainWindow();
             MainWindow = window;
             window.SetAlwaysOnTop(settings.AlwaysOnTop);
+            window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
             window.Show();
             if (showPending) ShowWindow();
             CreateTray();
@@ -116,16 +118,39 @@ namespace BunnyPet
             try
             {
                 var menu = new Forms.ContextMenuStrip();
-                pauseItem = new Forms.ToolStripMenuItem("Pause");
+
+                var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window.ReactToPetting(); });
+                menu.Items.Add(petItem);
+                menu.Items.Add(new Forms.ToolStripSeparator());
+
+                var itemsMenu = new Forms.ToolStripMenuItem("🎁 민트에게 선물하기");
+                var hayItem = new Forms.ToolStripMenuItem("🌾 맛있는 건초 (Hay)", null, delegate { window.SetItem(BunnyItem.Hay); });
+                var chairItem = new Forms.ToolStripMenuItem("🪑 작은 의자 (Chair)", null, delegate { window.SetItem(BunnyItem.Chair); });
+                var dollItem = new Forms.ToolStripMenuItem("🧸 토끼 인형 (Plush Doll)", null, delegate { window.SetItem(BunnyItem.Doll); });
+                var bagItem = new Forms.ToolStripMenuItem("🎒 소풍 가방 (Backpack)", null, delegate { window.SetItem(BunnyItem.Bag); });
+                var houseItem = new Forms.ToolStripMenuItem("🏠 아늑한 집 (House)", null, delegate { window.SetItem(BunnyItem.House); });
+                var clearItem = new Forms.ToolStripMenuItem("❌ 아이템 치우기 (Remove Item)", null, delegate { window.SetItem(BunnyItem.None); });
+
+                itemsMenu.DropDownItems.Add(hayItem);
+                itemsMenu.DropDownItems.Add(chairItem);
+                itemsMenu.DropDownItems.Add(dollItem);
+                itemsMenu.DropDownItems.Add(bagItem);
+                itemsMenu.DropDownItems.Add(houseItem);
+                itemsMenu.DropDownItems.Add(new Forms.ToolStripSeparator());
+                itemsMenu.DropDownItems.Add(clearItem);
+                menu.Items.Add(itemsMenu);
+                menu.Items.Add(new Forms.ToolStripSeparator());
+
+                pauseItem = new Forms.ToolStripMenuItem("⏸ 민트 잠깐 멈추기");
                 pauseItem.Click += delegate
                 {
                     paused = !paused;
                     window.SetPaused(paused);
-                    pauseItem.Text = paused ? "Resume" : "Pause";
+                    pauseItem.Text = paused ? "▶ 민트 다시 움직이기" : "⏸ 민트 잠깐 멈추기";
                 };
                 menu.Items.Add(pauseItem);
 
-                var topmostItem = new Forms.ToolStripMenuItem("Always on top")
+                var topmostItem = new Forms.ToolStripMenuItem("📌 항상 위에 표시 (Always on top)")
                 {
                     CheckOnClick = true,
                     Checked = settings.AlwaysOnTop
@@ -138,7 +163,7 @@ namespace BunnyPet
                 };
                 menu.Items.Add(topmostItem);
 
-                var autoStartItem = new Forms.ToolStripMenuItem("Start with Windows")
+                var autoStartItem = new Forms.ToolStripMenuItem("🚀 윈도우 시작 시 자동 실행 (Start with Windows)")
                 {
                     CheckOnClick = true,
                     Checked = settings.AutoStart,
@@ -152,18 +177,45 @@ namespace BunnyPet
                 };
                 menu.Items.Add(autoStartItem);
 
-                var resetItem = new Forms.ToolStripMenuItem("Reset position");
+                var restRemindersItem = new Forms.ToolStripMenuItem("🍵 휴식 알림 받기 (Rest reminders)")
+                {
+                    CheckOnClick = true,
+                    Checked = settings.RestRemindersEnabled
+                };
+                restRemindersItem.Click += delegate
+                {
+                    settings.RestRemindersEnabled = restRemindersItem.Checked;
+                    window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
+                    SaveSettings();
+                };
+                menu.Items.Add(restRemindersItem);
+
+                var resetItem = new Forms.ToolStripMenuItem("↩ 민트 자리로 부르기 (Reset position)");
                 resetItem.Click += delegate { window.ResetPosition(); };
                 menu.Items.Add(resetItem);
 
                 menu.Items.Add(new Forms.ToolStripSeparator());
-                var quitItem = new Forms.ToolStripMenuItem("Quit");
+                visibilityItem = new Forms.ToolStripMenuItem("민트 숨기기 (Hide Mint)");
+                visibilityItem.Click += delegate { ToggleWindow(); };
+                menu.Items.Add(visibilityItem);
+
+                menu.Items.Add(new Forms.ToolStripSeparator());
+                var backupItem = new Forms.ToolStripMenuItem("설정 백업하기 (Backup settings)...");
+                backupItem.Click += delegate { BackupSettings(); };
+                menu.Items.Add(backupItem);
+
+                var restoreItem = new Forms.ToolStripMenuItem("설정 복원하기 (Restore settings)...");
+                restoreItem.Click += delegate { RestoreSettings(topmostItem, autoStartItem, restRemindersItem); };
+                menu.Items.Add(restoreItem);
+
+                menu.Items.Add(new Forms.ToolStripSeparator());
+                var quitItem = new Forms.ToolStripMenuItem("👋 민트 재우기 / 종료 (Quit)");
                 quitItem.Click += delegate { Quit(); };
                 menu.Items.Add(quitItem);
 
                 tray = new Forms.NotifyIcon
                 {
-                    Text = "My Bunny Desktop Pet",
+                    Text = "민트 키우기",
                     Icon = LoadTrayIcon(),
                     ContextMenuStrip = menu,
                     Visible = true
@@ -205,8 +257,55 @@ namespace BunnyPet
                     window.Show();
                     window.Activate();
                 }
+                if (visibilityItem != null) visibilityItem.Text = window.IsVisible ? "민트 숨기기 (Hide Mint)" : "민트 보이기 (Show Mint)";
             }
             catch (Exception) { }
+        }
+
+        private void BackupSettings()
+        {
+            using (var dialog = new Forms.SaveFileDialog
+            {
+                FileName = "mint-settings.json",
+                Filter = "JSON (*.json)|*.json",
+                DefaultExt = "json"
+            })
+            {
+                if (dialog.ShowDialog() != Forms.DialogResult.OK) return;
+                try { settings.SaveTo(dialog.FileName); }
+                catch (Exception)
+                {
+                    System.Windows.MessageBox.Show("설정을 내보내지 못했습니다.", "민트 키우기");
+                }
+            }
+        }
+
+        private void RestoreSettings(Forms.ToolStripMenuItem topmostItem, Forms.ToolStripMenuItem autoStartItem, Forms.ToolStripMenuItem restRemindersItem)
+        {
+            using (var dialog = new Forms.OpenFileDialog
+            {
+                Filter = "JSON (*.json)|*.json",
+                DefaultExt = "json"
+            })
+            {
+                if (dialog.ShowDialog() != Forms.DialogResult.OK) return;
+                try
+                {
+                    settings = AppSettings.LoadFrom(dialog.FileName);
+                }
+                catch (Exception)
+                {
+                    System.Windows.MessageBox.Show("설정 파일을 읽지 못했습니다.", "민트 키우기");
+                    return;
+                }
+                window.SetAlwaysOnTop(settings.AlwaysOnTop);
+                window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
+                if (!IsPackaged()) SetAutoStart(settings.AutoStart);
+                topmostItem.Checked = settings.AlwaysOnTop;
+                autoStartItem.Checked = settings.AutoStart;
+                restRemindersItem.Checked = settings.RestRemindersEnabled;
+                SaveSettings();
+            }
         }
 
         private void ShowWindow()

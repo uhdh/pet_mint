@@ -10,6 +10,16 @@ public enum BunnyState
     Drag
 }
 
+public enum BunnyItem
+{
+    None,
+    Hay,
+    Doll,
+    Bag,
+    House,
+    Chair
+}
+
 public sealed class BunnyStateMachine
 {
     private DateTime lastInteraction;
@@ -31,6 +41,16 @@ public sealed class BunnyStateMachine
         if (!Enum.IsDefined(typeof(BunnyState), next))
             throw new ArgumentOutOfRangeException("next", next, "Unknown bunny state.");
         State = next;
+    }
+
+    public bool Paused
+    {
+        get { return paused; }
+    }
+
+    public void SetDirection(int value)
+    {
+        Direction = value < 0 ? -1 : 1;
     }
 
     public void SetPaused(bool value)
@@ -58,5 +78,21 @@ public sealed class BunnyStateMachine
         if (roll < 0.72) return BunnyState.Walk;
         if (roll < 0.90) return BunnyState.Stand;
         return BunnyState.Sleep;
+    }
+}
+
+public static class ClimbMath
+{
+    // ponytail: reuses the existing walk sprite/animation for vertical movement
+    // instead of new climbing artwork; only the position math needs a check.
+    public static double Clamp(double value, double min, double max)
+    {
+        if (min > max) return min;
+        return Math.Max(min, Math.Min(value, max));
+    }
+
+    public static bool ShouldClimb(double roll)
+    {
+        return roll < 0.3;
     }
 }

@@ -53,4 +53,4 @@
 
 ## 저작권
 
-© 2026 {{PUBLISHER_DISPLAY_NAME}}. All rights reserved.
+© 2026 UHDH. All rights reserved.

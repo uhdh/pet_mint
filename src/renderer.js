@@ -19,12 +19,37 @@ const ASSETS = {
 };
 
 const PHRASES = [
-  '오늘도 같이 있어요',
-  '코를 살짝 눌러 주세요',
-  '간식 생각 중…',
-  '옆에 있어도 될까요?',
-  '쓰다듬어 줘서 고마워요'
+  '💕', '🥰', '💖', '💗', '💓', '💞', '😻', '🌸', '✨', '❤️', '🧡', '💛', '🤍', '😍', '😚', '💘'
 ];
+
+const CURSOR_PHRASES = [
+  '👀', '❓', '👋', '🐰', '😳', '✨', '⭐', '💡', '🔍', '🧐', '🤍', '🐾', '😮', '💫'
+];
+
+const ITEM_PHRASES = {
+  doll: [
+    '💢', '😡', '😤', '😒', '🥺', '😱', '🙄', '💔', '⚡', '👿', '😣', '😾', '😠', '💥'
+  ],
+  hay: [
+    '🌾', '😋', '🥕', '🤤', '🥣', '🌿', '🍀', '🍽️', '🥗', '👅', '🍴', '🌱'
+  ],
+  bag: [
+    '🎒', '🎈', '🎉', '🗺️', '🧭', '🥪', '👟', '🏕️', '🏃', '✨', '🎊', '🏖️'
+  ],
+  house: [
+    '🏠', '💤', '🛋️', '🌙', '⭐', '🕯️', '🏡', '🛌', '😴', '☁️', '🛏️', '🪵'
+  ],
+  chair: [
+    '🪑', '😌', '🛋️', '☕', '🍃', '🌸', '💆', '✨', '🧋', '🍵', '🌼', '🫖'
+  ]
+};
+
+const itemHouse = document.querySelector('#item-house');
+const itemChair = document.querySelector('#item-chair');
+const itemDoll = document.querySelector('#item-doll');
+const itemHay = document.querySelector('#item-hay');
+const itemBag = document.querySelector('#item-bag');
+let currentItem = 'none';
 
 let behaviorTimer = null;
 let walkTimer = null;
@@ -109,30 +134,147 @@ function scheduleBehavior(delay = randomBetween(3500, 7600)) {
   }, delay);
 }
 
+function setItem(item) {
+  currentItem = item || 'none';
+  if (itemHouse) itemHouse.classList.toggle('hidden', item !== 'house');
+  if (itemChair) itemChair.classList.toggle('hidden', item !== 'chair');
+  if (itemDoll) itemDoll.classList.toggle('hidden', item !== 'doll');
+  if (itemHay) itemHay.classList.toggle('hidden', item !== 'hay');
+  if (itemBag) itemBag.classList.toggle('hidden', item !== 'bag');
+
+  machine.touch();
+  stopWalking();
+
+  if (item === 'doll') {
+    setDirection(-1);
+    setVisualState('stand');
+    showMessage(ITEM_PHRASES.doll[randomBetween(0, ITEM_PHRASES.doll.length - 1)], 2600);
+    scheduleBehavior(3000);
+  } else if (item === 'hay') {
+    setDirection(1);
+    setVisualState('happy');
+    floatHeart();
+    showMessage(ITEM_PHRASES.hay[randomBetween(0, ITEM_PHRASES.hay.length - 1)], 2500);
+    scheduleBehavior(2800);
+  } else if (item === 'chair') {
+    setVisualState('idle');
+    floatHeart();
+    showMessage(ITEM_PHRASES.chair[randomBetween(0, ITEM_PHRASES.chair.length - 1)], 2500);
+    scheduleBehavior(2800);
+  } else if (item === 'bag') {
+    setVisualState('happy');
+    showMessage(ITEM_PHRASES.bag[randomBetween(0, ITEM_PHRASES.bag.length - 1)], 2500);
+    scheduleBehavior(2800);
+  } else if (item === 'house') {
+    setVisualState('idle');
+    showMessage(ITEM_PHRASES.house[randomBetween(0, ITEM_PHRASES.house.length - 1)], 2500);
+    scheduleBehavior(2800);
+  } else {
+    showMessage('✨', 1800);
+    setVisualState('idle');
+    scheduleBehavior(2000);
+  }
+}
+
 function reactToPetting() {
   machine.touch();
   stopWalking();
+
+  if (currentItem === 'doll') {
+    setDirection(-1);
+    setVisualState('stand');
+    const phrase = ITEM_PHRASES.doll[randomBetween(0, ITEM_PHRASES.doll.length - 1)];
+    showMessage(phrase, 2800);
+    scheduleBehavior(3000);
+    return;
+  }
+
   setVisualState('happy');
   floatHeart();
   setTimeout(floatHeart, 190);
-  showMessage(PHRASES[randomBetween(0, PHRASES.length - 1)]);
+
+  let phrase;
+  if (currentItem === 'hay') {
+    phrase = ITEM_PHRASES.hay[randomBetween(0, ITEM_PHRASES.hay.length - 1)];
+  } else if (currentItem === 'chair') {
+    phrase = ITEM_PHRASES.chair[randomBetween(0, ITEM_PHRASES.chair.length - 1)];
+  } else if (currentItem === 'bag') {
+    phrase = ITEM_PHRASES.bag[randomBetween(0, ITEM_PHRASES.bag.length - 1)];
+  } else if (currentItem === 'house') {
+    phrase = ITEM_PHRASES.house[randomBetween(0, ITEM_PHRASES.house.length - 1)];
+  } else {
+    phrase = PHRASES[randomBetween(0, PHRASES.length - 1)];
+  }
+
+  showMessage(phrase, 2200);
+  scheduleBehavior(2400);
+}
+
+let lastHoverReactionTime = 0;
+
+function reactToHover(event) {
+  if (dragging || machine.paused || machine.state === 'happy' || machine.state === 'drag') return;
+  const now = Date.now();
+  if (now - lastHoverReactionTime < 2500) return;
+  lastHoverReactionTime = now;
+
+  machine.touch();
+  stopWalking();
+
+  if (event) {
+    const rect = pet.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    if (event.clientX < centerX) {
+      setDirection(-1);
+    } else {
+      setDirection(1);
+    }
+  }
+
+  setVisualState('stand');
+  const phrase = CURSOR_PHRASES[randomBetween(0, CURSOR_PHRASES.length - 1)];
+  showMessage(phrase, 2000);
   scheduleBehavior(2300);
 }
+
+let strokeDistance = 0;
+let lastStrokeTime = 0;
+let lastPetReactionTime = 0;
+
+pet.addEventListener('pointerenter', reactToHover);
 
 pet.addEventListener('pointerdown', (event) => {
   if (event.button !== 0) return;
   machine.touch();
   dragging = true;
   dragMoved = false;
+  strokeDistance = 0;
   lastPointer = { x: event.screenX, y: event.screenY };
   pet.setPointerCapture(event.pointerId);
 });
 
 pet.addEventListener('pointermove', (event) => {
-  if (!dragging || !lastPointer) return;
+  if (!dragging) {
+    const now = Date.now();
+    if (now - lastStrokeTime > 700) {
+      strokeDistance = 0;
+    }
+    lastStrokeTime = now;
+    if (lastPointer) {
+      strokeDistance += Math.abs(event.screenX - lastPointer.x) + Math.abs(event.screenY - lastPointer.y);
+    }
+    lastPointer = { x: event.screenX, y: event.screenY };
+    if (strokeDistance > 70 && now - lastPetReactionTime > 2200) {
+      lastPetReactionTime = now;
+      strokeDistance = 0;
+      reactToPetting();
+    }
+    return;
+  }
+  if (!lastPointer) return;
   const dx = event.screenX - lastPointer.x;
   const dy = event.screenY - lastPointer.y;
-  if (Math.abs(dx) + Math.abs(dy) > 2) {
+  if (Math.abs(dx) + Math.abs(dy) > 7) {
     if (!dragMoved) {
       dragMoved = true;
       stopWalking();
@@ -162,7 +304,7 @@ pet.addEventListener('dblclick', () => {
   machine.touch();
   stopWalking();
   setVisualState('stand');
-  showMessage('무슨 소리였지?');
+  showMessage('❗');
   scheduleBehavior(3000);
 });
 
@@ -183,13 +325,25 @@ window.bunnyDesktop.onPauseChanged((paused) => {
   machine.setPaused(paused);
   stopWalking();
   setVisualState(paused ? 'sleep' : 'idle');
-  showMessage(paused ? '여기서 잠깐 잘게요' : '다시 놀아 볼까요?');
+  showMessage(paused ? '💤' : '✨');
   scheduleBehavior(paused ? 30000 : 1400);
 });
+
+if (window.bunnyDesktop.onItemChanged) {
+  window.bunnyDesktop.onItemChanged((item) => {
+    setItem(item);
+  });
+}
+
+if (window.bunnyDesktop.onPetRequested) {
+  window.bunnyDesktop.onPetRequested(() => {
+    reactToPetting();
+  });
+}
 
 window.bunnyDesktop.getState().then((state) => {
   machine.setPaused(Boolean(state?.paused));
   setVisualState(machine.paused ? 'sleep' : 'idle');
-  showMessage('안녕하세요!');
+  showMessage('👋');
   scheduleBehavior(2200);
 });

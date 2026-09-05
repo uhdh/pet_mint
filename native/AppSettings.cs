@@ -15,10 +15,14 @@ namespace BunnyPet
         [DataMember(Name = "autoStart", EmitDefaultValue = false)]
         private bool? autoStart;
 
+        [DataMember(Name = "restRemindersEnabled", EmitDefaultValue = false)]
+        private bool? restRemindersEnabled;
+
         public AppSettings()
         {
             alwaysOnTop = true;
             autoStart = false;
+            restRemindersEnabled = true;
         }
 
         [IgnoreDataMember]
@@ -33,6 +37,13 @@ namespace BunnyPet
         {
             get { return autoStart ?? false; }
             set { autoStart = value; }
+        }
+
+        [IgnoreDataMember]
+        public bool RestRemindersEnabled
+        {
+            get { return restRemindersEnabled ?? true; }
+            set { restRemindersEnabled = value; }
         }
 
         public static string FilePath
@@ -87,12 +98,16 @@ namespace BunnyPet
 
         public void Save()
         {
-            var path = FilePath;
+            SaveTo(FilePath);
+        }
+
+        public void SaveTo(string path)
+        {
             var directory = Path.GetDirectoryName(path);
             var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
             try
             {
-                Directory.CreateDirectory(directory);
+                if (!String.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
                 File.WriteAllText(temporary, Serialize(this), new UTF8Encoding(false));
                 if (File.Exists(path)) File.Replace(temporary, path, null);
                 else File.Move(temporary, path);
@@ -101,6 +116,11 @@ namespace BunnyPet
             {
                 if (File.Exists(temporary)) File.Delete(temporary);
             }
+        }
+
+        public static AppSettings LoadFrom(string path)
+        {
+            return Parse(File.ReadAllText(path));
         }
     }
 }

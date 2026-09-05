@@ -44,37 +44,38 @@ namespace BunnyPet
             DispatcherUnhandledException += (s, ev) => { Log("DispatcherUnhandledException: " + ev.Exception); ev.Handled = true; };
 
             base.OnStartup(e);
+
+            var currentProc = Process.GetCurrentProcess();
+            var others = Process.GetProcessesByName(currentProc.ProcessName);
+            foreach (var other in others)
+            {
+                if (other.Id != currentProc.Id)
+                {
+                    try
+                    {
+                        Log("Terminating older instance PID: " + other.Id);
+                        other.Kill();
+                        other.WaitForExit(500);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("Could not terminate PID " + other.Id + ": " + ex.Message);
+                    }
+                }
+            }
+
             EnsureShowEvent();
-            bool created;
             try
             {
-                instanceMutex = new Mutex(true, MutexName, out created);
-                Log("Mutex created: " + created);
+                instanceMutex = new Mutex(true, MutexName, out _);
             }
             catch (AbandonedMutexException ame)
             {
                 Log("Mutex AbandonedMutexException: " + ame.Message);
-                created = true;
             }
             catch (Exception ex)
             {
-                Log("Mutex Exception: " + ex);
-                created = true;
-                instanceMutex = null;
-            }
-
-            if (!created)
-            {
-                var others = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
-                if (others.Length > 1)
-                {
-                    Log("SingleInstance: another active process found (" + others.Length + "), signaling and shutting down.");
-                    SignalExistingInstance();
-                    DisposeShowEvent();
-                    Shutdown();
-                    return;
-                }
-                Log("SingleInstance: mutex was locked but no other active process found. Continuing startup.");
+                Log("Mutex Exception: " + ex.Message);
             }
 
             Log("Loading settings");
@@ -87,6 +88,7 @@ namespace BunnyPet
             window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
             Log("Showing window");
             window.Show();
+            window.Activate();
             if (showPending) ShowWindow();
             Log("Creating Tray");
             CreateTray();
@@ -356,6 +358,7 @@ namespace BunnyPet
             {
                 if (!window.IsVisible) window.Show();
                 window.ResetPosition();
+                window.Topmost = true;
                 window.Activate();
                 if (visibilityItem != null) visibilityItem.Text = "민트 숨기기 (Hide Mint)";
             }

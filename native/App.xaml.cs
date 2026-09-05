@@ -317,7 +317,7 @@ namespace BunnyPet
 
         private System.Drawing.Icon LoadTrayIcon()
         {
-            var resource = GetResourceStream(new Uri("pack://application:,,,/Assets/icon.ico", UriKind.Absolute));
+            var resource = GetResourceStream(new Uri("pack://application:,,,/BunnyPet;component/Assets/icon.ico", UriKind.Absolute));
             if (resource == null) throw new InvalidOperationException("Tray icon resource is missing.");
             using (resource.Stream)
             using (var source = new System.Drawing.Icon(resource.Stream))

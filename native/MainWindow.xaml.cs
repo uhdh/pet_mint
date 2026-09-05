@@ -39,7 +39,7 @@ namespace BunnyPet
         };
         private readonly string[] cursorPhrases =
         {
-            "👀", "❓", "👋", "🐰", "😳", "✨", "⭐", "💡", "🔍", "🧐", "🤍", "🐾", "😮", "💫"
+            "👀", "❓", "👋", "🐰", "😳", "✨", "⭐", "💡", "🔍", "🧐", "🤍", "🐾", "😮", "💫", "👽", "👾"
         };
         private readonly string[] dollPhrases =
         {
@@ -71,7 +71,7 @@ namespace BunnyPet
         };
         private readonly string[] playPhrases =
         {
-            "🎉", "🏃", "✨", "🐾", "🎈", "👀", "🥳"
+            "🎉", "🏃", "✨", "🐾", "🎈", "👀", "🥳", "👽"
         };
         private readonly string[] scoldPhrases =
         {
@@ -87,7 +87,7 @@ namespace BunnyPet
         };
         private readonly string[] frontPhrases =
         {
-            "🐰", "👀", "✨", "🤍", "🐾", "⭐"
+            "🐰", "👀", "✨", "🤍", "🐾", "⭐", "👽", "🛸"
         };
 
         private readonly Dictionary<string, BitmapImage> emojiBitmaps = new Dictionary<string, BitmapImage>();
@@ -495,7 +495,7 @@ namespace BunnyPet
         public void SetVisualState(BunnyState next)
         {
             machine.SetState(next);
-            BunnyImage.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/" + ImageName(next), UriKind.Absolute));
+            BunnyImage.Source = new BitmapImage(new Uri("pack://application:,,,/BunnyPet;component/Assets/" + ImageName(next), UriKind.Absolute));
             StopAnimation();
             switch (next)
             {
@@ -768,7 +768,7 @@ namespace BunnyPet
                 .Concat(begPhrases)
                 .Concat(angryPhrases)
                 .Concat(frontPhrases)
-                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤" })
+                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸" })
                 .Distinct();
 
             foreach (var em in allEmojis)
@@ -776,7 +776,7 @@ namespace BunnyPet
                 try
                 {
                     var code = GetEmojiCode(em);
-                    var uri = new Uri($"pack://application:,,,/Assets/emojis/{code}.png", UriKind.Absolute);
+                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/emojis/{code}.png", UriKind.Absolute);
                     var bmp = new BitmapImage();
                     bmp.BeginInit();
                     bmp.UriSource = uri;
@@ -795,7 +795,7 @@ namespace BunnyPet
             {
                 try
                 {
-                    var uri = new Uri($"pack://application:,,,/Assets/confused/confused_{i:03d}.png", UriKind.Absolute);
+                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/confused/confused_{i:03d}.png", UriKind.Absolute);
                     var bmp = new BitmapImage();
                     bmp.BeginInit();
                     bmp.UriSource = uri;
@@ -816,19 +816,22 @@ namespace BunnyPet
                 return;
             }
 
+            if (currentItem == BunnyItem.House)
+            {
+                SetItem(BunnyItem.None);
+            }
+
             StopAnimation();
             StopWalking();
+            DirectionTransform.ScaleX = 1;
             isPlayingConfusedAnim = true;
             confusedFrameIndex = 0;
             confusedCompletedCallback = onCompleted;
 
             BunnyImage.Source = confusedFrames[0];
 
-            if (machine.PlayMode)
-            {
-                string[] confusedEmojis = { "👀", "❓", "🤔", "😳", "🐰" };
-                ShowMessage(confusedEmojis[random.Next(confusedEmojis.Length)], 3200);
-            }
+            string[] confusedEmojis = { "👀", "❓", "🤔", "😳", "🐰", "👽" };
+            ShowMessage(confusedEmojis[random.Next(confusedEmojis.Length)], 3200, true);
 
             if (confusedAnimTimer == null)
             {
@@ -929,7 +932,7 @@ namespace BunnyPet
                 try
                 {
                     var code = GetEmojiCode(text);
-                    var uri = new Uri($"pack://application:,,,/Assets/emojis/{code}.png", UriKind.Absolute);
+                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/emojis/{code}.png", UriKind.Absolute);
                     var newBmp = new BitmapImage();
                     newBmp.BeginInit();
                     newBmp.UriSource = uri;

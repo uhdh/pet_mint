@@ -56,7 +56,7 @@
   ];
 
   const CURSOR_PHRASES = [
-    '👀', '❓', '👋', '🐰', '😳', '✨', '⭐', '💡', '🔍', '🧐', '🤍', '🐾', '😮', '💫'
+    '👀', '❓', '👋', '🐰', '😳', '✨', '⭐', '💡', '🔍', '🧐', '🤍', '🐾', '😮', '💫', '👽', '👾'
   ];
 
   const ITEM_PHRASES = {
@@ -86,7 +86,7 @@
   ];
 
   const FRONT_PHRASES = [
-    '🐰', '👀', '✨', '🤍', '🐾', '⭐'
+    '🐰', '👀', '✨', '🤍', '🐾', '⭐', '👽', '🛸'
   ];
 
   const RESTING_PHRASES = [
@@ -98,7 +98,7 @@
   ];
 
   const PLAY_PHRASES = [
-    '🎉', '🏃', '✨', '🐾', '🎈', '👀', '🥳'
+    '🎉', '🏃', '✨', '🐾', '🎈', '👀', '🥳', '👽'
   ];
 
   const SCOLD_PHRASES = [
@@ -615,7 +615,7 @@
       btn.addEventListener('click', () => {
         stopSimWalking();
         setSimState('confused');
-        showSimSpeech('❓', 2200);
+        showSimSpeech('👽', 2200, true);
         scheduleSimBehavior(3300);
       });
     });
@@ -817,7 +817,7 @@
       idle: '🤍',
       walk: '🐾',
       stand: '❓',
-      confused: '👀',
+      confused: '👽',
       beg: '🌾',
       angry: '💢',
       front: '🐰',

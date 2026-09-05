@@ -19,12 +19,19 @@ namespace BunnyPet
         private RegisteredWaitHandle showRegistration;
         private MainWindow window;
         private Forms.NotifyIcon tray;
-        private Forms.ToolStripMenuItem pauseItem;
+        private Forms.ToolStripMenuItem playToggleItem;
         private Forms.ToolStripMenuItem visibilityItem;
         private AppSettings settings;
-        private bool paused;
         private bool quitting;
         private bool showPending;
+
+        public void UpdatePlayToggle(bool isPlay)
+        {
+            if (playToggleItem != null)
+            {
+                playToggleItem.Text = isPlay ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)";
+            }
+        }
 
         public static void Log(string msg)
         {
@@ -154,6 +161,15 @@ namespace BunnyPet
             {
                 var menu = new Forms.ContextMenuStrip();
 
+                playToggleItem = new Forms.ToolStripMenuItem(window != null && window.IsPlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)");
+                playToggleItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
+                playToggleItem.Click += delegate
+                {
+                    if (window != null) window.TogglePlayMode();
+                };
+                menu.Items.Add(playToggleItem);
+                menu.Items.Add(new Forms.ToolStripSeparator());
+
                 var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window.ReactToPetting(); });
                 menu.Items.Add(petItem);
                 menu.Items.Add(new Forms.ToolStripSeparator());
@@ -175,15 +191,6 @@ namespace BunnyPet
                 itemsMenu.DropDownItems.Add(clearItem);
                 menu.Items.Add(itemsMenu);
                 menu.Items.Add(new Forms.ToolStripSeparator());
-
-                pauseItem = new Forms.ToolStripMenuItem("⏸ 민트 잠깐 멈추기");
-                pauseItem.Click += delegate
-                {
-                    paused = !paused;
-                    window.SetPaused(paused);
-                    pauseItem.Text = paused ? "▶ 민트 다시 움직이기" : "⏸ 민트 잠깐 멈추기";
-                };
-                menu.Items.Add(pauseItem);
 
                 var topmostItem = new Forms.ToolStripMenuItem("📌 항상 위에 표시 (Always on top)")
                 {

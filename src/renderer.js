@@ -44,6 +44,22 @@ const ITEM_PHRASES = {
   ]
 };
 
+const RESTING_PHRASES = [
+  '🍞', '🍞', '💤', '💤', '😴', '☁️', '🥐', '🥱', '🌾', '🌙', '✨'
+];
+
+const PURR_PHRASES = [
+  '🥰', '💖', '💕', '🌸', '😻', '💓', '💗'
+];
+
+const PLAY_PHRASES = [
+  '🎉', '🏃', '✨', '🐾', '🎈', '👀', '🥳'
+];
+
+const SCOLD_PHRASES = [
+  '🍞', '🥺', '😳', '💤', '🤐', '🤫'
+];
+
 const itemHouse = document.querySelector('#item-house');
 const itemChair = document.querySelector('#item-chair');
 const itemDoll = document.querySelector('#item-doll');
@@ -119,12 +135,53 @@ function floatHeart() {
   setTimeout(() => heart.remove(), 1450);
 }
 
+function triggerPurring() {
+  if (dragging) return;
+  floatHeart();
+  showMessage(PURR_PHRASES[randomBetween(0, PURR_PHRASES.length - 1)], 2200);
+}
+
+function showRestingEmoji() {
+  if (dragging) return;
+  const emoji = RESTING_PHRASES[randomBetween(0, RESTING_PHRASES.length - 1)];
+  showMessage(emoji, 2500);
+}
+
+function setPlayMode(play) {
+  machine.setPlayMode(play);
+  stopWalking();
+  if (play) {
+    setDirection(machine.direction);
+    setVisualState('happy');
+    floatHeart();
+    showMessage(PLAY_PHRASES[randomBetween(0, PLAY_PHRASES.length - 1)], 2200);
+    scheduleBehavior(1500);
+  } else {
+    setVisualState('idle');
+    showMessage(SCOLD_PHRASES[randomBetween(0, SCOLD_PHRASES.length - 1)], 2400);
+    scheduleBehavior(randomBetween(4000, 7500));
+  }
+}
+
 function scheduleBehavior(delay = randomBetween(3500, 7600)) {
   if (behaviorTimer) clearTimeout(behaviorTimer);
   behaviorTimer = setTimeout(() => {
     if (dragging) return scheduleBehavior(900);
-    const next = machine.chooseNext();
     stopWalking();
+
+    if (!machine.playMode) {
+      setVisualState('idle');
+      const roll = Math.random();
+      if (roll < 0.35) {
+        triggerPurring();
+      } else if (roll < 0.75) {
+        showRestingEmoji();
+      }
+      scheduleBehavior(randomBetween(4500, 8500));
+      return;
+    }
+
+    const next = machine.chooseNext();
     setVisualState(next);
     if (next === 'walk') startWalking();
     const duration = next === 'sleep'
@@ -186,6 +243,12 @@ function reactToPetting() {
     const phrase = ITEM_PHRASES.doll[randomBetween(0, ITEM_PHRASES.doll.length - 1)];
     showMessage(phrase, 2800);
     scheduleBehavior(3000);
+    return;
+  }
+
+  if (!machine.playMode) {
+    triggerPurring();
+    scheduleBehavior(randomBetween(4500, 8000));
     return;
   }
 
@@ -302,10 +365,7 @@ pet.addEventListener('pointerup', finishDrag);
 pet.addEventListener('pointercancel', finishDrag);
 pet.addEventListener('dblclick', () => {
   machine.touch();
-  stopWalking();
-  setVisualState('stand');
-  showMessage('❗');
-  scheduleBehavior(3000);
+  setPlayMode(!machine.playMode);
 });
 
 pet.addEventListener('contextmenu', (event) => {
@@ -343,7 +403,8 @@ if (window.bunnyDesktop.onPetRequested) {
 
 window.bunnyDesktop.getState().then((state) => {
   machine.setPaused(Boolean(state?.paused));
+  machine.setPlayMode(false);
   setVisualState(machine.paused ? 'sleep' : 'idle');
-  showMessage('👋');
+  showMessage('🍞', 2500);
   scheduleBehavior(2200);
 });

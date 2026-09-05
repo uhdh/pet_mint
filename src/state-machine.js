@@ -12,6 +12,7 @@
       this.state = 'idle';
       this.direction = options.direction === 1 ? 1 : -1;
       this.paused = false;
+      this.playMode = false;
       this.lastInteraction = options.now ?? Date.now();
     }
 
@@ -19,6 +20,12 @@
       if (!VALID_STATES.has(next)) throw new Error(`Unknown bunny state: ${next}`);
       this.state = next;
       return this.state;
+    }
+
+    setPlayMode(play) {
+      this.playMode = Boolean(play);
+      if (!this.playMode) this.setState('idle');
+      return this.playMode;
     }
 
     setPaused(paused) {
@@ -39,6 +46,9 @@
 
     chooseNext(random = Math.random, now = Date.now()) {
       if (this.paused || now - this.lastInteraction > 120000) return 'sleep';
+      if (!this.playMode) {
+        return random() < 0.85 ? 'idle' : 'sleep';
+      }
       const roll = random();
       if (roll < 0.42) return 'idle';
       if (roll < 0.72) return 'walk';

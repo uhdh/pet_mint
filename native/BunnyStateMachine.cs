@@ -48,6 +48,17 @@ public sealed class BunnyStateMachine
         get { return paused; }
     }
 
+    public bool PlayMode { get; private set; }
+
+    public void SetPlayMode(bool value)
+    {
+        PlayMode = value;
+        if (!PlayMode)
+        {
+            SetState(BunnyState.Idle);
+        }
+    }
+
     public void SetDirection(int value)
     {
         Direction = value < 0 ? -1 : 1;
@@ -74,6 +85,11 @@ public sealed class BunnyStateMachine
     public BunnyState ChooseNext(double roll, DateTime now)
     {
         if (paused || now - lastInteraction > TimeSpan.FromSeconds(120)) return BunnyState.Sleep;
+        if (!PlayMode)
+        {
+            // 기본은 멈추기 자세 (Idle 또는 편히 쉬기)
+            return roll < 0.85 ? BunnyState.Idle : BunnyState.Sleep;
+        }
         if (roll < 0.42) return BunnyState.Idle;
         if (roll < 0.72) return BunnyState.Walk;
         if (roll < 0.90) return BunnyState.Stand;

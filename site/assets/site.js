@@ -73,6 +73,22 @@
     ]
   };
 
+  const RESTING_PHRASES = [
+    '🍞', '🍞', '💤', '💤', '😴', '☁️', '🥐', '🥱', '🌾', '🌙', '✨'
+  ];
+
+  const PURR_PHRASES = [
+    '🥰', '💖', '💕', '🌸', '😻', '💓', '💗'
+  ];
+
+  const PLAY_PHRASES = [
+    '🎉', '🏃', '✨', '🐾', '🎈', '👀', '🥳'
+  ];
+
+  const SCOLD_PHRASES = [
+    '🍞', '🥺', '😳', '💤', '🤐', '🤫'
+  ];
+
   function randomItem(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
@@ -215,7 +231,7 @@
       simDirection = -1;
       updateSimTransform();
       setSimState('idle');
-      showSimSpeech('👋', 2200);
+      showSimSpeech('🍞', 2500);
     }
 
     function updateSimTransform() {
@@ -282,14 +298,51 @@
       }, 70);
     }
 
+    let simPlayMode = false;
+
+    function setSimPlayMode(play) {
+      simPlayMode = Boolean(play);
+      stopSimWalking();
+      const playBtn = document.querySelector('#sim-play-toggle-btn');
+      if (playBtn) {
+        playBtn.textContent = simPlayMode ? '🛑 나대지마 (멈추기)' : '🎉 놀자! (움직이기)';
+        playBtn.classList.toggle('active', simPlayMode);
+      }
+      if (simPlayMode) {
+        setSimState('happy');
+        floatSimHeart();
+        showSimSpeech(randomItem(PLAY_PHRASES), 2200);
+        scheduleSimBehavior(1500);
+      } else {
+        setSimState('idle');
+        showSimSpeech(randomItem(SCOLD_PHRASES), 2400);
+        scheduleSimBehavior(randomBetween(4000, 7500));
+      }
+    }
+
     function scheduleSimBehavior(delay = randomBetween(3500, 7000)) {
       if (simBehaviorTimer) clearTimeout(simBehaviorTimer);
       simBehaviorTimer = setTimeout(() => {
         if (simDragging) return scheduleSimBehavior(1000);
 
-        const roll = Math.random();
         stopSimWalking();
 
+        if (!simPlayMode) {
+          setSimState('idle');
+          const roll = Math.random();
+          if (roll < 0.35) {
+            // 멈추기 자세에서 가끔 갸르릉 하기
+            floatSimHeart();
+            showSimSpeech(randomItem(PURR_PHRASES), 2200);
+          } else if (roll < 0.75) {
+            // 멈춰 있을때는 간헐적으로 식빵, zzz 등 이모티콘 보여주기
+            showSimSpeech(randomItem(RESTING_PHRASES), 2500);
+          }
+          scheduleSimBehavior(randomBetween(4500, 8500));
+          return;
+        }
+
+        const roll = Math.random();
         if (roll < 0.45) {
           setSimState('idle');
           scheduleSimBehavior(randomBetween(3500, 6000));
@@ -317,6 +370,20 @@
         playPopSound();
         showSimSpeech(randomItem(ITEM_PHRASES.doll), 2600);
         scheduleSimBehavior(3000);
+        return;
+      }
+
+      if (!simPlayMode) {
+        floatSimHeart();
+        let phrase;
+        if (simCurrentItem === 'hay') phrase = randomItem(ITEM_PHRASES.hay);
+        else if (simCurrentItem === 'chair') phrase = randomItem(ITEM_PHRASES.chair);
+        else if (simCurrentItem === 'bag') phrase = randomItem(ITEM_PHRASES.bag);
+        else if (simCurrentItem === 'house') phrase = randomItem(ITEM_PHRASES.house);
+        else phrase = randomItem(PURR_PHRASES);
+
+        showSimSpeech(phrase, 2200);
+        scheduleSimBehavior(randomBetween(4500, 8000));
         return;
       }
 
@@ -460,6 +527,18 @@
     if (simHayBtn) {
       simHayBtn.addEventListener('click', () => {
         setSimItem(simCurrentItem === 'hay' ? 'none' : 'hay');
+      });
+    }
+
+    simBunny.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      setSimPlayMode(!simPlayMode);
+    });
+
+    const simPlayBtn = document.querySelector('#sim-play-toggle-btn');
+    if (simPlayBtn) {
+      simPlayBtn.addEventListener('click', () => {
+        setSimPlayMode(!simPlayMode);
       });
     }
 

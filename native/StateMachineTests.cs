@@ -3,14 +3,20 @@ using BunnyPet;
 
 internal static class StateMachineTests
 {
-    private static void Require(bool value, string name) { if (!value) throw new Exception(name); }
+    private static void Require(bool value, string name) { if (!value) { Console.WriteLine("TEST FAILED: " + name); Environment.Exit(1); } }
 
     public static int Main()
     {
         var now = new DateTime(2026, 9, 4, 0, 0, 0, DateTimeKind.Utc);
         var bunny = new BunnyStateMachine(now);
         Require(bunny.State == BunnyState.Idle && bunny.Direction == -1, "initial state");
-        Require(bunny.ChooseNext(0.50, now) == BunnyState.Walk, "walk range");
+        Require(!bunny.PlayMode, "default is stopped mode");
+        Require(bunny.ChooseNext(0.50, now) == BunnyState.Idle, "stopped mode stays idle");
+        bunny.SetPlayMode(true);
+        Require(bunny.PlayMode, "play mode enabled");
+        Require(bunny.ChooseNext(0.50, now) == BunnyState.Walk, "walk range in play mode");
+        bunny.SetPlayMode(false);
+        Require(!bunny.PlayMode && bunny.State == BunnyState.Idle, "stopped mode reset to idle");
         bunny.SetPaused(true);
         Require(bunny.State == BunnyState.Sleep && bunny.Paused, "pause sleeps");
         bunny.SetPaused(false);

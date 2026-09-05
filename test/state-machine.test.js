@@ -23,9 +23,18 @@ test('pause puts the bunny to sleep', () => {
   assert.equal(machine.state, 'sleep');
 });
 
-test('recent activity maps random ranges to expected actions', () => {
+test('stopped mode stays idle by default', () => {
   const now = 1_000_000;
   const machine = new BunnyStateMachine({ now });
+  assert.equal(machine.playMode, false);
+  assert.equal(machine.chooseNext(() => 0.5, now), 'idle');
+});
+
+test('play mode maps random ranges to expected actions', () => {
+  const now = 1_000_000;
+  const machine = new BunnyStateMachine({ now });
+  machine.setPlayMode(true);
+  assert.equal(machine.playMode, true);
   assert.equal(machine.chooseNext(() => 0.1, now), 'idle');
   assert.equal(machine.chooseNext(() => 0.5, now), 'walk');
   assert.equal(machine.chooseNext(() => 0.8, now), 'stand');

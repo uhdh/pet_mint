@@ -18,8 +18,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/site.css?v=20260906_1715">
-  <script src="assets/site.js?v=20260906_1715" defer></script>
+  <link rel="stylesheet" href="assets/site.css?v=20260906_1830">
+  <script src="assets/site.js?v=20260906_1830" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 바로가기</a>
@@ -262,60 +262,95 @@
         </div>
 
         <div class="feature-grid">
-          <div class="feature-card">
+          <!-- 1. 산책 -->
+          <div class="feature-card" data-feature="walk">
             <div class="feature-card__icon">
-              <img src="assets/bunny-walk.png" class="feature-card__asset" alt="산책하는 민트">
+              <div class="feature-stage feature-stage--walk">
+                <span class="feature-paws">🐾</span>
+                <img src="assets/bunny-walk.png" class="feature-card__asset anim-walk" alt="산책하는 민트">
+                <div class="feature-card__shadow"></div>
+              </div>
             </div>
             <h3 class="feature-card__title">화면 아래를 산책합니다</h3>
             <p class="feature-card__desc">작업창 밑을 천천히 깡충깡충 걷다가 화면 모서리에 닿으면 자연스럽게 방향을 바꿔요. 때로는 가만히 숨을 쉬며 주변을 살핍니다.</p>
           </div>
 
-          <div class="feature-card">
+          <!-- 2. 돌아봄 -->
+          <div class="feature-card" data-feature="stand">
             <div class="feature-card__icon">
-              <img src="assets/bunny-stand.png" class="feature-card__asset" alt="돌아보는 민트">
+              <div class="feature-stage feature-stage--stand">
+                <div class="feature-card__bubble anim-bubble-curious" id="bubble-stand">👀</div>
+                <img src="assets/bunny-stand.png" class="feature-card__asset anim-stand" alt="돌아보는 민트">
+                <div class="feature-card__shadow"></div>
+              </div>
             </div>
             <h3 class="feature-card__title">마우스가 오면 돌아봅니다</h3>
             <p class="feature-card__desc">커서가 가까이 다가오면 호기심 가득한 눈으로 쳐다보며 👀, ❓, 🤍 등 깜찍한 이모티콘 1개로 반응합니다.</p>
           </div>
 
-          <div class="feature-card">
+          <!-- 3. 쓰다듬기 -->
+          <div class="feature-card" data-feature="pet">
             <div class="feature-card__icon">
-              <img src="assets/bunny-kiss.png" class="feature-card__asset" alt="뽀뽀하는 민트">
+              <div class="feature-stage feature-stage--pet">
+                <div class="feature-hearts-container" id="hearts-pet">
+                  <span class="feature-floating-heart h1">♥</span>
+                  <span class="feature-floating-heart h2">💕</span>
+                  <span class="feature-floating-heart h3">💖</span>
+                </div>
+                <img src="assets/bunny-kiss.png" class="feature-card__asset anim-pet" alt="쓰다듬으면 하트로 화답하는 민트">
+                <div class="feature-card__shadow"></div>
+              </div>
             </div>
             <h3 class="feature-card__title">쓰다듬으면 하트로 화답해요</h3>
             <p class="feature-card__desc">토끼를 클릭하거나 살살 문지르면 기분 좋게 깡충 뛰며 분홍빛 하트와 💕, 🥰, 💖 등 다채로운 감정 이모티콘이 피어오릅니다.</p>
           </div>
 
-          <div class="feature-card">
+          <!-- 4. 수면 -->
+          <div class="feature-card" data-feature="sleep">
             <div class="feature-card__icon">
-              <img src="assets/bunny-sleep.png" class="feature-card__asset" alt="잠자는 식빵 민트">
+              <div class="feature-stage feature-stage--sleep">
+                <div class="feature-sleep-zzz">
+                  <span class="zzz z1">z</span>
+                  <span class="zzz z2">z</span>
+                  <span class="zzz z3">Z</span>
+                  <span class="zzz z4">💤</span>
+                </div>
+                <img src="assets/bunny-sleep.png" class="feature-card__asset anim-sleep" alt="잠자는 식빵 민트">
+                <div class="feature-card__shadow"></div>
+              </div>
             </div>
             <h3 class="feature-card__title">혼자 두면 쿨쿨 잠이 듭니다</h3>
             <p class="feature-card__desc">일정 시간 상호작용이 없으면 얌전히 엎드려 식빵을 굽습니다. 마우스를 가져가거나 클릭하면 눈을 깜빡이며 다시 깨어나요.</p>
           </div>
 
-          <div class="feature-card">
+          <!-- 5. 초경량 -->
+          <div class="feature-card" data-feature="light">
             <div class="feature-card__icon">
-              <img src="assets/icon.png" class="feature-card__asset" alt="초경량 단일 실행 파일">
+              <div class="feature-stage feature-stage--light">
+                <div class="feature-feather">🪶</div>
+                <img src="assets/bunny-front.png" class="feature-card__asset anim-light" alt="초경량 무설치 민트">
+                <div class="feature-card__shadow"></div>
+              </div>
             </div>
             <h3 class="feature-card__title">6.8MB 초경량 무설치</h3>
             <p class="feature-card__desc">무거운 브라우저 엔진 없이 고속 네이티브 C# WPF로 제작되어 RAM 사용량이 20~30MB에 불과합니다. 설치 없이 다운로드 후 바로 실행됩니다.</p>
           </div>
 
-          <div class="feature-card">
+          <!-- 6. 오프라인 -->
+          <div class="feature-card" data-feature="offline">
             <div class="feature-card__icon">
-              <img src="assets/bunny-front.png" class="feature-card__asset" alt="안전한 오프라인 민트">
+              <div class="feature-stage feature-stage--offline">
+                <div class="feature-shield-aura"></div>
+                <div class="feature-sparkles">
+                  <span class="sp sp1">✨</span>
+                  <span class="sp sp2">✦</span>
+                </div>
+                <img src="assets/bunny-wash.png" class="feature-card__asset anim-wash" alt="안전한 오프라인 민트">
+                <div class="feature-card__shadow"></div>
+              </div>
             </div>
             <h3 class="feature-card__title">100% 안전한 오프라인 동작</h3>
             <p class="feature-card__desc">인터넷 통신, 광고, 계정 연동, 분석 트래커가 전혀 없습니다. 사용자의 모든 데이터와 작업 화면을 안전하게 보호합니다.</p>
-          </div>
-
-          <div class="feature-card feature-card--highlight">
-            <div class="feature-card__icon">
-              <img src="assets/item-house.png?v=20260906_1615" class="feature-card__asset" alt="토끼 선물 아이템">
-            </div>
-            <h3 class="feature-card__title">토끼 집, 건초, 가방, 인형 선물</h3>
-            <p class="feature-card__desc">우클릭 메뉴에서 건초를 주거나 가방을 메어주고, 아늑한 집을 지어줄 수 있어요. 특히 <strong>토끼 인형</strong>을 선물하면 <em>💢</em> 또는 <em>😡</em>라며 질투하는 귀여운 전용 이모티콘 리액션을 보여줍니다!</p>
           </div>
         </div>
       </div>

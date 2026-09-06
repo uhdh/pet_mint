@@ -939,6 +939,98 @@
 
     // 호감도 및 버튼 텍스트 초기화 (전체 해금 상태)
     updateAffinityUI();
+
+    // 특징 카드 인터랙티브 애니메이션 컨트롤러
+    initFeatureCardsAnimation();
+  }
+
+  /* ==========================================================================
+     4. 특징 카드 인터랙티브 애니메이션 컨트롤러 (.feature-card)
+     ========================================================================== */
+  function initFeatureCardsAnimation() {
+    // 2번 카드: 돌아보기 & 호기심 이모티콘 순환
+    const curiousEmoticons = ['👀', '❓', '🤍', '🥰', '✨'];
+    let curiousIdx = 0;
+    const bubbleStand = document.getElementById('bubble-stand');
+    if (bubbleStand) {
+      setInterval(() => {
+        curiousIdx = (curiousIdx + 1) % curiousEmoticons.length;
+        bubbleStand.textContent = curiousEmoticons[curiousIdx];
+      }, 3400);
+    }
+
+    const standCard = document.querySelector('.feature-card[data-feature="stand"]');
+    if (standCard) {
+      standCard.addEventListener('mousemove', (e) => {
+        const rect = standCard.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const img = standCard.querySelector('.feature-card__asset');
+        if (img) {
+          const facing = mouseX < rect.width * 0.5 ? 'scaleX(-1)' : 'scaleX(1)';
+          img.style.transform = `${facing} translateY(-4px)`;
+        }
+      });
+      standCard.addEventListener('mouseleave', () => {
+        const img = standCard.querySelector('.feature-card__asset');
+        if (img) img.style.transform = '';
+      });
+    }
+
+    // 3번 카드: 쓰다듬기 클릭 시 하트 팡팡
+    const petCard = document.querySelector('.feature-card[data-feature="pet"]');
+    if (petCard) {
+      const heartsContainer = petCard.querySelector('.feature-hearts-container');
+      const petImg = petCard.querySelector('.feature-card__asset');
+      petCard.addEventListener('click', (e) => {
+        if (petImg) {
+          petImg.style.transform = 'translateY(-14px) scale(1.15) rotate(-5deg)';
+          setTimeout(() => { if (petImg) petImg.style.transform = ''; }, 350);
+        }
+        if (heartsContainer) {
+          const heartIcons = ['💖', '💕', '♥', '🌸', '✨'];
+          for (let i = 0; i < 3; i++) {
+            const h = document.createElement('span');
+            h.className = 'feature-floating-heart';
+            h.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+            h.style.left = `${20 + Math.random() * 60}%`;
+            h.style.animationDuration = `${1.6 + Math.random() * 0.8}s`;
+            h.style.fontSize = `${0.85 + Math.random() * 0.4}rem`;
+            heartsContainer.appendChild(h);
+            setTimeout(() => h.remove(), 2400);
+          }
+        }
+      });
+    }
+
+    // 4번 카드: 쿨쿨 자다가 마우스 올리면 살짝 눈뜨며 깨어남
+    const sleepCard = document.querySelector('.feature-card[data-feature="sleep"]');
+    if (sleepCard) {
+      const sleepImg = sleepCard.querySelector('.feature-card__asset');
+      sleepCard.addEventListener('mouseenter', () => {
+        if (sleepImg) {
+          sleepImg.style.filter = 'drop-shadow(0 6px 14px rgba(67, 206, 162, 0.4))';
+          sleepImg.style.transform = 'scale(1.08) translateY(-3px)';
+        }
+      });
+      sleepCard.addEventListener('mouseleave', () => {
+        if (sleepImg) {
+          sleepImg.style.filter = '';
+          sleepImg.style.transform = '';
+        }
+      });
+    }
+
+    // 1번 카드: 산책 클릭 시 신나게 깡충
+    const walkCard = document.querySelector('.feature-card[data-feature="walk"]');
+    if (walkCard) {
+      const walkImg = walkCard.querySelector('.feature-card__asset');
+      walkCard.addEventListener('click', () => {
+        if (walkImg) {
+          walkImg.style.transform = 'translateY(-18px) rotate(-8deg) scale(1.1)';
+          setTimeout(() => { if (walkImg) walkImg.style.transform = ''; }, 350);
+        }
+      });
+    }
   }
 
 })();

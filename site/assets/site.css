@@ -1043,42 +1043,419 @@ img {
 /* ==========================================================================
    특징 그리드 (Feature Grid)
    ========================================================================== */
+/* ==========================================================================
+   특징 그리드 (Feature Grid) & 생생한 인터랙티브 애니메이션
+   ========================================================================== */
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
 }
 
 .feature-card {
+  position: relative;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 32px 28px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
 }
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .feature-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-6px);
+  border-color: rgba(67, 206, 162, 0.45);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18), 0 0 16px rgba(67, 206, 162, 0.12);
+}
+
+.feature-card:hover::before {
+  opacity: 1;
 }
 
 .feature-card__icon {
   display: flex;
   align-items: center;
-  min-height: 54px;
+  min-height: 68px;
   margin-bottom: 16px;
 }
+
+/* 무대 컨테이너 */
+.feature-stage {
+  position: relative;
+  width: 76px;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .feature-card__asset {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.22));
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+  z-index: 2;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s;
 }
-.feature-card:hover .feature-card__asset {
-  transform: scale(1.15) rotate(-3deg);
+
+/* 동적 바닥 그림자 */
+.feature-card__shadow {
+  width: 42px;
+  height: 7px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 75%);
+  border-radius: 50%;
+  margin-top: -3px;
+  z-index: 1;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
+
+/* --- 1. 산책 애니메이션 (Walk) --- */
+@keyframes anim-card-walk {
+  0% {
+    transform: translateY(0) translateX(-4px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) translateX(0px) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(0) translateX(4px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-10px) translateX(0px) rotate(4deg);
+  }
+  100% {
+    transform: translateY(0) translateX(-4px) rotate(0deg);
+  }
+}
+@keyframes anim-shadow-walk {
+  0%, 50%, 100% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.35;
+  }
+  25%, 75% {
+    transform: scaleX(0.65) scaleY(0.5);
+    opacity: 0.15;
+  }
+}
+.anim-walk {
+  animation: anim-card-walk 2.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.feature-stage--walk .feature-card__shadow {
+  animation: anim-shadow-walk 2.4s ease-in-out infinite;
+}
+.feature-card:hover .anim-walk {
+  animation-duration: 1.1s;
+}
+.feature-card:hover .feature-stage--walk .feature-card__shadow {
+  animation-duration: 1.1s;
+}
+
+.feature-paws {
+  position: absolute;
+  top: -6px;
+  right: 4px;
+  font-size: 0.85rem;
+  opacity: 0;
+  animation: anim-paws 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes anim-paws {
+  0%, 100% { opacity: 0; transform: translateY(4px); }
+  50% { opacity: 0.8; transform: translateY(0) scale(1.1); }
+}
+
+/* --- 2. 돌아봄 애니메이션 (Stand & Curious) --- */
+@keyframes anim-card-stand {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-3px) rotate(-3deg);
+  }
+  70% {
+    transform: translateY(-1px) rotate(3deg);
+  }
+}
+.anim-stand {
+  animation: anim-card-stand 3.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.feature-card__bubble {
+  position: absolute;
+  top: -14px;
+  right: -2px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+  border-radius: 12px;
+  padding: 2px 7px;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  pointer-events: none;
+  z-index: 4;
+}
+@keyframes anim-bubble-curious {
+  0%, 10% {
+    opacity: 0;
+    transform: scale(0.6) translateY(5px);
+  }
+  25%, 75% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  90%, 100% {
+    opacity: 0;
+    transform: scale(0.6) translateY(-4px);
+  }
+}
+.anim-bubble-curious {
+  animation: anim-bubble-curious 3.4s ease-in-out infinite;
+}
+.feature-card:hover .anim-stand {
+  transform: scale(1.12) translateY(-4px);
+}
+
+/* --- 3. 쓰다듬기 애니메이션 (Pet & Hearts) --- */
+@keyframes anim-card-pet {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-9px) scale(1.08, 0.92) rotate(-3deg);
+  }
+  40% {
+    transform: translateY(0) scale(0.96, 1.04) rotate(0deg);
+  }
+  60% {
+    transform: translateY(-5px) scale(1.04, 0.96) rotate(2deg);
+  }
+  80% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+.anim-pet {
+  animation: anim-card-pet 2.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.feature-card:hover .anim-pet {
+  animation-duration: 0.95s;
+}
+
+.feature-hearts-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 3;
+}
+.feature-floating-heart {
+  position: absolute;
+  color: #ff6584;
+  font-size: 0.85rem;
+  opacity: 0;
+  animation: anim-float-heart 2.6s ease-out infinite;
+}
+.feature-floating-heart.h1 { left: 12%; animation-delay: 0s; }
+.feature-floating-heart.h2 { right: 8%; animation-delay: 0.85s; font-size: 0.95rem; }
+.feature-floating-heart.h3 { left: 42%; animation-delay: 1.7s; font-size: 0.75rem; }
+
+@keyframes anim-float-heart {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.5);
+  }
+  20% {
+    opacity: 0.95;
+    transform: translateY(-4px) scale(1.15);
+  }
+  75% {
+    opacity: 0.85;
+    transform: translateY(-28px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-42px) scale(0.6);
+  }
+}
+
+/* --- 4. 수면 애니메이션 (Sleep & zzz) --- */
+@keyframes anim-card-sleep {
+  0%, 100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.05, 0.94);
+  }
+}
+.anim-sleep {
+  animation: anim-card-sleep 3.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.feature-sleep-zzz {
+  position: absolute;
+  top: -16px;
+  right: -4px;
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 4;
+}
+.feature-sleep-zzz .zzz {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: #8da4c4;
+  opacity: 0;
+  display: inline-block;
+  animation: anim-zzz 3.4s ease-out infinite;
+}
+.feature-sleep-zzz .z1 { font-size: 0.7rem; animation-delay: 0s; }
+.feature-sleep-zzz .z2 { font-size: 0.82rem; animation-delay: 0.75s; }
+.feature-sleep-zzz .z3 { font-size: 0.95rem; animation-delay: 1.5s; }
+.feature-sleep-zzz .z4 { font-size: 0.9rem; animation-delay: 2.25s; }
+
+@keyframes anim-zzz {
+  0% {
+    opacity: 0;
+    transform: translate(0, 8px) scale(0.6);
+  }
+  30% {
+    opacity: 0.9;
+    transform: translate(3px, -4px) scale(1);
+  }
+  75% {
+    opacity: 0.7;
+    transform: translate(7px, -18px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(11px, -28px) scale(0.75);
+  }
+}
+
+/* --- 5. 초경량 애니메이션 (Light & Float) --- */
+@keyframes anim-card-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(-2deg);
+  }
+}
+@keyframes anim-shadow-float {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(0.7);
+    opacity: 0.16;
+  }
+}
+.anim-light {
+  animation: anim-card-float 3.6s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.feature-stage--light .feature-card__shadow {
+  animation: anim-shadow-float 3.6s ease-in-out infinite;
+}
+.feature-feather {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  font-size: 0.95rem;
+  animation: anim-feather-drift 3.6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+@keyframes anim-feather-drift {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-15deg);
+  }
+  50% {
+    transform: translate(5px, -8px) rotate(15deg);
+  }
+}
+
+/* --- 6. 오프라인 & 안전 애니메이션 (Wash & Shield) --- */
+@keyframes anim-card-wash {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-3deg) scale(1.02);
+  }
+  75% {
+    transform: rotate(3deg) scale(1.02);
+  }
+}
+.anim-wash {
+  animation: anim-card-wash 2.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.feature-shield-aura {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(67, 206, 162, 0.22) 0%, rgba(67, 206, 162, 0) 70%);
+  animation: anim-shield-pulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes anim-shield-pulse {
+  0%, 100% {
+    transform: scale(0.88);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.95;
+  }
+}
+.feature-sparkles {
+  position: absolute;
+  top: -8px;
+  right: 2px;
+  pointer-events: none;
+  z-index: 3;
+}
+.feature-sparkles .sp {
+  position: absolute;
+  color: #43cea2;
+  font-size: 0.85rem;
+  animation: anim-sparkle 2.4s ease-in-out infinite;
+}
+.feature-sparkles .sp1 { top: 0; right: 0; animation-delay: 0s; }
+.feature-sparkles .sp2 { top: 14px; right: -8px; font-size: 0.72rem; animation-delay: 1.2s; color: #fbc02d; }
+
+@keyframes anim-sparkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.7) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25) rotate(45deg);
+  }
+}
+
 .feature-card__title {
   font-family: var(--font-serif);
   font-size: 1.25rem;

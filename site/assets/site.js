@@ -239,8 +239,8 @@
     }
   };
 
-  let globalAffinity = parseInt(localStorage.getItem('mint-affinity') || '10', 10);
-  if (isNaN(globalAffinity)) globalAffinity = 10;
+  let globalAffinity = parseInt(localStorage.getItem('mint-affinity') || '0', 10);
+  if (isNaN(globalAffinity)) globalAffinity = 0;
 
   function updateAffinityUI() {
     const levelName = BUNNY_PROGRESSION.getLevelName(globalAffinity);
@@ -248,7 +248,10 @@
 
     const simBadge = document.getElementById('sim-affinity-badge');
     if (simBadge) {
-      simBadge.textContent = `💖 ${globalAffinity}점 (${levelName.split(' ')[0]} 🌸)`;
+      const parts = levelName.split(' ');
+      const tag = parts[0];
+      const emoji = parts.pop();
+      simBadge.textContent = `💖 ${globalAffinity}점 (${tag} ${emoji})`;
     }
 
     const sbVal = document.getElementById('sandbox-affinity-val');

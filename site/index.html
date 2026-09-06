@@ -109,10 +109,15 @@
         <div class="stage" id="demo">
           <div class="desktop-mockup">
             <div class="desktop-mockup__bar">
-              <div class="window-dots">
-                <span></span><span></span><span></span>
+              <div class="desktop-mockup__title-area">
+                <svg class="win-app-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                  <rect x="1" y="1" width="6.5" height="6.5" fill="#0078D4"/>
+                  <rect x="8.5" y="1" width="6.5" height="6.5" fill="#0078D4"/>
+                  <rect x="1" y="8.5" width="6.5" height="6.5" fill="#0078D4"/>
+                  <rect x="8.5" y="8.5" width="6.5" height="6.5" fill="#0078D4"/>
+                </svg>
+                <span class="desktop-mockup__title">Windows 데스크톱 · <span id="sim-affinity-badge" style="color: #e85d75; font-weight: bold;">💖 0점 (Lv.1 🌱)</span></span>
               </div>
-              <div class="desktop-mockup__title">내 컴퓨터 바탕화면 (시뮬레이션) · <span id="sim-affinity-badge" style="color: #e85d75; font-weight: bold;">💖 10점 (Lv.2 🌸)</span></div>
               <div class="desktop-mockup__controls">
                 <button class="mockup-btn" id="sim-mock-play-btn" type="button" title="놀자 / 나대지마 모드 전환">🎉 놀자! (움직이기)</button>
                 <button class="mockup-btn" id="sim-mock-binky-btn" type="button" title="기분 최고 점프 빙키">🤸 빙키</button>
@@ -126,22 +131,60 @@
                 <button class="mockup-btn" id="sim-reset-btn" type="button" title="민트 위치 초기화">위치 초기화</button>
                 <button class="mockup-btn" id="sim-pet-btn" type="button" title="민트 쓰다듬기">🖐️ 쓰다듬기</button>
               </div>
+              <div class="win-caption-controls" aria-hidden="true">
+                <span class="win-caption-btn" title="최소화">─</span>
+                <span class="win-caption-btn" title="최대화">□</span>
+                <span class="win-caption-btn win-caption-btn--close" title="닫기">✕</span>
+              </div>
             </div>
 
             <div class="desktop-mockup__screen" id="sim-screen">
-              <!-- 가상 작업창 -->
+              <!-- Windows 바탕화면 바로가기 아이콘들 -->
+              <div class="mock-desktop-icons">
+                <div class="mock-desktop-icon" title="내 PC">
+                  <div class="mock-desktop-icon__img">💻</div>
+                  <span class="mock-desktop-icon__label">내 PC</span>
+                </div>
+                <div class="mock-desktop-icon" title="휴지통">
+                  <div class="mock-desktop-icon__img">🗑️</div>
+                  <span class="mock-desktop-icon__label">휴지통</span>
+                </div>
+                <div class="mock-desktop-icon mock-desktop-icon--shortcut" title="민트 키우기">
+                  <div class="mock-desktop-icon__img">
+                    🐰
+                    <span class="mock-shortcut-arrow">↗</span>
+                  </div>
+                  <span class="mock-desktop-icon__label">민트 키우기</span>
+                </div>
+              </div>
+
+              <!-- 가상 메모장 작업창 -->
               <div class="mock-window">
                 <div class="mock-window__header">
-                  <span class="mock-icon">📝</span>
-                  <span>오늘의 메모.txt - 메모장</span>
+                  <div class="mock-window__title">
+                    <span class="mock-icon">📝</span>
+                    <span>오늘의 메모.txt - 메모장</span>
+                  </div>
+                  <div class="mock-window__caption">
+                    <span>─</span>
+                    <span>□</span>
+                    <span class="mock-close">✕</span>
+                  </div>
+                </div>
+                <div class="mock-window__menu">
+                  <span>파일(<u>F</u>)</span>
+                  <span>편집(<u>E</u>)</span>
+                  <span>서식(<u>O</u>)</span>
+                  <span>보기(<u>V</u>)</span>
+                  <span>도움말(<u>H</u>)</span>
                 </div>
                 <div class="mock-window__body">
-                  <p class="mock-typing">오늘 하루도 고생 많았어요. 잠시 민트와 함께 쉬어가세요! ☕✨</p>
+                  <p class="mock-typing">오늘 하루도 고생 많았어요.<br>잠시 민트와 함께 편안하게 쉬어가세요! ☕🌿</p>
                 </div>
               </div>
 
               <!-- 가상 토끼 -->
-              <div class="sim-bunny-wrap" id="sim-bunny" style="left: calc(100% - 130px); bottom: 42px;">
+              <div class="sim-bunny-wrap" id="sim-bunny" style="left: calc(100% - 130px); bottom: 48px;">
                 <!-- 말풍선 -->
                 <div class="sim-speech" id="sim-speech">
                   <span class="sim-speech__text" id="sim-speech-text">👋</span>
@@ -162,20 +205,40 @@
                 <img src="assets/item-bag.png" class="sim-item-layer sim-item-bag hidden" id="sim-item-bag" alt="가방">
               </div>
 
-              <!-- 데스크톱 작업표시줄 -->
+              <!-- Windows 11 데스크톱 작업표시줄 -->
               <div class="mock-taskbar">
-                <div class="mock-taskbar__start">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <rect x="3" y="3" width="8" height="8" rx="1"/>
-                    <rect x="13" y="3" width="8" height="8" rx="1"/>
-                    <rect x="3" y="13" width="8" height="8" rx="1"/>
-                    <rect x="13" y="13" width="8" height="8" rx="1"/>
-                  </svg>
-                  <span>시작</span>
+                <div class="mock-taskbar__center">
+                  <div class="mock-taskbar__btn mock-taskbar__start" title="시작">
+                    <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
+                      <rect x="1" y="1" width="6.5" height="6.5" fill="#0078D4"/>
+                      <rect x="8.5" y="1" width="6.5" height="6.5" fill="#0078D4"/>
+                      <rect x="1" y="8.5" width="6.5" height="6.5" fill="#0078D4"/>
+                      <rect x="8.5" y="8.5" width="6.5" height="6.5" fill="#0078D4"/>
+                    </svg>
+                  </div>
+                  <div class="mock-taskbar__btn" title="검색">
+                    <span>🔍</span>
+                  </div>
+                  <div class="mock-taskbar__btn" title="파일 탐색기">
+                    <span>📁</span>
+                  </div>
+                  <div class="mock-taskbar__btn mock-taskbar__app--active" title="메모장">
+                    <span>📝</span>
+                    <span class="mock-taskbar__indicator"></span>
+                  </div>
                 </div>
+
                 <div class="mock-taskbar__tray">
-                  <span class="tray-bunny" title="내 토끼 실행 중">🐰</span>
-                  <span id="sim-clock">14:00</span>
+                  <span class="tray-btn" title="숨겨진 아이콘 표시">︿</span>
+                  <span class="tray-bunny" title="BunnyPet (민트 키우기) 실행 중">🐰</span>
+                  <span class="tray-status" title="네트워크 연결됨">📶</span>
+                  <span class="tray-status" title="스피커 100%">🔊</span>
+                  <span class="tray-lang" title="한/영">한</span>
+                  <div class="tray-datetime" title="날짜 및 시간">
+                    <span id="sim-clock">14:00</span>
+                    <span class="tray-date">2026-09-06</span>
+                  </div>
+                  <div class="mock-taskbar__peek" title="바탕화면 보기"></div>
                 </div>
               </div>
             </div>
@@ -486,7 +549,7 @@
             </div>
             <ul class="dl-card__features">
               <li>✓ 별도 설치 없는 무설치 단독 실행</li>
-              <li>✓ 1.9MB의 믿을 수 없을 만큼 작은 용량</li>
+              <li>✓ 6.8MB의 초경량 단독 실행 파일</li>
               <li>✓ 초고속 시작 & 초저전력/저메모리</li>
               <li>✓ 🖐️ 터치·클릭·문지르기 쓰다듬기 기능 완벽 지원</li>
               <li>✓ 🎁 5종 아이템 (작은 의자, 집, 건초, 가방, 인형) & 특수 리액션</li>
@@ -497,7 +560,7 @@
                 <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                 </svg>
-                <span>BunnyPet.exe 받기 (1.9 MB)</span>
+                <span>BunnyPet.exe 받기 (6.8 MB)</span>
               </a>
             </div>
           </div>
@@ -507,20 +570,20 @@
             <div class="dl-card__header">
               <div class="dl-card__icon">📦</div>
               <h3 class="dl-card__title">휴대용 전체 패키지 (ZIP)</h3>
-              <p class="dl-card__subtitle">My-Bunny-Desktop-Pet-win32-x64.zip</p>
+              <p class="dl-card__subtitle">BunnyPet-v1.0.1-win-x64.zip</p>
             </div>
             <ul class="dl-card__features">
               <li>✓ USB 메모리나 외장 드라이브 보관용</li>
-              <li>✓ 런타임이 모두 포함된 독립 패키지</li>
+              <li>✓ 실행 파일(BunnyPet.exe) 및 사용법 가이드 포함</li>
               <li>✓ 원하는 폴더에 압축 풀고 바로 사용</li>
-              <li>✓ 사용법.txt 가이드 파일 포함</li>
+              <li>✓ 6.8MB 초경량 무설치 포터블 압축본</li>
             </ul>
             <div class="dl-card__action">
-              <a class="btn btn--secondary btn--full" href="downloads/My-Bunny-Desktop-Pet-win32-x64.zip" download>
+              <a class="btn btn--secondary btn--full" href="downloads/BunnyPet-v1.0.1-win-x64.zip" download>
                 <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                 </svg>
-                <span>ZIP 패키지 다운로드</span>
+                <span>ZIP 패키지 다운로드 (6.8 MB)</span>
               </a>
             </div>
           </div>

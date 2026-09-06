@@ -199,12 +199,12 @@
     },
     milestones: [
       { threshold: 5, name: '간식 내놔! 포즈 🌾' },
-      { threshold: 10, name: '작은 의자 선물 🪑' },
+      { threshold: 10, name: '반성의자 선물 🪑' },
       { threshold: 15, name: '손으로 세수하기 포즈 🧼' },
       { threshold: 20, name: '화났어! 포즈 💢' },
       { threshold: 25, name: '토끼 인형 선물 🧸' },
       { threshold: 30, name: '래빗키스 뽀뽀 포즈 💋' },
-      { threshold: 40, name: '소풍 가방 선물 🎒' },
+      { threshold: 40, name: '토끼 가방 선물 🎒' },
       { threshold: 50, name: '신나는 점프 빙키 포즈 🤸' },
       { threshold: 60, name: '아늑한 집 선물 🏠' },
       { threshold: 70, name: '어리둥절 실사 영상 포즈 👀' },
@@ -255,13 +255,13 @@
     if (confusedBtn) confusedBtn.textContent = '👀 어리둥절';
 
     const chairBtn = document.getElementById('sim-chair-btn');
-    if (chairBtn) chairBtn.textContent = '🪑 의자';
+    if (chairBtn) chairBtn.textContent = '🪑 반성의자';
     const dollBtn = document.getElementById('sim-doll-btn');
     if (dollBtn) dollBtn.textContent = '🧸 인형';
     const hayBtn = document.getElementById('sim-hay-btn');
     if (hayBtn) hayBtn.textContent = '🌾 건초';
     const bagBtn = document.getElementById('sim-bag-btn');
-    if (bagBtn) bagBtn.textContent = '🎒 가방';
+    if (bagBtn) bagBtn.textContent = '🎒 토끼 가방';
     const houseBtn = document.getElementById('sim-house-btn');
     if (houseBtn) houseBtn.textContent = '🏠 집';
 

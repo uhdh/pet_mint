@@ -117,9 +117,9 @@ namespace BunnyPet
             var items = new[]
             {
                 new { Item = BunnyItem.Hay, Req = 0, Title = "🌾 맛있는 건초 (Hay)", Desc = "민트의 최애 간식 티모시 건초! 먹을 때마다 호감도가 2점씩 올라갑니다." },
-                new { Item = BunnyItem.Chair, Req = 10, Title = "🪑 작은 의자 (Chair)", Desc = "자연스러운 나뭇결의 앙증맞은 원목 스툴. 민트가 올라앉아 휴식을 취합니다." },
+                new { Item = BunnyItem.Chair, Req = 10, Title = "🪑 반성의자 (Chair)", Desc = "잘못한 건 없지만 귀엽게 쏙 올라앉는 반성의자. 민트가 다소곳이 올라앉아 생각에 잠깁니다." },
                 new { Item = BunnyItem.Doll, Req = 25, Title = "🧸 토끼 인형 (Plushie)", Desc = "주인님 곁에 다른 인형이 놓이자 질투 폭발! 뾰로통하게 인형을 째려봅니다." },
-                new { Item = BunnyItem.Bag, Req = 40, Title = "🎒 소풍 가방 (Backpack)", Desc = "귀여운 화이트 베어 미니 백팩을 등에 메고 소풍 분위기를 즐깁니다." },
+                new { Item = BunnyItem.Bag, Req = 40, Title = "🎒 토끼 가방 (Rabbit Bag)", Desc = "귀여운 토끼 가방을 등에 메고 외출 분위기를 즐깁니다." },
                 new { Item = BunnyItem.House, Req = 60, Title = "🏠 아늑한 집 (House)", Desc = "따뜻하고 아늑한 원목 보금자리 하우스 안으로 쏙 들어가 얼굴을 내밉니다." }
             };
 

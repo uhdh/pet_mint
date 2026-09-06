@@ -123,10 +123,10 @@
                 <button class="mockup-btn" id="sim-mock-wash-btn" type="button" title="손으로 쓱싹 세수하기">🧼 세수</button>
                 <button class="mockup-btn" id="sim-mock-flop-btn" type="button" title="안심하고 벌러덩 눕기">🛌 벌러덩</button>
                 <button class="mockup-btn" id="sim-mock-confused-btn" type="button" title="실사 어리둥절 민트 보기">👀 어리둥절</button>
-                <button class="mockup-btn mockup-btn--item" id="sim-chair-btn" type="button" title="작은 의자 놓기">🪑 의자</button>
+                <button class="mockup-btn mockup-btn--item" id="sim-chair-btn" type="button" title="반성의자 놓기">🪑 반성의자</button>
                 <button class="mockup-btn mockup-btn--item" id="sim-doll-btn" type="button" title="토끼 인형 주기">🧸 인형</button>
                 <button class="mockup-btn mockup-btn--item" id="sim-hay-btn" type="button" title="건초 주기">🌾 건초</button>
-                <button class="mockup-btn mockup-btn--item" id="sim-bag-btn" type="button" title="소풍 가방 메기">🎒 가방</button>
+                <button class="mockup-btn mockup-btn--item" id="sim-bag-btn" type="button" title="토끼 가방 메기">🎒 토끼 가방</button>
                 <button class="mockup-btn mockup-btn--item" id="sim-house-btn" type="button" title="아늑한 집 놓기">🏠 집</button>
                 <button class="mockup-btn" id="sim-reset-btn" type="button" title="민트 위치 초기화">위치 초기화</button>
                 <button class="mockup-btn" id="sim-pet-btn" type="button" title="민트 쓰다듬기">🖐️ 쓰다듬기</button>
@@ -194,7 +194,7 @@
                 <div class="sim-hearts" id="sim-hearts"></div>
                 <!-- 토끼 집, 의자 아이템 (토끼 뒤 레이어) -->
                 <img src="assets/item-house.png?v=20260906_1655" class="sim-item-layer sim-item-house hidden" id="sim-item-house" alt="토끼 집">
-                <img src="assets/item-chair.png?v=20260906_1655" class="sim-item-layer sim-item-chair hidden" id="sim-item-chair" alt="작은 의자">
+                <img src="assets/item-chair.png?v=20260906_1655" class="sim-item-layer sim-item-chair hidden" id="sim-item-chair" alt="반성의자">
                 <!-- 토끼 캐릭터 스프라이트 -->
                 <div class="sim-bunny-sprite" id="sim-sprite">
                   <img src="assets/bunny-sleep.png" id="sim-img" alt="데스크톱 토끼">
@@ -202,7 +202,7 @@
                 <!-- 토끼 인형, 건초, 가방 아이템 (토끼 앞 레이어) -->
                 <img src="assets/item-doll.png?v=20260906_1655" class="sim-item-layer sim-item-doll hidden" id="sim-item-doll" alt="토끼 인형">
                 <img src="assets/item-hay.png?v=20260906_1655" class="sim-item-layer sim-item-hay hidden" id="sim-item-hay" alt="건초">
-                <img src="assets/item-bag.png?v=20260906_1655" class="sim-item-layer sim-item-bag hidden" id="sim-item-bag" alt="가방">
+                <img src="assets/item-bag.png?v=20260906_1655" class="sim-item-layer sim-item-bag hidden" id="sim-item-bag" alt="토끼 가방">
               </div>
 
               <!-- Windows 11 데스크톱 작업표시줄 -->
@@ -361,17 +361,17 @@
             </div>
           </div>
 
-          <!-- 아이템 3: 가방 -->
+          <!-- 아이템 3: 토끼 가방 -->
           <div class="item-card">
             <div class="item-card__media">
-              <img src="assets/item-bag.png" alt="가방" width="76" height="76">
+              <img src="assets/item-bag.png" alt="토끼 가방" width="76" height="76">
             </div>
             <div class="item-card__content">
-              <span class="item-card__tag">소풍 준비</span>
-              <h3 class="item-card__title">🎒 소풍 가방 (Fluffy Bear)</h3>
+              <span class="item-card__tag">외출 준비</span>
+              <h3 class="item-card__title">🎒 토끼 가방</h3>
               <blockquote class="item-card__quote">🎒</blockquote>
               <p class="item-card__desc">
-                앙증맞은 화이트 베어 미니 백팩! 멈춰 있을 때도 귀여운 가방을 등에 포근하게 메고 있어요.
+                앙증맞은 토끼 가방! 멈춰 있을 때도 귀여운 가방을 등에 포근하게 메고 있어요.
               </p>
             </div>
           </div>
@@ -391,17 +391,17 @@
             </div>
           </div>
 
-          <!-- 아이템 5: 작은 의자 -->
+          <!-- 아이템 5: 반성의자 -->
           <div class="item-card">
             <div class="item-card__media">
-              <img src="assets/item-chair.png" alt="원목 스툴" width="84" height="68">
+              <img src="assets/item-chair.png" alt="반성의자" width="84" height="68">
             </div>
             <div class="item-card__content">
-              <span class="item-card__tag">편안한 휴식</span>
-              <h3 class="item-card__title">🪑 원목 스툴 (Wooden Stool)</h3>
+              <span class="item-card__tag">생각하는 시간</span>
+              <h3 class="item-card__title">🪑 반성의자</h3>
               <blockquote class="item-card__quote">🪑</blockquote>
               <p class="item-card__desc">
-                자연스러운 나뭇결이 살아있는 원목 스툴! 민트가 동그란 스툴 위에 다소곳이 올라앉아 🪑 😌 ☕ 등 안락함을 나타냅니다.
+                잘못한 건 없지만 귀엽게 쏙 올라앉는 반성의자! 민트가 동그란 의자 위에 다소곳이 올라앉아 🪑 🥺 💭 귀여운 모습을 보여줍니다.
               </p>
             </div>
           </div>

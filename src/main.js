@@ -112,9 +112,9 @@ function buildMenu() {
       label: '🎁 민트에게 선물하기',
       submenu: [
         { label: '🌾 맛있는 건초 주기', click: () => petWindow?.webContents.send('pet:item-changed', 'hay') },
-        { label: '🪑 작은 의자 놓기', click: () => petWindow?.webContents.send('pet:item-changed', 'chair') },
+        { label: '🪑 반성의자 놓기', click: () => petWindow?.webContents.send('pet:item-changed', 'chair') },
         { label: '🧸 토끼 인형 놓기', click: () => petWindow?.webContents.send('pet:item-changed', 'doll') },
-        { label: '🎒 소풍 가방 메어주기', click: () => petWindow?.webContents.send('pet:item-changed', 'bag') },
+        { label: '🎒 토끼 가방 메어주기', click: () => petWindow?.webContents.send('pet:item-changed', 'bag') },
         { label: '🏠 아늑한 집 지어주기', click: () => petWindow?.webContents.send('pet:item-changed', 'house') },
         { type: 'separator' },
         { label: '❌ 아이템 치우기', click: () => petWindow?.webContents.send('pet:item-changed', 'none') }

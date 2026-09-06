@@ -96,12 +96,12 @@ public static class BunnyProgression
     public static string GetNextUnlockDescription(int affinity)
     {
         if (affinity < 5) return "다음 해금: 간식 내놔! (5점) 🌾";
-        if (affinity < 10) return "다음 해금: 작은 의자 (10점) 🪑";
+        if (affinity < 10) return "다음 해금: 반성의자 (10점) 🪑";
         if (affinity < 15) return "다음 해금: 세수하기 (15점) 🧼";
         if (affinity < 20) return "다음 해금: 화났어! (20점) 💢";
         if (affinity < 25) return "다음 해금: 토끼 인형 (25점) 🧸";
         if (affinity < 30) return "다음 해금: 래빗키스 뽀뽀 (30점) 💋";
-        if (affinity < 40) return "다음 해금: 소풍 가방 (40점) 🎒";
+        if (affinity < 40) return "다음 해금: 토끼 가방 (40점) 🎒";
         if (affinity < 50) return "다음 해금: 신나는 점프 빙키 (50점) 🤸";
         if (affinity < 60) return "다음 해금: 아늑한 집 (60점) 🏠";
         if (affinity < 70) return "다음 해금: 어리둥절 실사 영상 (70점) 👀";

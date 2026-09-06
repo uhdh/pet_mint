@@ -113,6 +113,34 @@ namespace BunnyPet
         {
             "💢", "😡", "😤", "⚡", "👿", "😾", "😠"
         };
+        private readonly string[] realAngryPhrases =
+        {
+            "👿", "💢", "⚡", "😡"
+        };
+        private readonly string[] angry2Phrases =
+        {
+            "😾", "💢", "😤", "👿"
+        };
+        private readonly string[] curiousPhrases =
+        {
+            "👀", "❓", "✨", "🐰"
+        };
+        private readonly string[] cheerPhrases =
+        {
+            "🎉", "✨", "💖", "🥳"
+        };
+        private readonly string[] chinPhrases =
+        {
+            "💤", "😴", "☁️", "🤍"
+        };
+        private readonly string[] pawPhrases =
+        {
+            "🐾", "🤍", "✨", "🥕"
+        };
+        private readonly string[] stand2Phrases =
+        {
+            "🥕", "🌾", "🥺", "👀"
+        };
 
         private int affinity = 0;
         private readonly DispatcherTimer companionTimer;
@@ -1371,7 +1399,14 @@ namespace BunnyPet
                 .Concat(washPhrases)
                 .Concat(flopPhrases)
                 .Concat(spamAngryPhrases)
-                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸", "💋", "🧼", "🛌", "🤸", "🔒", "🎁", "🕊️", "🫧", "🐇", "🥳", "🤔", "🤍", "💖", "🥰", "😚", "💕", "💢", "😡", "😤", "⚡", "👿", "😾", "😠" })
+                .Concat(realAngryPhrases)
+                .Concat(angry2Phrases)
+                .Concat(curiousPhrases)
+                .Concat(cheerPhrases)
+                .Concat(chinPhrases)
+                .Concat(pawPhrases)
+                .Concat(stand2Phrases)
+                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸", "💋", "🧼", "🛌", "🤸", "🔒", "🎁", "🕊️", "🫧", "🐇", "🥳", "🤔", "🤍", "💖", "🥰", "😚", "💕", "💢", "😡", "😤", "⚡", "👿", "😾", "😠", "🐾", "👀", "🎉", "🥕", "🌾", "🥺", "🔍" })
                 .Distinct();
 
             foreach (var em in allEmojis)
@@ -1648,27 +1683,27 @@ namespace BunnyPet
                     ShowMessage("🔍", 3200, true);
                     break;
                 case BunnyState.RealAngry:
-                    ShowMessage("なんでェ……", 3200, true);
+                    ShowMessage(realAngryPhrases[random.Next(realAngryPhrases.Length)], 3200, true);
                     break;
                 case BunnyState.Angry2:
-                    ShowMessage("흥! 단단히 삐졌어! 💢", 3000, true);
+                    ShowMessage(angry2Phrases[random.Next(angry2Phrases.Length)], 3000, true);
                     break;
                 case BunnyState.Curious:
-                    ShowMessage("응? 뭐하는 거야? 👀", 3000, true);
+                    ShowMessage(curiousPhrases[random.Next(curiousPhrases.Length)], 3000, true);
                     break;
                 case BunnyState.Cheer:
                     AddHeart();
-                    ShowMessage("와아아~! 신난다! 🎉", 3000, true);
+                    ShowMessage(cheerPhrases[random.Next(cheerPhrases.Length)], 3000, true);
                     break;
                 case BunnyState.Chin:
-                    ShowMessage("노곤노곤... 나른해 💤", 3000, true);
+                    ShowMessage(chinPhrases[random.Next(chinPhrases.Length)], 3000, true);
                     break;
                 case BunnyState.Paw:
                     AddHeart();
-                    ShowMessage("손! 나랑 놀아줘~ 🐾", 3000, true);
+                    ShowMessage(pawPhrases[random.Next(pawPhrases.Length)], 3000, true);
                     break;
                 case BunnyState.Stand2:
-                    ShowMessage("간식 하나만 줘요... 🙏", 3000, true);
+                    ShowMessage(stand2Phrases[random.Next(stand2Phrases.Length)], 3000, true);
                     break;
             }
             ScheduleBehavior(3600);
@@ -1686,7 +1721,7 @@ namespace BunnyPet
             if (BunnyProgression.IsUnlocked(BunnyState.RealAngry, affinity) && random.NextDouble() < 0.6)
             {
                 SetVisualState(BunnyState.RealAngry);
-                ShowMessage("なんでェ……", 3200, true);
+                ShowMessage(realAngryPhrases[random.Next(realAngryPhrases.Length)], 3200, true);
             }
             else
             {
@@ -1811,9 +1846,18 @@ namespace BunnyPet
             }
             else
             {
-                Message.Text = text;
-                Message.Visibility = Visibility.Visible;
-                MessageEmoji.Visibility = Visibility.Collapsed;
+                // 민트 대화는 무조건 이모티콘만 표시 (텍스트 절대 노출 금지)
+                var fallbackBmp = FindEmojiBitmap("✨");
+                if (fallbackBmp != null)
+                {
+                    MessageEmoji.Source = fallbackBmp;
+                    MessageEmoji.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageEmoji.Visibility = Visibility.Collapsed;
+                }
+                Message.Visibility = Visibility.Collapsed;
             }
 
             MessageBorder.Visibility = Visibility.Visible;

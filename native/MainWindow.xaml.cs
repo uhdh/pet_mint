@@ -1868,18 +1868,6 @@ namespace BunnyPet
             };
             menu.Items.Add(dashboardItem);
 
-            var cheatItem = new MenuItem
-            {
-                Header = "👑 [치트키] 전체 즉시 해금 (호감도 100점 MAX) [Ctrl+Alt+U]",
-                FontWeight = FontWeights.Bold,
-                Foreground = new SolidColorBrush(Color.FromRgb(216, 80, 100))
-            };
-            cheatItem.Click += delegate
-            {
-                CheatUnlockAll();
-            };
-            menu.Items.Add(cheatItem);
-
             menu.Items.Add(new Separator());
 
             var playToggleItem = new MenuItem

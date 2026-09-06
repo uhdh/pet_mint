@@ -282,27 +282,12 @@
                                 <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="📂 설정 복원하기..." Margin="5,0,0,0" Click="OnRestoreSettingsClick" />
                             </Grid>
 
-                            <Border Background="#FFF5F7" CornerRadius="8" Padding="12" Margin="0,0,0,10" BorderBrush="#FCD5DC" BorderThickness="1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
-                                        <TextBlock Text="👑 [치트키] 모든 포즈 &amp; 선물 즉시 전체 해금" FontWeight="Bold" FontSize="13" Foreground="#C03A50" />
-                                        <TextBlock Text="전역 단축키: Ctrl + Shift + U | 호감도 100점(MAX)으로 모든 콘텐츠를 즉시 해금합니다." FontSize="11.5" Foreground="#8A5A65" Margin="0,2,0,0" />
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Style="{StaticResource ActionButton}" Content="✨ 전체 해금하기" VerticalAlignment="Center" Padding="14,6" Click="OnCheatUnlockClick" />
-                                </Grid>
-                            </Border>
-
                             <Button Style="{StaticResource SecondaryButton}" Content="🔄 호감도 초기화 (0점부터 다시 키우기)" Margin="0,0,0,16" Click="OnResetAffinityClick" Foreground="#C03A50" />
 
                             <!-- 단축키 가이드 -->
                             <Border Background="#F9F6F0" CornerRadius="8" Padding="12" BorderBrush="#EAE3D8" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="⌨️ 주요 조작 및 케어 가이드" FontWeight="Bold" FontSize="12" Foreground="#4A3F35" Margin="0,0,0,6" />
-                                    <TextBlock Text="• 👑 전체 해금 치트키 : Ctrl + Shift + U (언제 어디서나 모든 포즈/아이템 즉시 해금)" FontSize="11.5" FontWeight="Bold" Foreground="#C03A50" LineHeight="18" />
                                     <TextBlock Text="• 클릭 / 문지르기 : 민트 쓰다듬기 (60초마다 정성껏 쓰다듬을 때 호감도 +1)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
                                     <TextBlock Text="• 빠른 연타/괴롭힘 : 민트가 뿔나서 호감도 3점 감점 (-3)" FontSize="11.5" Foreground="#C03A50" LineHeight="18" />
                                     <TextBlock Text="• 건초 먹이기 : 3분마다 배고플 때 주면 호감도 +1 (배부를 땐 효과 없음)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />

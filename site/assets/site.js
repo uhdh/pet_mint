@@ -61,23 +61,23 @@
   ];
 
   const BINKY_PHRASES = [
-    '🤸', '🎉', '✨', '신나! 🐾', '너무 좋아! 🎈', '폴짝! 🐇', '빙키! 💫'
+    '🤸', '🐇', '✨', '🎉', '🎈', '💫', '🐾'
   ];
 
   const KISS_PHRASES = [
-    '💋', '💖', '쪽! 💋', '사랑해! 🤍', '친해져서 좋아! 💕', '뽀뽀~ 😚', '헤헤 🥰'
+    '💋', '😚', '🥰', '💕', '💖', '🤍'
   ];
 
   const WASH_PHRASES = [
-    '🧼', '✨', '🌸', '쓱싹쓱싹 🧼', '세수하는 중 🫧', '개운해! 🤍', '단장 완료 ✨'
+    '🧼', '🫧', '✨', '🌸', '🤍'
   ];
 
   const FLOP_PHRASES = [
-    '🛌', '💤', '🤍', '안전해~ ☁️', '벌러덩~ 😴', '편안해요 🤍', '나른해~ 🌾'
+    '🛌', '💤', '😴', '☁️', '🌾', '🤍'
   ];
 
   const SPAM_ANGRY_PHRASES = [
-    '그만 찔러! 😤', '민트 뿔났다! ⚡', '발로 쿵쿵! 😾', '아야! 괴롭히지 마! 💢', '화났어! 😡'
+    '💢', '😡', '😤', '⚡', '👿', '😾', '😠'
   ];
 
   const PET_PHRASES = [
@@ -364,13 +364,12 @@
       for (let i = 0; i < 5; i++) {
         setTimeout(floatSimHeart, i * 140);
       }
-      showSimSpeech(`🎉 호감도 ${aff}점 달성! 🎉\n✨ ${name} 해금! ✨`, 3800, true);
+      showSimSpeech('🎁', 2800, true);
     }
 
     function setSimItem(item) {
       if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
-        const req = BUNNY_PROGRESSION.items[item] || 0;
-        showSimSpeech(`아직 덜 친해요... 🔒\n(호감도 ${req}점 필요! 🥺)`, 3000, true);
+        showSimSpeech('🔒', 2500, true);
         return;
       }
 
@@ -861,7 +860,7 @@
     confusedBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         if (!BUNNY_PROGRESSION.isStateUnlocked('confused', globalAffinity)) {
-          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 70점 필요! 🥺)', 3000, true);
+          showSimSpeech('🔒', 2500, true);
           return;
         }
         stopSimWalking();
@@ -875,7 +874,7 @@
     binkyBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         if (!BUNNY_PROGRESSION.isStateUnlocked('binky', globalAffinity)) {
-          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 50점 필요! 🥺)', 3000, true);
+          showSimSpeech('🔒', 2500, true);
           return;
         }
         stopSimWalking();
@@ -890,7 +889,7 @@
     kissBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         if (!BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity)) {
-          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 30점 필요! 🥺)', 3000, true);
+          showSimSpeech('🔒', 2500, true);
           return;
         }
         stopSimWalking();
@@ -905,7 +904,7 @@
     washBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         if (!BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity)) {
-          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 15점 필요! 🥺)', 3000, true);
+          showSimSpeech('🔒', 2500, true);
           return;
         }
         stopSimWalking();
@@ -919,7 +918,7 @@
     flopBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         if (!BUNNY_PROGRESSION.isStateUnlocked('flop', globalAffinity)) {
-          showSimSpeech('아직 덜 친해요... 🔒\n(호감도 85점 필요! 🥺)', 3000, true);
+          showSimSpeech('🔒', 2500, true);
           return;
         }
         stopSimWalking();
@@ -969,13 +968,12 @@
       for (let i = 0; i < 5; i++) {
         setTimeout(floatSandboxHeart, i * 140);
       }
-      showSandboxSpeech(`🎉 호감도 ${aff}점 달성! 🎉\n✨ ${name} 해금! ✨`, 3800);
+      showSandboxSpeech('🎁', 2800);
     }
 
     function setSandboxState(state, message) {
       if (!BUNNY_PROGRESSION.isStateUnlocked(state, globalAffinity)) {
-        const req = BUNNY_PROGRESSION.states[state] || 0;
-        showSandboxSpeech(`아직 덜 친해요... 🔒\n(호감도 ${req}점 필요! 🥺)`, 3000);
+        showSandboxSpeech('🔒', 2500);
         return;
       }
 
@@ -1005,8 +1003,7 @@
 
     function setSandboxItem(item) {
       if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
-        const req = BUNNY_PROGRESSION.items[item] || 0;
-        showSandboxSpeech(`아직 덜 친해요... 🔒\n(호감도 ${req}점 필요! 🥺)`, 3000);
+        showSandboxSpeech('🔒', 2500);
         return;
       }
 

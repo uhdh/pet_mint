@@ -97,14 +97,14 @@
               Visibility="Collapsed"
               IsHitTestVisible="False">
             <StackPanel HorizontalAlignment="Center">
-                <Border Padding="5,3"
+                <Border Padding="6,4"
                         Background="#F8FFFDF9"
                         BorderBrush="#3D68584C"
                         BorderThickness="1"
-                        CornerRadius="9">
+                        CornerRadius="10">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Image x:Name="MessageEmoji"
-                               Width="20" Height="20"
+                               Width="24" Height="24"
                                Stretch="Uniform"
                                RenderOptions.BitmapScalingMode="HighQuality"
                                Visibility="Collapsed" />

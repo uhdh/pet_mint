@@ -95,19 +95,23 @@ namespace BunnyPet
         };
         private readonly string[] kissPhrases =
         {
-            "💋", "💖", "쪽! 💋", "사랑해! 🤍", "친해져서 좋아! 💕", "뽀뽀~ 😚", "헤헤 🥰"
+            "💋", "😚", "🥰", "💕", "💖", "🤍"
         };
         private readonly string[] binkyPhrases =
         {
-            "🤸", "🎉", "✨", "신나! 🐾", "너무 좋아! 🎈", "폴짝! 🐇", "빙키! 💫"
+            "🤸", "🐇", "✨", "🎉", "🎈", "💫", "🐾"
         };
         private readonly string[] washPhrases =
         {
-            "🧼", "✨", "🌸", "쓱싹쓱싹 🧼", "세수하는 중 🫧", "개운해! 🤍", "단장 완료 ✨"
+            "🧼", "🫧", "✨", "🌸", "🤍"
         };
         private readonly string[] flopPhrases =
         {
-            "🛌", "💤", "🤍", "안전해~ ☁️", "벌러덩~ 😴", "편안해요 🤍", "나른해~ 🌾"
+            "🛌", "💤", "😴", "☁️", "🌾", "🤍"
+        };
+        private readonly string[] spamAngryPhrases =
+        {
+            "💢", "😡", "😤", "⚡", "👿", "😾", "😠"
         };
 
         private int affinity = 10;
@@ -418,7 +422,7 @@ namespace BunnyPet
                     catch (InvalidOperationException) { }
                 });
             }
-            ShowMessage($"🎉 호감도 {currentAffinity}점 달성! 🎉\n✨ {unlockedName} 해금! ✨", 3800, true);
+            ShowMessage("🎁", 2800, true);
         }
 
         public BunnyItem CurrentItem => currentItem;
@@ -427,8 +431,7 @@ namespace BunnyPet
         {
             if (item != BunnyItem.None && !BunnyProgression.IsUnlocked(item, affinity))
             {
-                int req = BunnyProgression.GetRequiredAffinity(item);
-                ShowMessage($"아직 덜 친해요... 🔒\n(호감도 {req}점 필요! 🥺)", 3000, true);
+                ShowMessage("🔒", 2500, true);
                 return;
             }
 
@@ -1086,6 +1089,49 @@ namespace BunnyPet
             return string.Join("_", codes);
         }
 
+        private BitmapImage LoadEmojiBitmap(string code)
+        {
+            try
+            {
+                var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/emojis/{code}.png", UriKind.Absolute);
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = uri;
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+                bmp.Freeze();
+                return bmp;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private BitmapImage FindEmojiBitmap(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return null;
+            if (emojiBitmaps.TryGetValue(text, out var cached)) return cached;
+
+            var code = GetEmojiCode(text);
+            var bmp = LoadEmojiBitmap(code);
+
+            if (bmp == null && code.EndsWith("_fe0f"))
+            {
+                bmp = LoadEmojiBitmap(code.Replace("_fe0f", ""));
+            }
+            else if (bmp == null && !code.EndsWith("_fe0f"))
+            {
+                bmp = LoadEmojiBitmap(code + "_fe0f");
+            }
+
+            if (bmp != null)
+            {
+                emojiBitmaps[text] = bmp;
+            }
+            return bmp;
+        }
+
         private void InitEmojiBitmaps()
         {
             var allEmojis = phrases
@@ -1106,24 +1152,13 @@ namespace BunnyPet
                 .Concat(binkyPhrases)
                 .Concat(washPhrases)
                 .Concat(flopPhrases)
-                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸", "💋", "🧼", "🛌", "🤸" })
+                .Concat(spamAngryPhrases)
+                .Concat(new[] { "✨", "👋", "⏰", "🍵", "❗", "🍞", "💤", "👽", "👾", "🛸", "💋", "🧼", "🛌", "🤸", "🔒", "🎁", "🕊️", "🫧", "🐇", "🥳", "🤔", "🤍", "💖", "🥰", "😚", "💕", "💢", "😡", "😤", "⚡", "👿", "😾", "😠" })
                 .Distinct();
 
             foreach (var em in allEmojis)
             {
-                try
-                {
-                    var code = GetEmojiCode(em);
-                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/emojis/{code}.png", UriKind.Absolute);
-                    var bmp = new BitmapImage();
-                    bmp.BeginInit();
-                    bmp.UriSource = uri;
-                    bmp.CacheOption = BitmapCacheOption.OnLoad;
-                    bmp.EndInit();
-                    bmp.Freeze();
-                    emojiBitmaps[em] = bmp;
-                }
-                catch { }
+                FindEmojiBitmap(em);
             }
         }
 
@@ -1236,8 +1271,7 @@ namespace BunnyPet
             if (resourcesDisposed) return;
             if (!BunnyProgression.IsUnlocked(state, affinity))
             {
-                int req = BunnyProgression.GetRequiredAffinity(state);
-                ShowMessage($"아직 덜 친해요... 🔒\n(호감도 {req}점 필요! 🥺)", 3000, true);
+                ShowMessage("🔒", 2500, true);
                 return;
             }
             StopAnimation();
@@ -1302,7 +1336,6 @@ namespace BunnyPet
             AnimatePurring();
             AddAffinity(-2);
 
-            string[] spamAngryPhrases = { "그만 찔러! 😤", "민트 뿔났다! ⚡", "발로 쿵쿵! 😾", "아야! 괴롭히지 마! 💢", "화났어! 😡" };
             ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
             ScheduleBehavior(3500);
         }
@@ -1409,26 +1442,7 @@ namespace BunnyPet
             }
             messageTimer.Stop();
 
-            if (!emojiBitmaps.TryGetValue(text, out var bmp))
-            {
-                try
-                {
-                    var code = GetEmojiCode(text);
-                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/emojis/{code}.png", UriKind.Absolute);
-                    var newBmp = new BitmapImage();
-                    newBmp.BeginInit();
-                    newBmp.UriSource = uri;
-                    newBmp.CacheOption = BitmapCacheOption.OnLoad;
-                    newBmp.EndInit();
-                    newBmp.Freeze();
-                    emojiBitmaps[text] = newBmp;
-                    bmp = newBmp;
-                }
-                catch
-                {
-                    bmp = null;
-                }
-            }
+            var bmp = FindEmojiBitmap(text);
 
             if (bmp != null)
             {

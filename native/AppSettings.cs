@@ -21,12 +21,20 @@ namespace BunnyPet
         [DataMember(Name = "affinity", EmitDefaultValue = false)]
         private int? affinity;
 
+        [DataMember(Name = "emojiFrequency", EmitDefaultValue = false)]
+        private int? emojiFrequency;
+
+        [DataMember(Name = "purrFrequency", EmitDefaultValue = false)]
+        private int? purrFrequency;
+
         public AppSettings()
         {
             alwaysOnTop = false;
             autoStart = false;
             restRemindersEnabled = true;
             affinity = 10;
+            emojiFrequency = 0;
+            purrFrequency = 0;
         }
 
         [IgnoreDataMember]
@@ -55,6 +63,20 @@ namespace BunnyPet
         {
             get { return affinity ?? 10; }
             set { affinity = value; }
+        }
+
+        [IgnoreDataMember]
+        public int EmojiFrequency
+        {
+            get { return emojiFrequency ?? 0; }
+            set { emojiFrequency = Math.Max(0, Math.Min(3, value)); }
+        }
+
+        [IgnoreDataMember]
+        public int PurrFrequency
+        {
+            get { return purrFrequency ?? 0; }
+            set { purrFrequency = Math.Max(0, Math.Min(3, value)); }
         }
 
         public static string FilePath

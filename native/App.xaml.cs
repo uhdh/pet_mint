@@ -94,6 +94,8 @@ namespace BunnyPet
             window.SetAlwaysOnTop(settings.AlwaysOnTop);
             window.SetRestRemindersEnabled(settings.RestRemindersEnabled);
             window.SetAffinity(settings.Affinity);
+            window.SetEmojiFrequency(settings.EmojiFrequency);
+            window.SetPurrFrequency(settings.PurrFrequency);
             window.AffinityChanged += (newAffinity) =>
             {
                 settings.Affinity = newAffinity;

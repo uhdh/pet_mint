@@ -222,6 +222,46 @@
                                 </Grid>
                             </Border>
 
+                            <TextBlock Text="💬 소통 및 반응 빈도" FontSize="14" FontWeight="Bold" Foreground="#3B342E" Margin="0,10,0,12" />
+
+                            <Border Background="#FAF7F2" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <TextBlock Text="💭 말풍선 이모티콘 빈도" FontWeight="SemiBold" FontSize="13" Foreground="#2C2623" />
+                                        <TextBlock Text="민트가 말풍선으로 기분/이모티콘을 띄우는 빈도를 조절합니다." FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" x:Name="CmbEmojiFrequency" Width="135" Height="28" VerticalAlignment="Center" SelectionChanged="OnEmojiFrequencyChanged">
+                                        <ComboBoxItem Content="가끔 (추천 🌿)" />
+                                        <ComboBoxItem Content="보통 (45초 ⚖️)" />
+                                        <ComboBoxItem Content="자주 (15초 🎉)" />
+                                        <ComboBoxItem Content="끄기 (안 함 🤫)" />
+                                    </ComboBox>
+                                </Grid>
+                            </Border>
+
+                            <Border Background="#FAF7F2" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <TextBlock Text="🐱 갸르릉 반응 빈도" FontWeight="SemiBold" FontSize="13" Foreground="#2C2623" />
+                                        <TextBlock Text="민트가 몸을 떨며 갸르릉(골골송) 애교를 부리는 빈도를 조절합니다." FontSize="11.5" Foreground="#7D746C" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" x:Name="CmbPurrFrequency" Width="135" Height="28" VerticalAlignment="Center" SelectionChanged="OnPurrFrequencyChanged">
+                                        <ComboBoxItem Content="가끔 (추천 🌿)" />
+                                        <ComboBoxItem Content="보통 (50초 ⚖️)" />
+                                        <ComboBoxItem Content="자주 (18초 🎉)" />
+                                        <ComboBoxItem Content="끄기 (안 함 🤫)" />
+                                    </ComboBox>
+                                </Grid>
+                            </Border>
+
                             <TextBlock Text="🔧 간편 조작 및 데이터" FontSize="14" FontWeight="Bold" Foreground="#3B342E" Margin="0,10,0,12" />
 
                             <Grid Margin="0,0,0,10">

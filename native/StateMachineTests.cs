@@ -30,16 +30,21 @@ internal static class StateMachineTests
         Require(bunny.Direction == 1, "set direction right");
         var missing = AppSettings.Parse(null);
         Require(!missing.AlwaysOnTop && !missing.AutoStart, "missing settings defaults");
+        Require(missing.EmojiFrequency == 0 && missing.PurrFrequency == 0, "missing emoji/purr frequency defaults 0 (rare)");
         var omittedMembers = AppSettings.Parse("{}");
         Require(!omittedMembers.AlwaysOnTop && !omittedMembers.AutoStart, "omitted settings merge defaults");
+        Require(omittedMembers.EmojiFrequency == 0 && omittedMembers.PurrFrequency == 0, "omitted emoji/purr frequency defaults 0");
+        var customFreq = AppSettings.Parse("{\"emojiFrequency\":2,\"purrFrequency\":3}");
+        Require(customFreq.EmojiFrequency == 2 && customFreq.PurrFrequency == 3, "custom emoji/purr frequency parsed");
         var autoStartOnly = AppSettings.Parse("{\"autoStart\":true}");
         Require(!autoStartOnly.AlwaysOnTop && autoStartOnly.AutoStart, "partial settings merge defaults");
         var malformed = AppSettings.Parse("{");
         Require(!malformed.AlwaysOnTop && !malformed.AutoStart, "malformed settings defaults");
-        var original = new AppSettings { AlwaysOnTop = true, AutoStart = true, RestRemindersEnabled = false };
+        var original = new AppSettings { AlwaysOnTop = true, AutoStart = true, RestRemindersEnabled = false, EmojiFrequency = 1, PurrFrequency = 2 };
         var parsed = AppSettings.Parse(AppSettings.Serialize(original));
         Require(parsed.AlwaysOnTop == original.AlwaysOnTop && parsed.AutoStart == original.AutoStart, "settings round trip");
         Require(parsed.RestRemindersEnabled == original.RestRemindersEnabled, "rest reminder setting round trip");
+        Require(parsed.EmojiFrequency == original.EmojiFrequency && parsed.PurrFrequency == original.PurrFrequency, "frequency setting round trip");
         Require(AppSettings.Parse(null).RestRemindersEnabled, "rest reminders default on");
 
         var exportPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "bunny-settings-test-" + Guid.NewGuid().ToString("N") + ".json");
@@ -49,7 +54,9 @@ internal static class StateMachineTests
             var imported = AppSettings.LoadFrom(exportPath);
             Require(imported.AlwaysOnTop == original.AlwaysOnTop
                 && imported.AutoStart == original.AutoStart
-                && imported.RestRemindersEnabled == original.RestRemindersEnabled, "settings export/import round trip");
+                && imported.RestRemindersEnabled == original.RestRemindersEnabled
+                && imported.EmojiFrequency == original.EmojiFrequency
+                && imported.PurrFrequency == original.PurrFrequency, "settings export/import round trip");
         }
         finally
         {

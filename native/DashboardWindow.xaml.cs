@@ -52,12 +52,21 @@ namespace BunnyPet
             ProgressAffinity.Value = Math.Max(0, Math.Min(100, affinity));
             TxtNextUnlock.Text = $"💡 {BunnyProgression.GetNextUnlockDescription(affinity)}";
 
-            // 2. 설정 체크박스 동기화
+            // 2. 설정 체크박스 및 선택창 동기화
             ChkAlwaysOnTop.IsChecked = settings.AlwaysOnTop;
             ChkAutoStart.IsChecked = settings.AutoStart;
             ChkAutoStart.IsEnabled = !App.IsPackagedApp();
             ChkRestReminders.IsChecked = settings.RestRemindersEnabled;
             BtnTogglePlay.Content = mainWindow.IsPlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)";
+
+            if (CmbEmojiFrequency != null)
+            {
+                CmbEmojiFrequency.SelectedIndex = Math.Max(0, Math.Min(3, settings.EmojiFrequency));
+            }
+            if (CmbPurrFrequency != null)
+            {
+                CmbPurrFrequency.SelectedIndex = Math.Max(0, Math.Min(3, settings.PurrFrequency));
+            }
 
             // 3. 포즈 및 선물 카드 생성
             PopulatePoseCards(affinity);
@@ -243,6 +252,30 @@ namespace BunnyPet
             SaveSettings();
         }
 
+        private void OnEmojiFrequencyChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CmbEmojiFrequency == null || mainWindow == null) return;
+            int idx = CmbEmojiFrequency.SelectedIndex;
+            if (idx >= 0 && idx <= 3 && settings.EmojiFrequency != idx)
+            {
+                settings.EmojiFrequency = idx;
+                mainWindow.SetEmojiFrequency(idx);
+                SaveSettings();
+            }
+        }
+
+        private void OnPurrFrequencyChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CmbPurrFrequency == null || mainWindow == null) return;
+            int idx = CmbPurrFrequency.SelectedIndex;
+            if (idx >= 0 && idx <= 3 && settings.PurrFrequency != idx)
+            {
+                settings.PurrFrequency = idx;
+                mainWindow.SetPurrFrequency(idx);
+                SaveSettings();
+            }
+        }
+
         private void OnResetPositionClick(object sender, RoutedEventArgs e)
         {
             mainWindow.ResetPosition();
@@ -299,10 +332,14 @@ namespace BunnyPet
                     settings.AutoStart = loaded.AutoStart;
                     settings.RestRemindersEnabled = loaded.RestRemindersEnabled;
                     settings.Affinity = loaded.Affinity;
+                    settings.EmojiFrequency = loaded.EmojiFrequency;
+                    settings.PurrFrequency = loaded.PurrFrequency;
 
                     mainWindow.SetAlwaysOnTop(settings.AlwaysOnTop);
                     mainWindow.SetRestRemindersEnabled(settings.RestRemindersEnabled);
                     mainWindow.SetAffinity(settings.Affinity);
+                    mainWindow.SetEmojiFrequency(settings.EmojiFrequency);
+                    mainWindow.SetPurrFrequency(settings.PurrFrequency);
                     if (!App.IsPackagedApp()) App.SetAutoStart(settings.AutoStart);
 
                     SaveSettings();

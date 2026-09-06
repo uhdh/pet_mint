@@ -140,6 +140,13 @@ namespace BunnyPet
         private bool isPlayingConfusedAnim = false;
         private Action confusedCompletedCallback = null;
         private DashboardWindow dashboardWindow;
+        private int emojiFrequency = 0;
+        private int purrFrequency = 0;
+        private DateTime lastSpontaneousEmojiUtc = DateTime.MinValue;
+        private DateTime lastSpontaneousPurrUtc = DateTime.MinValue;
+
+        public int EmojiFrequency => emojiFrequency;
+        public int PurrFrequency => purrFrequency;
 
         public bool ExitOnClose { get; set; }
 
@@ -250,7 +257,7 @@ namespace BunnyPet
                 SetVisualState(BunnyState.Happy);
                 AddHeart();
                 string phrase = playPhrases[random.Next(playPhrases.Length)];
-                ShowMessage(phrase, 2200);
+                ShowMessage(phrase, 2200, true);
                 ScheduleBehavior(1400);
             }
             else
@@ -312,6 +319,26 @@ namespace BunnyPet
         public void SetAffinity(int val)
         {
             affinity = Math.Max(0, Math.Min(100, val));
+        }
+
+        public void SetEmojiFrequency(int level)
+        {
+            emojiFrequency = Math.Max(0, Math.Min(3, level));
+        }
+
+        public void SetPurrFrequency(int level)
+        {
+            purrFrequency = Math.Max(0, Math.Min(3, level));
+        }
+
+        public bool ShouldShowEmoji(bool force = false)
+        {
+            if (force) return true;
+            if (emojiFrequency == 3) return false;
+            var now = DateTime.UtcNow;
+            double cooldownSec = emojiFrequency == 0 ? 120.0 : (emojiFrequency == 1 ? 45.0 : 15.0);
+            if ((now - lastSpontaneousEmojiUtc).TotalSeconds < cooldownSec) return false;
+            return true;
         }
 
         public void OpenDashboard()
@@ -574,9 +601,21 @@ namespace BunnyPet
                 SetVisualState(BunnyState.Idle);
 
                 double roll = random.NextDouble();
-                if (roll < 0.30)
+                bool canPurr = false;
+                var now = DateTime.UtcNow;
+                if (purrFrequency != 3)
                 {
-                    // 멈추기 자세에서는 가끔 갸르릉 하기 (진동 및 하트만, 이모티콘 말풍선 X)
+                    double purrCooldownSec = purrFrequency == 0 ? 120.0 : (purrFrequency == 1 ? 50.0 : 18.0);
+                    double purrThreshold = purrFrequency == 0 ? 0.12 : (purrFrequency == 1 ? 0.22 : 0.40);
+                    if ((now - lastSpontaneousPurrUtc).TotalSeconds >= purrCooldownSec && roll < purrThreshold)
+                    {
+                        canPurr = true;
+                    }
+                }
+
+                if (canPurr)
+                {
+                    // 멈추기 자세에서는 설정된 빈도에 맞춰 가끔 갸르릉 하기 (진동 및 하트만, 이모티콘 말풍선 X)
                     TriggerPurring();
                 }
                 else
@@ -618,7 +657,10 @@ namespace BunnyPet
                 {
                     // 실사 내놔! 포즈
                     SetVisualState(BunnyState.Beg);
-                    ShowMessage(begPhrases[random.Next(begPhrases.Length)], 2600);
+                    if (ShouldShowEmoji(false))
+                    {
+                        ShowMessage(begPhrases[random.Next(begPhrases.Length)], 2600);
+                    }
                     ScheduleBehavior(3200);
                     return;
                 }
@@ -626,7 +668,10 @@ namespace BunnyPet
                 {
                     // 정면 똘망 민트
                     SetVisualState(BunnyState.Front);
-                    ShowMessage(frontPhrases[random.Next(frontPhrases.Length)], 2600);
+                    if (ShouldShowEmoji(false))
+                    {
+                        ShowMessage(frontPhrases[random.Next(frontPhrases.Length)], 2600);
+                    }
                     ScheduleBehavior(3200);
                     return;
                 }
@@ -819,15 +864,20 @@ namespace BunnyPet
             Animate(rotate, RotateTransform.AngleProperty, -2, 2, 160, 8);
         }
 
-        public void TriggerPurring()
+        public void TriggerPurring(bool force = false)
         {
             if (resourcesDisposed || dragging || !IsVisible) return;
+            if (!force && purrFrequency == 3) return;
+            if (!force)
+            {
+                lastSpontaneousPurrUtc = DateTime.UtcNow;
+            }
             AnimatePurring();
             AddHeart();
-            if (machine.PlayMode)
+            if (machine.PlayMode && ShouldShowEmoji(force))
             {
                 string phrase = purrPhrases[random.Next(purrPhrases.Length)];
-                ShowMessage(phrase, 2200);
+                ShowMessage(phrase, 2200, force);
             }
             Task.Delay(1800).ContinueWith(_ =>
             {
@@ -849,7 +899,7 @@ namespace BunnyPet
 
         private void ShowRestingEmoji()
         {
-            if (resourcesDisposed || dragging || !IsVisible || !machine.PlayMode) return;
+            if (resourcesDisposed || dragging || !IsVisible || !machine.PlayMode || !ShouldShowEmoji(false)) return;
             string emoji = restingPhrases[random.Next(restingPhrases.Length)];
             ShowMessage(emoji, 2500);
         }
@@ -963,7 +1013,7 @@ namespace BunnyPet
             });
 
             string happyPhrase = GetItemPetPhrase();
-            ShowMessage(happyPhrase, 2200);
+            ShowMessage(happyPhrase, 2200, true);
             ScheduleBehavior(2400);
         }
 
@@ -1331,6 +1381,11 @@ namespace BunnyPet
         public void ShowMessage(string text, int duration, bool force = false)
         {
             if (resourcesDisposed || (!machine.PlayMode && !force)) return;
+            if (!force && !ShouldShowEmoji(false)) return;
+            if (!force)
+            {
+                lastSpontaneousEmojiUtc = DateTime.UtcNow;
+            }
             messageTimer.Stop();
 
             if (!emojiBitmaps.TryGetValue(text, out var bmp))
@@ -1434,7 +1489,8 @@ namespace BunnyPet
             if (machine.Paused || machine.State == BunnyState.Happy || machine.State == BunnyState.Drag) return;
 
             var now = DateTime.UtcNow;
-            if (now - lastCursorReactionUtc < TimeSpan.FromSeconds(2.5)) return;
+            double cursorCooldown = emojiFrequency == 0 ? 30.0 : (emojiFrequency == 1 ? 15.0 : (emojiFrequency == 2 ? 5.0 : 30.0));
+            if (now - lastCursorReactionUtc < TimeSpan.FromSeconds(cursorCooldown)) return;
 
             lastCursorReactionUtc = now;
             machine.Touch(now);
@@ -1453,8 +1509,11 @@ namespace BunnyPet
             }
 
             SetVisualState(BunnyState.Stand);
-            var phraseStand = cursorPhrases[random.Next(cursorPhrases.Length)];
-            ShowMessage(phraseStand, 2000);
+            if (ShouldShowEmoji(false))
+            {
+                var phraseStand = cursorPhrases[random.Next(cursorPhrases.Length)];
+                ShowMessage(phraseStand, 2000);
+            }
             ScheduleBehavior(2300);
         }
 

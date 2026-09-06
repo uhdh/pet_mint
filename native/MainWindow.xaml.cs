@@ -114,11 +114,17 @@ namespace BunnyPet
             "💢", "😡", "😤", "⚡", "👿", "😾", "😠"
         };
 
-        private int affinity = 10;
+        private int affinity = 0;
         private readonly DispatcherTimer companionTimer;
         public event Action<int> AffinityChanged;
         public int Affinity => affinity;
         private readonly List<DateTime> clickHistory = new List<DateTime>();
+        private DateTime lastPetAffinityUtc = DateTime.MinValue;
+        private DateTime lastHayFeedUtc = DateTime.MinValue;
+        private DateTime lastItemAffinityUtc = DateTime.MinValue;
+        private DateTime lastItemSwitchTime = DateTime.MinValue;
+        private int itemSwitchCount = 0;
+        private DateTime itemSpamLockoutUntilUtc = DateTime.MinValue;
 
         private readonly Dictionary<string, BitmapImage> emojiBitmaps = new Dictionary<string, BitmapImage>();
         private BunnyItem currentItem = BunnyItem.None;
@@ -192,7 +198,7 @@ namespace BunnyPet
             messageTimer.Tick += OnMessageTimerTick;
             companionTimer = new DispatcherTimer(DispatcherPriority.Background)
             {
-                Interval = TimeSpan.FromSeconds(120)
+                Interval = TimeSpan.FromSeconds(600)
             };
             companionTimer.Tick += (s, e) =>
             {
@@ -429,10 +435,38 @@ namespace BunnyPet
 
         public void SetItem(BunnyItem item)
         {
+            var now = DateTime.UtcNow;
+
+            if (now < itemSpamLockoutUntilUtc)
+            {
+                ShowMessage("😤", 2200, true);
+                return;
+            }
+
             if (item != BunnyItem.None && !BunnyProgression.IsUnlocked(item, affinity))
             {
                 ShowMessage("🔒", 2500, true);
                 return;
+            }
+
+            if (item != currentItem)
+            {
+                if ((now - lastItemSwitchTime).TotalSeconds < 3.5)
+                {
+                    itemSwitchCount++;
+                    if (itemSwitchCount >= 4)
+                    {
+                        itemSpamLockoutUntilUtc = now.AddSeconds(12);
+                        itemSwitchCount = 0;
+                        ShowMessage("💢", 2500, true);
+                        return;
+                    }
+                }
+                else
+                {
+                    itemSwitchCount = 1;
+                }
+                lastItemSwitchTime = now;
             }
 
             currentItem = item;
@@ -465,11 +499,19 @@ namespace BunnyPet
 
             if (item == BunnyItem.Hay)
             {
-                AddAffinity(2);
+                if ((now - lastHayFeedUtc).TotalSeconds >= 180)
+                {
+                    lastHayFeedUtc = now;
+                    AddAffinity(1);
+                }
             }
             else if (item != BunnyItem.None)
             {
-                AddAffinity(1);
+                if ((now - lastItemAffinityUtc).TotalSeconds >= 300)
+                {
+                    lastItemAffinityUtc = now;
+                    AddAffinity(1);
+                }
             }
 
             ReactToItemEquip(item);
@@ -933,7 +975,15 @@ namespace BunnyPet
         {
             machine.Touch(DateTime.UtcNow);
             StopWalking();
-            AddAffinity(1);
+
+            var now = DateTime.UtcNow;
+            bool isSleeping = machine.State == BunnyState.Sleep || (!machine.PlayMode && currentItem == BunnyItem.House);
+
+            if (!isSleeping && (now - lastPetAffinityUtc).TotalSeconds >= 60)
+            {
+                lastPetAffinityUtc = now;
+                AddAffinity(1);
+            }
 
             if (currentItem == BunnyItem.House)
             {
@@ -1334,7 +1384,8 @@ namespace BunnyPet
             }
             SetVisualState(BunnyState.Angry);
             AnimatePurring();
-            AddAffinity(-2);
+            AddAffinity(-3);
+            lastPetAffinityUtc = DateTime.UtcNow.AddSeconds(45);
 
             ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
             ScheduleBehavior(3500);

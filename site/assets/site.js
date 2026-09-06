@@ -357,8 +357,12 @@
     let simDragging = false;
     let simDragMoved = false;
     let simLastPointer = null;
-    let simLastReactionTime = 0;
-    let simCurrentItem = 'none';
+    let simLastPetAffinityTime = 0;
+    let simLastHayFeedTime = 0;
+    let simLastItemAffinityTime = 0;
+    let simLastItemSwitchTime = 0;
+    let simItemSwitchCount = 0;
+    let simItemLockoutUntil = 0;
 
     function triggerSimCelebration(name, aff) {
       for (let i = 0; i < 5; i++) {
@@ -368,9 +372,30 @@
     }
 
     function setSimItem(item) {
+      const now = Date.now();
+      if (simItemLockoutUntil && now < simItemLockoutUntil) {
+        showSimSpeech('😤', 2200, true);
+        return;
+      }
+
       if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
         showSimSpeech('🔒', 2500, true);
         return;
+      }
+
+      if (item !== simCurrentItem) {
+        if (now - simLastItemSwitchTime < 3500) {
+          simItemSwitchCount++;
+          if (simItemSwitchCount >= 4) {
+            simItemLockoutUntil = now + 12000;
+            simItemSwitchCount = 0;
+            showSimSpeech('💢', 2500, true);
+            return;
+          }
+        } else {
+          simItemSwitchCount = 1;
+        }
+        simLastItemSwitchTime = now;
       }
 
       simCurrentItem = item || 'none';
@@ -398,9 +423,15 @@
       stopSimWalking();
 
       if (item === 'hay') {
-        changeAffinity(2, triggerSimCelebration);
+        if (!simLastHayFeedTime || now - simLastHayFeedTime >= 180000) {
+          simLastHayFeedTime = now;
+          changeAffinity(1, triggerSimCelebration);
+        }
       } else if (item && item !== 'none') {
-        changeAffinity(1, triggerSimCelebration);
+        if (!simLastItemAffinityTime || now - simLastItemAffinityTime >= 300000) {
+          simLastItemAffinityTime = now;
+          changeAffinity(1, triggerSimCelebration);
+        }
       }
 
       if (item === 'doll') {
@@ -645,7 +676,8 @@
       }
       if (simClickHistory.length >= 4) {
         simClickHistory.length = 0;
-        changeAffinity(-2);
+        changeAffinity(-3);
+        simLastPetAffinityTime = Date.now() + 45000;
         setSimState('angry');
         playPopSound();
         showSimSpeech(randomItem(SPAM_ANGRY_PHRASES), 2600, true);
@@ -653,7 +685,11 @@
         return;
       }
 
-      changeAffinity(1, triggerSimCelebration);
+      const isSleeping = simState === 'sleep' || (!simPlayMode && simCurrentItem === 'house');
+      if (!isSleeping && (!simLastPetAffinityTime || now - simLastPetAffinityTime >= 60000)) {
+        simLastPetAffinityTime = now;
+        changeAffinity(1, triggerSimCelebration);
+      }
 
       if (simCurrentItem === 'house') {
         floatSimHeart();

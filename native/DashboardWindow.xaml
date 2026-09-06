@@ -273,7 +273,7 @@
                                 <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" x:Name="BtnTogglePlay" Content="🎉 놀자! 모드 전환" Margin="5,0,0,0" Click="OnTogglePlayModeClick" />
                             </Grid>
 
-                            <Grid Margin="0,0,0,16">
+                            <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
@@ -282,14 +282,18 @@
                                 <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="📂 설정 복원하기..." Margin="5,0,0,0" Click="OnRestoreSettingsClick" />
                             </Grid>
 
+                            <Button Style="{StaticResource SecondaryButton}" Content="🔄 호감도 초기화 (0점부터 다시 키우기)" Margin="0,0,0,16" Click="OnResetAffinityClick" Foreground="#C03A50" />
+
                             <!-- 단축키 가이드 -->
                             <Border Background="#F9F6F0" CornerRadius="8" Padding="12" BorderBrush="#EAE3D8" BorderThickness="1">
                                 <StackPanel>
-                                    <TextBlock Text="⌨️ 주요 조작 단축키" FontWeight="Bold" FontSize="12" Foreground="#4A3F35" Margin="0,0,0,6" />
-                                    <TextBlock Text="• 클릭 / 문지르기 : 민트 쓰다듬기 (호감도 +1, 하트 퐁퐁)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="⌨️ 주요 조작 및 케어 가이드" FontWeight="Bold" FontSize="12" Foreground="#4A3F35" Margin="0,0,0,6" />
+                                    <TextBlock Text="• 클릭 / 문지르기 : 민트 쓰다듬기 (60초마다 정성껏 쓰다듬을 때 호감도 +1)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="• 빠른 연타/괴롭힘 : 민트가 뿔나서 호감도 3점 감점 (-3)" FontSize="11.5" Foreground="#C03A50" LineHeight="18" />
+                                    <TextBlock Text="• 건초 먹이기 : 3분마다 배고플 때 주면 호감도 +1 (배부를 땐 효과 없음)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="• 함께 머무르기 : 10분 평화롭게 켜둘 때마다 호감도 +1" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
                                     <TextBlock Text="• 마우스 더블클릭 : 놀자! (움직이기) / 나대지마 (멈추기) 토글" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
-                                    <TextBlock Text="• 드래그 : 원하는 화면 위치로 이동" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
-                                    <TextBlock Text="• Esc 키 : 화면 오른쪽 아래 기본 위치로 즉시 복귀" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="• 드래그 : 원하는 화면 위치로 이동 | Esc 키 : 기본 위치 복귀" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>

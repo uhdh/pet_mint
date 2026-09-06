@@ -362,6 +362,27 @@ namespace BunnyPet
             catch { }
         }
 
+        private void OnResetAffinityClick(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show(
+                "민트와의 호감도를 0점으로 초기화하시겠습니까?\n이제부터 가혹해진 조건으로 천천히 민트와 신뢰를 쌓아보세요.",
+                "호감도 초기화 확인",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (mainWindow != null)
+                {
+                    mainWindow.SetAffinity(0);
+                    settings.Affinity = 0;
+                    SaveSettings();
+                    RefreshAll();
+                    MessageBox.Show("민트와의 호감도가 0점(Lv.1 낯가리는 민트 🌱)으로 초기화되었습니다!", "초기화 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+        }
+
         private void OnCloseClick(object sender, RoutedEventArgs e)
         {
             Close();

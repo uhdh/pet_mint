@@ -32,7 +32,7 @@ namespace BunnyPet
             alwaysOnTop = false;
             autoStart = false;
             restRemindersEnabled = true;
-            affinity = 10;
+            affinity = 0;
             emojiFrequency = 0;
             purrFrequency = 0;
         }

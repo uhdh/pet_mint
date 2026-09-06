@@ -19,7 +19,13 @@ public enum BunnyState
     Confused,
     Wanted,
     RealAngry,
-    PetReal
+    PetReal,
+    Angry2,
+    Curious,
+    Cheer,
+    Chin,
+    Paw,
+    Stand2
 }
 
 public enum BunnyItem
@@ -45,12 +51,18 @@ public static class BunnyProgression
     public const int AffinityBeg = 5;
     public const int AffinityWash = 15;
     public const int AffinityAngry = 20;
+    public const int AffinityCurious = 25;
     public const int AffinityKiss = 30;
+    public const int AffinityPaw = 35;
     public const int AffinityPetReal = 45;
     public const int AffinityBinky = 50;
+    public const int AffinityStand2 = 60;
     public const int AffinityConfused = 70;
+    public const int AffinityCheer = 75;
     public const int AffinityRealAngry = 80;
+    public const int AffinityAngry2 = 82;
     public const int AffinityFlop = 85;
+    public const int AffinityChin = 88;
     public const int AffinityWanted = 90;
 
     public static int GetRequiredAffinity(BunnyItem item)
@@ -72,12 +84,18 @@ public static class BunnyProgression
             case BunnyState.Beg: return AffinityBeg;
             case BunnyState.Wash: return AffinityWash;
             case BunnyState.Angry: return AffinityAngry;
+            case BunnyState.Curious: return AffinityCurious;
             case BunnyState.Kiss: return AffinityKiss;
+            case BunnyState.Paw: return AffinityPaw;
             case BunnyState.PetReal: return AffinityPetReal;
             case BunnyState.Binky: return AffinityBinky;
+            case BunnyState.Stand2: return AffinityStand2;
             case BunnyState.Confused: return AffinityConfused;
+            case BunnyState.Cheer: return AffinityCheer;
             case BunnyState.RealAngry: return AffinityRealAngry;
+            case BunnyState.Angry2: return AffinityAngry2;
             case BunnyState.Flop: return AffinityFlop;
+            case BunnyState.Chin: return AffinityChin;
             case BunnyState.Wanted: return AffinityWanted;
             default: return 0;
         }
@@ -108,15 +126,19 @@ public static class BunnyProgression
         if (affinity < 10) return "다음 해금: 반성의자 (10점) 🪑";
         if (affinity < 15) return "다음 해금: 세수하기 (15점) 🧼";
         if (affinity < 20) return "다음 해금: 화났어! (20점) 💢";
-        if (affinity < 25) return "다음 해금: 토끼 인형 (25점) 🧸";
+        if (affinity < 25) return "다음 해금: 호기심 민트 (25점) 👀";
         if (affinity < 30) return "다음 해금: 래빗키스 뽀뽀 (30점) 💋";
+        if (affinity < 35) return "다음 해금: 앞발 올리기 민트 (35점) 🐾";
         if (affinity < 40) return "다음 해금: 토끼 가방 (40점) 🎒";
         if (affinity < 45) return "다음 해금: 실사 쓰다듬기 영상 (45점) 🖐️";
         if (affinity < 50) return "다음 해금: 신나는 점프 빙키 (50점) 🤸";
-        if (affinity < 60) return "다음 해금: 아늑한 집 (60점) 🏠";
+        if (affinity < 60) return "다음 해금: 두발 서기 민트 & 아늑한 집 (60점) 🏠";
         if (affinity < 70) return "다음 해금: 어리둥절 실사 영상 (70점) 👀";
+        if (affinity < 75) return "다음 해금: 환호 민트 (75점) 🙌";
         if (affinity < 80) return "다음 해금: 찐 화난 민트 (80점) 👿";
+        if (affinity < 82) return "다음 해금: 화났어2 (82점) 😾";
         if (affinity < 85) return "다음 해금: 안심 벌러덩 눕기 (85점) 🛌";
+        if (affinity < 88) return "다음 해금: 턱괴기 민트 (88점) 😴";
         if (affinity < 90) return "다음 해금: 현상수배 민트 (90점) 📜";
         return "모든 특별 포즈와 선물 해금 완료! 👑";
     }

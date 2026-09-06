@@ -49,6 +49,12 @@
     petReal: 'assets/bunny-pet.gif',
     realAngry: 'assets/bunny-real-angry.png',
     wanted: 'assets/bunny-wanted.png',
+    curious: 'assets/bunny-curious.png',
+    paw: 'assets/bunny-paw.png',
+    stand2: 'assets/bunny-stand2.png',
+    cheer: 'assets/bunny-cheer.png',
+    angry2: 'assets/bunny-angry2.png',
+    chin: 'assets/bunny-chin.png',
     beg: 'assets/bunny-beg.png',
     angry: 'assets/bunny-angry.png',
     front: 'assets/bunny-front.png',
@@ -89,6 +95,30 @@
 
   const PET_REAL_PHRASES = [
     '🥰', '💖', '💕', '🌸', '😻', '💓', '💗'
+  ];
+
+  const CURIOUS_PHRASES = [
+    '👀', '❓', '🐰', '✨', '응?'
+  ];
+
+  const PAW_PHRASES = [
+    '🐾', '🤍', '🥕', '손!', '놀아줘~'
+  ];
+
+  const STAND2_PHRASES = [
+    '🙏', '✨', '간식 주세요...', '두 발로 섰어!'
+  ];
+
+  const CHEER_PHRASES = [
+    '🙌', '🎉', '와아아~!', '신난다!!'
+  ];
+
+  const ANGRY2_PHRASES = [
+    '😾', '💢', '흥!', '삐졌어!'
+  ];
+
+  const CHIN_PHRASES = [
+    '😴', '💤', '턱괴기', '노곤노곤...'
   ];
 
   const SPAM_ANGRY_PHRASES = [
@@ -207,12 +237,18 @@
       beg: 5,
       wash: 15,
       angry: 20,
+      curious: 25,
       kiss: 30,
+      paw: 35,
       petReal: 45,
       binky: 50,
+      stand2: 60,
       confused: 70,
+      cheer: 75,
       realAngry: 80,
+      angry2: 82,
       flop: 85,
+      chin: 88,
       wanted: 90
     },
     milestones: [
@@ -989,6 +1025,68 @@
         setSimState('wanted');
         showSimSpeech(randomItem(WANTED_PHRASES), 3000, true);
         scheduleSimBehavior(3800);
+      });
+    });
+
+    const curiousBtns = document.querySelectorAll('#sim-mock-curious-btn');
+    curiousBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('curious');
+        showSimSpeech(randomItem(CURIOUS_PHRASES), 2600, true);
+        scheduleSimBehavior(3400);
+      });
+    });
+
+    const pawBtns = document.querySelectorAll('#sim-mock-paw-btn');
+    pawBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('paw');
+        floatSimHeart();
+        showSimSpeech(randomItem(PAW_PHRASES), 2600, true);
+        scheduleSimBehavior(3400);
+      });
+    });
+
+    const stand2Btns = document.querySelectorAll('#sim-mock-stand2-btn');
+    stand2Btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('stand2');
+        showSimSpeech(randomItem(STAND2_PHRASES), 2600, true);
+        scheduleSimBehavior(3400);
+      });
+    });
+
+    const cheerBtns = document.querySelectorAll('#sim-mock-cheer-btn');
+    cheerBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('cheer');
+        floatSimHeart();
+        showSimSpeech(randomItem(CHEER_PHRASES), 2600, true);
+        scheduleSimBehavior(3400);
+      });
+    });
+
+    const angry2Btns = document.querySelectorAll('#sim-mock-angry2-btn');
+    angry2Btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('angry2');
+        showSimSpeech(randomItem(ANGRY2_PHRASES), 2600, true);
+        scheduleSimBehavior(3400);
+      });
+    });
+
+    const chinBtns = document.querySelectorAll('#sim-mock-chin-btn');
+    chinBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('chin');
+        showSimSpeech(randomItem(CHIN_PHRASES), 2600, true);
+        scheduleSimBehavior(3600);
       });
     });
 

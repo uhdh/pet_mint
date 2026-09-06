@@ -60,6 +60,12 @@
     <Resource Include="Assets\item-chair.png" />
     <Resource Include="Assets\bunny-wanted.png" />
     <Resource Include="Assets\bunny-real-angry.png" />
+    <Resource Include="Assets\bunny-angry2.png" />
+    <Resource Include="Assets\bunny-curious.png" />
+    <Resource Include="Assets\bunny-cheer.png" />
+    <Resource Include="Assets\bunny-chin.png" />
+    <Resource Include="Assets\bunny-paw.png" />
+    <Resource Include="Assets\bunny-stand2.png" />
     <Resource Include="Assets\emojis\*.png" />
     <Resource Include="Assets\confused\*.png" />
     <Resource Include="Assets\pet\*.png" />

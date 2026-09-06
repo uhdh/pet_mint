@@ -926,6 +926,12 @@ namespace BunnyPet
                 case BunnyState.Confused: break;
                 case BunnyState.Wanted: AnimateBreathing(); break;
                 case BunnyState.RealAngry: AnimatePurring(); break;
+                case BunnyState.Angry2: AnimatePurring(); break;
+                case BunnyState.Curious: AnimateCurious(); break;
+                case BunnyState.Cheer: AnimateHappy(); break;
+                case BunnyState.Chin: AnimateSleeping(); break;
+                case BunnyState.Paw: AnimateBreathing(); break;
+                case BunnyState.Stand2: AnimateCurious(); break;
                 case BunnyState.PetReal: break;
             }
         }
@@ -947,6 +953,30 @@ namespace BunnyPet
             if (state == BunnyState.RealAngry)
             {
                 return "bunny-real-angry.png";
+            }
+            if (state == BunnyState.Angry2)
+            {
+                return "bunny-angry2.png";
+            }
+            if (state == BunnyState.Curious)
+            {
+                return "bunny-curious.png";
+            }
+            if (state == BunnyState.Cheer)
+            {
+                return "bunny-cheer.png";
+            }
+            if (state == BunnyState.Chin)
+            {
+                return "bunny-chin.png";
+            }
+            if (state == BunnyState.Paw)
+            {
+                return "bunny-paw.png";
+            }
+            if (state == BunnyState.Stand2)
+            {
+                return "bunny-stand2.png";
             }
             if (state == BunnyState.PetReal)
             {
@@ -994,6 +1024,12 @@ namespace BunnyPet
                 case BunnyState.Confused: return "confused/confused_000.png";
                 case BunnyState.Wanted: return "bunny-wanted.png";
                 case BunnyState.RealAngry: return "bunny-real-angry.png";
+                case BunnyState.Angry2: return "bunny-angry2.png";
+                case BunnyState.Curious: return "bunny-curious.png";
+                case BunnyState.Cheer: return "bunny-cheer.png";
+                case BunnyState.Chin: return "bunny-chin.png";
+                case BunnyState.Paw: return "bunny-paw.png";
+                case BunnyState.Stand2: return "bunny-stand2.png";
                 case BunnyState.PetReal: return "pet/pet_000.png";
                 default: return "bunny-idle.png";
             }
@@ -1613,6 +1649,26 @@ namespace BunnyPet
                     break;
                 case BunnyState.RealAngry:
                     ShowMessage("なんでェ……", 3200, true);
+                    break;
+                case BunnyState.Angry2:
+                    ShowMessage("흥! 단단히 삐졌어! 💢", 3000, true);
+                    break;
+                case BunnyState.Curious:
+                    ShowMessage("응? 뭐하는 거야? 👀", 3000, true);
+                    break;
+                case BunnyState.Cheer:
+                    AddHeart();
+                    ShowMessage("와아아~! 신난다! 🎉", 3000, true);
+                    break;
+                case BunnyState.Chin:
+                    ShowMessage("노곤노곤... 나른해 💤", 3000, true);
+                    break;
+                case BunnyState.Paw:
+                    AddHeart();
+                    ShowMessage("손! 나랑 놀아줘~ 🐾", 3000, true);
+                    break;
+                case BunnyState.Stand2:
+                    ShowMessage("간식 하나만 줘요... 🙏", 3000, true);
                     break;
             }
             ScheduleBehavior(3600);

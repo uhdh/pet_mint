@@ -720,12 +720,15 @@ img {
 }
 
 .sim-bunny-sprite {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   transform-origin: center bottom;
+  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
 }
 .sim-bunny-sprite img {
   width: 100%;
@@ -738,9 +741,9 @@ img {
   transform: scaleX(-1);
 }
 .sim-bunny-sprite.inside-house {
-  width: 48px;
-  height: 54px;
-  margin: 0 auto 19px auto;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 4px auto;
 }
 .sandbox-pet.inside-house {
   width: 58px;
@@ -818,8 +821,8 @@ img {
   height: 61px;
   object-fit: contain;
 }
-.sim-sprite-wrapper.on-chair {
-  transform: translateY(-36px);
+.sim-bunny-sprite.on-chair {
+  transform: translateY(-34px);
 }
 .sim-item-doll {
   z-index: 12;
@@ -856,6 +859,13 @@ img {
 }
 .mockup-btn--item:hover {
   background: var(--accent-soft);
+}
+.mockup-btn.active,
+.mockup-btn--item.active {
+  background: #e85d75 !important;
+  color: #ffffff !important;
+  border-color: #d14960 !important;
+  box-shadow: 0 0 0 2px rgba(232, 93, 117, 0.35);
 }
 
 .heart-float {

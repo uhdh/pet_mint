@@ -333,6 +333,9 @@
     let simY = 42; // bottom px
     let simDirection = -1; // -1: left, 1: right
     let simState = 'idle'; // idle, walk, stand, happy, sleep
+    let simCurrentItem = 'none';
+    let simPlayMode = false;
+    let simLastReactionTime = 0;
     let simWalkTimer = null;
     let simBehaviorTimer = null;
     let simSpeechTimer = null;
@@ -460,13 +463,17 @@
       let assetKey = next;
       if (simCurrentItem === 'house') {
         assetKey = 'front';
+      } else if (simCurrentItem === 'chair') {
+        if (next === 'sleep') assetKey = 'sleep';
+        else assetKey = next;
       } else if (!simPlayMode && (next === 'idle' || next === 'sleep')) {
         assetKey = 'sleep';
       }
       if (ASSETS[assetKey]) {
         simImg.src = ASSETS[assetKey];
       }
-      simSprite.className = `sim-bunny-sprite ${simCurrentItem === 'house' ? 'inside-house' : ''} ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' || next === 'beg' ? 'curious' : next === 'happy' ? 'happy' : next === 'angry' ? 'angry' : ''}`;
+      const itemClass = simCurrentItem === 'house' ? 'inside-house' : simCurrentItem === 'chair' ? 'on-chair' : '';
+      simSprite.className = `sim-bunny-sprite ${itemClass} ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' || next === 'beg' ? 'curious' : next === 'happy' ? 'happy' : next === 'angry' ? 'angry' : ''}`;
     }
 
     function hideSimSpeech() {
@@ -504,7 +511,7 @@
     }
 
     function startSimWalking() {
-      if (simCurrentItem === 'house') return;
+      if (simCurrentItem === 'house' || simCurrentItem === 'chair') return;
       stopSimWalking();
       if (Math.random() < 0.3) {
         simDirection *= -1;
@@ -512,22 +519,20 @@
       simWalkTimer = setInterval(() => {
         if (simDragging || simState !== 'walk') return;
         const bounds = getScreenBounds();
-        const minX = 10;
-        const maxX = bounds.width - 100;
+        const maxX = bounds.width - 110;
+        const minX = 20;
 
-        simX += simDirection * 2;
-        if (simX <= minX) {
-          simX = minX;
-          simDirection = 1;
-        } else if (simX >= maxX) {
+        simX += simDirection * 4;
+        if (simX >= maxX) {
           simX = maxX;
           simDirection = -1;
+        } else if (simX <= minX) {
+          simX = minX;
+          simDirection = 1;
         }
         updateSimTransform();
       }, 70);
     }
-
-    let simPlayMode = false;
 
     function setSimPlayMode(play) {
       simPlayMode = Boolean(play);
@@ -558,6 +563,13 @@
 
         if (simCurrentItem === 'house') {
           setSimState('front');
+          if (Math.random() < 0.25) floatSimHeart();
+          scheduleSimBehavior(randomBetween(4000, 8000));
+          return;
+        }
+
+        if (simCurrentItem === 'chair') {
+          setSimState('idle');
           if (Math.random() < 0.25) floatSimHeart();
           scheduleSimBehavior(randomBetween(4000, 8000));
           return;

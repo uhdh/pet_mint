@@ -224,8 +224,10 @@
     }
   };
 
-  let globalAffinity = parseInt(localStorage.getItem('mint-affinity') || '100', 10);
-  if (isNaN(globalAffinity)) globalAffinity = 100;
+  let globalAffinity = 100;
+  try {
+    localStorage.setItem('mint-affinity', '100');
+  } catch (e) {}
 
   function updateAffinityUI() {
     const simBadge = document.getElementById('sim-affinity-badge');

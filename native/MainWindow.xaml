@@ -23,7 +23,7 @@
           MouseRightButtonUp="OnMouseRightButtonUp">
         <Image x:Name="ItemHouse"
                Panel.ZIndex="1"
-               Width="108" Height="123"
+               Width="116" Height="106"
                HorizontalAlignment="Center"
                VerticalAlignment="Bottom"
                Margin="0,0,0,1"

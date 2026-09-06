@@ -805,8 +805,8 @@ img {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 104px;
-  height: 118px;
+  width: 114px;
+  height: 104px;
   object-fit: contain;
 }
 .sim-item-chair {
@@ -1164,8 +1164,8 @@ img {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 128px;
-  height: 144px;
+  width: 140px;
+  height: 128px;
   object-fit: contain;
 }
 .sandbox-item-chair {

@@ -89,6 +89,8 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   line-height: 1.7;
+  word-break: keep-all;
+  overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -1699,6 +1701,10 @@ img {
   color: var(--accent);
 }
 
+.sim-hint__mobile {
+  display: none;
+}
+
 /* ==========================================================================
    반응형 (Responsive)
    ========================================================================== */
@@ -1709,25 +1715,331 @@ img {
   .hide-mobile {
     display: none;
   }
-  .band {
-    padding-block: 60px;
+  .sim-hint__desktop {
+    display: none;
   }
+  .sim-hint__mobile {
+    display: inline;
+  }
+
+  /* 헤더 모바일 최적화 */
+  .masthead__inner {
+    padding-block: 10px;
+  }
+  .brand__text {
+    font-size: 1.15rem;
+  }
+  .btn--header {
+    padding: 6px 13px;
+    font-size: 0.8rem;
+  }
+  .theme-toggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* 히어로 모바일 최적화 */
+  .hero {
+    padding-top: 36px;
+    padding-bottom: 48px;
+  }
+  .hero__badge {
+    margin-bottom: 16px;
+    font-size: 0.76rem;
+    padding: 4px 12px;
+  }
+  .hero__title {
+    font-size: clamp(1.95rem, 6.8vw, 2.4rem);
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+  .hero__tagline {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    padding-inline: 4px;
+  }
+  .hero__cta-group {
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+    margin-inline: auto;
+    gap: 10px;
+  }
+  .hero__cta-group .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .hero__notice {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 8px;
+    font-size: 0.76rem;
+    margin-bottom: 32px;
+  }
+  .hero__notice .sep {
+    display: none;
+  }
+  .hero__notice span {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+  }
+
+  /* 데스크톱 시뮬레이터 모바일 반응형 UI */
+  .desktop-mockup {
+    border-radius: var(--radius-md);
+  }
+  .desktop-mockup__bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px 10px;
+    gap: 10px;
+  }
+  .win-caption-controls {
+    display: none !important;
+  }
+  .desktop-mockup__title-area {
+    font-size: 0.78rem;
+  }
+  .desktop-mockup__controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 6px;
+    padding: 2px 2px 6px;
+    justify-content: flex-start;
+    width: 100%;
+  }
+  .desktop-mockup__controls::-webkit-scrollbar {
+    display: none;
+  }
+  .desktop-mockup__controls .mockup-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    border-radius: var(--radius-full);
+  }
+
+  /* 가상 데스크톱 화면 및 메모장 */
   .desktop-mockup__screen {
-    height: 300px;
+    height: 310px;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: pan-y;
+  }
+  .mock-desktop-icons {
+    top: 12px;
+    left: 10px;
+    gap: 10px;
+  }
+  .mock-desktop-icon {
+    width: 56px;
+    padding: 3px 2px;
+  }
+  .mock-desktop-icon__img {
+    font-size: 1.3rem;
+    margin-bottom: 2px;
+  }
+  .mock-desktop-icon__label {
+    font-size: 0.6rem;
   }
   .mock-window {
-    width: 220px;
-    left: 20px;
+    top: 10px;
+    left: auto;
+    right: 8px;
+    width: min(195px, calc(100% - 76px));
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   }
+  .mock-window__header {
+    padding: 4px 8px;
+    font-size: 0.68rem;
+  }
+  .mock-window__caption {
+    display: none;
+  }
+  .mock-window__menu {
+    display: none;
+  }
+  .mock-window__body {
+    padding: 8px 10px 10px;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    min-height: auto;
+  }
+  .mock-typing {
+    font-size: 0.68rem;
+    line-height: 1.4;
+  }
+
+  /* Windows 11 가상 작업표시줄 모바일 축소 */
+  .mock-taskbar {
+    height: 38px;
+    padding-inline: 8px;
+  }
+  .mock-taskbar__center {
+    position: static;
+    transform: none;
+    gap: 2px;
+  }
+  .mock-taskbar__btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.88rem;
+  }
+  .mock-taskbar__btn:nth-child(2),
+  .mock-taskbar__btn:nth-child(3) {
+    display: none;
+  }
+  .tray-btn,
+  .tray-status,
+  .tray-lang,
+  .tray-date,
+  .mock-taskbar__peek {
+    display: none !important;
+  }
+  .tray-bunny {
+    font-size: 1rem;
+  }
+  .tray-datetime {
+    padding: 2px 4px;
+    font-size: 0.72rem;
+  }
+  #sim-clock {
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .stage__caption {
+    font-size: 0.82rem;
+    margin-top: 10px;
+    padding-inline: 6px;
+  }
+
+  /* 공통 밴드 & 헤더 */
+  .band {
+    padding-block: 52px;
+  }
+  .section-head {
+    margin-bottom: 34px;
+    padding-inline: 8px;
+  }
+  .band__title {
+    font-size: clamp(1.48rem, 5.2vw, 1.85rem);
+  }
+  .band__lede {
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  /* 카드 그리드 반응형 */
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .feature-card {
+    padding: 22px 18px;
+    border-radius: var(--radius-md);
+  }
+  .feature-card__title {
+    font-size: 1.15rem;
+  }
+  .feature-card__desc {
+    font-size: 0.88rem;
+  }
+
+  .item-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .item-card {
+    padding: 22px 18px;
+  }
+  .item-card__media {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+  }
+  .item-card__title {
+    font-size: 1.05rem;
+  }
+  .item-card__desc {
+    font-size: 0.85rem;
+  }
+
+  .download-cards {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .dl-card {
+    padding: 28px 20px;
+  }
+  .dl-card__title {
+    font-size: 1.3rem;
+  }
+  .dl-card__features li {
+    font-size: 0.86rem;
+  }
+  .dl-alt-link {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    padding-inline: 8px;
+  }
+  .dl-alt-link a {
+    display: block;
+    margin-top: 4px;
+    margin-left: 0 !important;
+  }
+  .guide-box {
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 16px;
+    font-size: 0.86rem;
+  }
+  .guide-box__icon {
+    font-size: 1.5rem;
+  }
+
   .specs-table th[scope="row"] {
     width: 38%;
   }
+
+  /* 푸터 모바일 */
+  .footer {
+    padding-block: 40px 32px;
+  }
   .footer__inner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
   }
   .footer__meta {
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+  }
+  .footer__links {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell {
+    width: min(100% - 24px, var(--shell-max));
+  }
+  .hero__title {
+    font-size: 1.85rem;
   }
 }
 

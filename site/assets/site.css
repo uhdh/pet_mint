@@ -1052,8 +1052,20 @@ img {
 }
 
 .feature-card__icon {
-  font-size: 2.2rem;
-  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  margin-bottom: 16px;
+}
+.feature-card__asset {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.22));
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.feature-card:hover .feature-card__asset {
+  transform: scale(1.15) rotate(-3deg);
 }
 .feature-card__title {
   font-family: var(--font-serif);
@@ -1560,6 +1572,24 @@ img {
   border-radius: var(--radius-full);
   letter-spacing: 0.04em;
   box-shadow: 0 4px 10px var(--accent-glow);
+}
+
+.dl-card--store {
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+.dl-card__badge--store {
+  background: #0078d4;
+  box-shadow: 0 4px 10px rgba(0, 120, 212, 0.35);
+}
+.dl-card__icon--store {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.btn--store-soon {
+  opacity: 0.8;
+  cursor: default;
 }
 
 .dl-card__header {

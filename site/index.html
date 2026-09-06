@@ -38,8 +38,6 @@
         <a href="#demo">데모 체험</a>
         <a href="#how">특징</a>
         <a href="#items">아이템 선물</a>
-        <a href="#play">직접 만져보기</a>
-        <a href="#specs">사양</a>
         <a href="#download" class="nav__cta">다운로드</a>
       </nav>
 
@@ -263,43 +261,57 @@
 
         <div class="feature-grid">
           <div class="feature-card">
-            <div class="feature-card__icon">🐾</div>
+            <div class="feature-card__icon">
+              <img src="assets/bunny-walk.png" class="feature-card__asset" alt="산책하는 민트">
+            </div>
             <h3 class="feature-card__title">화면 아래를 산책합니다</h3>
             <p class="feature-card__desc">작업창 밑을 천천히 깡충깡충 걷다가 화면 모서리에 닿으면 자연스럽게 방향을 바꿔요. 때로는 가만히 숨을 쉬며 주변을 살핍니다.</p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-card__icon">👀</div>
+            <div class="feature-card__icon">
+              <img src="assets/bunny-stand.png" class="feature-card__asset" alt="돌아보는 민트">
+            </div>
             <h3 class="feature-card__title">마우스가 오면 돌아봅니다</h3>
             <p class="feature-card__desc">커서가 가까이 다가오면 호기심 가득한 눈으로 쳐다보며 👀, ❓, 🤍 등 깜찍한 이모티콘 1개로 반응합니다.</p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-card__icon">💖</div>
+            <div class="feature-card__icon">
+              <img src="assets/bunny-kiss.png" class="feature-card__asset" alt="뽀뽀하는 민트">
+            </div>
             <h3 class="feature-card__title">쓰다듬으면 하트로 화답해요</h3>
             <p class="feature-card__desc">토끼를 클릭하거나 살살 문지르면 기분 좋게 깡충 뛰며 분홍빛 하트와 💕, 🥰, 💖 등 다채로운 감정 이모티콘이 피어오릅니다.</p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-card__icon">💤</div>
+            <div class="feature-card__icon">
+              <img src="assets/bunny-sleep.png" class="feature-card__asset" alt="잠자는 식빵 민트">
+            </div>
             <h3 class="feature-card__title">혼자 두면 쿨쿨 잠이 듭니다</h3>
-            <p class="feature-card__desc">일정 시간 상호작용이 없으면 엎드려 새근새근 잠을 청합니다. 마우스를 가져가거나 클릭하면 눈을 깜빡이며 다시 깨어나요.</p>
+            <p class="feature-card__desc">일정 시간 상호작용이 없으면 얌전히 엎드려 식빵을 굽습니다. 마우스를 가져가거나 클릭하면 눈을 깜빡이며 다시 깨어나요.</p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-card__icon">🪶</div>
-            <h3 class="feature-card__title">1.9MB 초경량 무설치</h3>
-            <p class="feature-card__desc">무거운 브라우저 엔진 없이 .NET 4.8 고속 네이티브로 제작되어 RAM 사용량이 25MB 이하에 불과합니다. 설치 없이 다운로드 후 바로 열립니다.</p>
+            <div class="feature-card__icon">
+              <img src="assets/icon.png" class="feature-card__asset" alt="초경량 단일 실행 파일">
+            </div>
+            <h3 class="feature-card__title">6.8MB 초경량 무설치</h3>
+            <p class="feature-card__desc">무거운 브라우저 엔진 없이 고속 네이티브 C# WPF로 제작되어 RAM 사용량이 20~30MB에 불과합니다. 설치 없이 다운로드 후 바로 실행됩니다.</p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-card__icon">🔒</div>
+            <div class="feature-card__icon">
+              <img src="assets/bunny-front.png" class="feature-card__asset" alt="안전한 오프라인 민트">
+            </div>
             <h3 class="feature-card__title">100% 안전한 오프라인 동작</h3>
             <p class="feature-card__desc">인터넷 통신, 광고, 계정 연동, 분석 트래커가 전혀 없습니다. 사용자의 모든 데이터와 작업 화면을 안전하게 보호합니다.</p>
           </div>
 
           <div class="feature-card feature-card--highlight">
-            <div class="feature-card__icon">🎁</div>
+            <div class="feature-card__icon">
+              <img src="assets/item-house.png" class="feature-card__asset" alt="토끼 선물 아이템">
+            </div>
             <h3 class="feature-card__title">토끼 집, 건초, 가방, 인형 선물</h3>
             <p class="feature-card__desc">우클릭 메뉴에서 건초를 주거나 가방을 메어주고, 아늑한 집을 지어줄 수 있어요. 특히 <strong>토끼 인형</strong>을 선물하면 <em>💢</em> 또는 <em>😡</em>라며 질투하는 귀여운 전용 이모티콘 리액션을 보여줍니다!</p>
           </div>
@@ -395,142 +407,6 @@
       </div>
     </section>
 
-    <!-- 인터랙티브 체험 섹션 -->
-    <section class="band" id="play" aria-labelledby="play-title">
-      <div class="shell">
-        <div class="section-head">
-          <p class="band__label">만져보기</p>
-          <h2 class="band__title" id="play-title">웹에서 지금 바로 민트를 쓰다듬어 보세요</h2>
-          <p class="band__lede">실제 데스크톱 앱과 동일한 오리지널 아트워크와 상태 머신이 적용되어 있습니다.</p>
-        </div>
-
-        <div class="sandbox">
-          <!-- 호감도 레벨 안내 바 -->
-          <div class="affinity-banner" id="sandbox-affinity-banner" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; background: rgba(255, 182, 193, 0.18); border: 1px solid rgba(255, 105, 180, 0.35); border-radius: 12px; padding: 10px 18px; margin-bottom: 16px;">
-            <div>
-              <span id="sandbox-affinity-val" style="font-weight: 700; color: #d63384; font-size: 1.05rem;">💖 웹 체험판: 모든 포즈 & 아이템 100% 해금</span>
-              <span id="sandbox-affinity-level" style="margin-left: 6px; color: var(--color-ink-muted, #666); font-weight: 500;">(잠금 없이 자유롭게 즐겨보세요 ✨)</span>
-            </div>
-            <div id="sandbox-affinity-next" style="color: var(--color-ink-muted, #777); font-size: 0.9rem;">
-              💡 실제 앱(BunnyPet.exe)에서는 호감도를 쌓으며 하나씩 해금할 수 있습니다!
-            </div>
-          </div>
-
-          <div class="sandbox__stage" id="sandbox-stage">
-            <div class="sandbox__hint" id="sandbox-hint">민트를 클릭하거나 마우스로 살살 문질러 쓰다듬어 보세요 💕</div>
-            
-            <div class="sandbox-bunny" id="sandbox-bunny">
-              <div class="sandbox-speech" id="sandbox-speech">
-                <span id="sandbox-speech-text">👋</span>
-                <span class="sandbox-speech__tail"></span>
-              </div>
-              <div class="sandbox-hearts" id="sandbox-hearts"></div>
-              <!-- 토끼 집, 의자 아이템 (토끼 뒤 레이어) -->
-              <img src="assets/item-house.png" class="sandbox-item sandbox-item-house hidden" id="sandbox-item-house" alt="토끼 집">
-              <img src="assets/item-chair.png" class="sandbox-item sandbox-item-chair hidden" id="sandbox-item-chair" alt="작은 의자">
-              <div class="sandbox-pet" id="sandbox-pet" tabindex="0" role="button" aria-label="토끼 쓰다듬기">
-                <img src="assets/bunny-idle.png" id="sandbox-img" alt="체험용 롭이어 토끼">
-              </div>
-              <!-- 토끼 인형, 건초, 가방 아이템 (토끼 앞 레이어) -->
-              <img src="assets/item-doll.png" class="sandbox-item sandbox-item-doll hidden" id="sandbox-item-doll" alt="토끼 인형">
-              <img src="assets/item-hay.png" class="sandbox-item sandbox-item-hay hidden" id="sandbox-item-hay" alt="건초">
-              <img src="assets/item-bag.png" class="sandbox-item sandbox-item-bag hidden" id="sandbox-item-bag" alt="가방">
-            </div>
-            <div class="sandbox__floor"></div>
-          </div>
-
-          <!-- 아이템 선물하기 탭 -->
-          <div class="item-controls">
-            <span class="item-controls__label">🎁 아이템 선물하기:</span>
-            <div class="item-btn-group">
-              <button class="item-btn" data-item="hay" type="button">🌾 건초 주기</button>
-              <button class="item-btn" data-item="chair" type="button">🪑 작은 의자</button>
-              <button class="item-btn item-btn--doll" data-item="doll" type="button">🧸 토끼 인형</button>
-              <button class="item-btn" data-item="bag" type="button">🎒 가방 메어주기</button>
-              <button class="item-btn" data-item="house" type="button">🏠 아늑한 집</button>
-              <button class="item-btn item-btn--clear" data-item="none" type="button">❌ 치우기</button>
-            </div>
-          </div>
-
-          <!-- 상태 수동 변경 탭 -->
-          <div class="state-controls">
-            <span class="state-controls__label">상태 직접 보기:</span>
-            <div class="state-btn-group">
-              <button class="state-btn state-btn--play" id="sim-play-toggle-btn" type="button" style="font-weight: bold; background: #ffe4e8; border-color: #f7a8b8; color: #842838;">🎉 놀자! (움직이기)</button>
-              <button class="state-btn active" data-state="idle" type="button">멈추기 (식빵)</button>
-              <button class="state-btn" data-state="walk" type="button">산책 (Walk)</button>
-              <button class="state-btn" data-state="stand" type="button">일어서기 (Stand)</button>
-              <button class="state-btn" data-state="beg" type="button">🌾 내놔! (Beg)</button>
-              <button class="state-btn" data-state="angry" type="button">💢 화났어! (Angry)</button>
-              <button class="state-btn" data-state="binky" type="button">🤸 빙키 (Binky)</button>
-              <button class="state-btn" data-state="kiss" type="button">💋 뽀뽀 (Kiss)</button>
-              <button class="state-btn" data-state="wash" type="button">🧼 세수하기 (Wash)</button>
-              <button class="state-btn" data-state="flop" type="button">🛌 벌러덩 (Flop)</button>
-              <button class="state-btn" data-state="front" type="button">🐰 똘망똘망 (Front)</button>
-              <button class="state-btn" data-state="confused" type="button">👀 어리둥절 (Confused)</button>
-              <button class="state-btn" data-state="intro" type="button">✨ 천사 등장 (Intro)</button>
-              <button class="state-btn" data-state="happy" type="button">기쁨 (Happy)</button>
-              <button class="state-btn" data-state="sleep" type="button">잠자기 (Sleep)</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 사양 및 특징 비교 -->
-    <section class="band band--subtle" id="specs" aria-labelledby="specs-title">
-      <div class="shell">
-        <div class="section-head">
-          <p class="band__label">상세 사양</p>
-          <h2 class="band__title" id="specs-title">부담 없는 가벼운 데스크톱 친구</h2>
-          <p class="band__lede">컴퓨터에 어떠한 흔적도 남기지 않고, 언제든 편하게 켜고 끌 수 있습니다.</p>
-        </div>
-
-        <div class="specs-table-wrap">
-          <table class="specs-table">
-            <thead>
-              <tr>
-                <th scope="col">항목</th>
-                <th scope="col">사양 및 안내</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">지원 운영체제</th>
-                <td>Windows 10 / Windows 11 (64-bit)</td>
-              </tr>
-              <tr>
-                <th scope="row">파일 크기</th>
-                <td><strong>약 1.9 MB</strong> (무설치 단일 EXE 파일)</td>
-              </tr>
-              <tr>
-                <th scope="row">메모리 점유율</th>
-                <td>약 20~30 MB (초경량 네이티브 WPF 구동)</td>
-              </tr>
-              <tr>
-                <th scope="row">인터넷 연결</th>
-                <td><strong>완전 불필요</strong> (100% 로컬 오프라인 실행)</td>
-              </tr>
-              <tr>
-                <th scope="row">주요 조작 단축키</th>
-                <td>
-                  <code>클릭 / 문지르기</code> 🖐️ 쓰다듬기 (하트 퐁퐁 & 골골 반응)<br>
-                  <code>더블클릭</code> 일어서서 주변 살피기<br>
-                  <code>드래그</code> 바탕화면 원하는 위치로 이동<br>
-                  <code>우클릭</code> 🖐️ 쓰다듬기, 🎁 아이템 선물 (집/의자/건초/가방/인형), 일시정지, 항상 위, 복귀, 종료<br>
-                  <code>Esc</code> 화면 오른쪽 아래 기본 위치로 복귀
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">라이선스 & 비용</th>
-                <td>무료 (개인 및 비상업용 자유 사용, MIT License)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
     <!-- 다운로드 섹션 -->
     <section class="band" id="download" aria-labelledby="download-title">
       <div class="shell">
@@ -552,10 +428,10 @@
             <ul class="dl-card__features">
               <li>✓ 별도 설치 없는 무설치 단독 실행</li>
               <li>✓ 6.8MB의 초경량 단독 실행 파일</li>
-              <li>✓ 초고속 시작 & 초저전력/저메모리</li>
+              <li>✓ 초고속 시작 & 초저전력/저메모리 (20~30MB)</li>
               <li>✓ 🖐️ 터치·클릭·문지르기 쓰다듬기 기능 완벽 지원</li>
-              <li>✓ 🎁 5종 아이템 (작은 의자, 집, 건초, 가방, 인형) & 특수 리액션</li>
-              <li>✓ 마우스 호버 반응 & 말풍선 최신 개선판</li>
+              <li>✓ 🎁 5종 아이템 (의자, 집, 건초, 가방, 인형) & 특수 리액션</li>
+              <li>✓ 100% 로컬 오프라인 실행 (인터넷 통신 없음)</li>
             </ul>
             <div class="dl-card__action">
               <a class="btn btn--hero btn--full" href="downloads/BunnyPet.exe" download>
@@ -567,28 +443,42 @@
             </div>
           </div>
 
-          <!-- 카드 2: 전체 포터블 ZIP 패키지 -->
-          <div class="dl-card">
+          <!-- 카드 2: Microsoft Store (스토어 연동 예정) -->
+          <div class="dl-card dl-card--store">
+            <div class="dl-card__badge dl-card__badge--store">스토어 출시 예정</div>
             <div class="dl-card__header">
-              <div class="dl-card__icon">📦</div>
-              <h3 class="dl-card__title">휴대용 전체 패키지 (ZIP)</h3>
-              <p class="dl-card__subtitle">BunnyPet-v1.0.1-win-x64.zip</p>
+              <div class="dl-card__icon dl-card__icon--store">
+                <svg viewBox="0 0 32 32" width="40" height="40" fill="none" aria-hidden="true">
+                  <rect x="2" y="2" width="13" height="13" rx="1" fill="#F25022"/>
+                  <rect x="17" y="2" width="13" height="13" rx="1" fill="#7FBA00"/>
+                  <rect x="2" y="17" width="13" height="13" rx="1" fill="#00A4EF"/>
+                  <rect x="17" y="17" width="13" height="13" rx="1" fill="#FFB900"/>
+                </svg>
+              </div>
+              <h3 class="dl-card__title">Microsoft Store</h3>
+              <p class="dl-card__subtitle">공식 스토어 자동 업데이트 & 간편 설치</p>
             </div>
             <ul class="dl-card__features">
-              <li>✓ USB 메모리나 외장 드라이브 보관용</li>
-              <li>✓ 실행 파일(BunnyPet.exe) 및 사용법 가이드 포함</li>
-              <li>✓ 원하는 폴더에 압축 풀고 바로 사용</li>
-              <li>✓ 6.8MB 초경량 무설치 포터블 압축본</li>
+              <li>✓ Microsoft Store 공식 패키지 검증</li>
+              <li>✓ 별도 경고 창 없는 가장 안전하고 간편한 설치</li>
+              <li>✓ 새로운 포즈와 아이템 자동 무중단 업데이트</li>
+              <li>✓ 🛒 마이크로소프트 스토어 출시 심사 및 연동 준비 중</li>
             </ul>
             <div class="dl-card__action">
-              <a class="btn btn--secondary btn--full" href="downloads/BunnyPet-v1.0.1-win-x64.zip" download>
-                <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              <button class="btn btn--secondary btn--full btn--store-soon" type="button" disabled title="Microsoft Store 연동 준비 중입니다">
+                <svg class="btn__icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z"/>
                 </svg>
-                <span>ZIP 패키지 다운로드 (6.8 MB)</span>
-              </a>
+                <span>스토어 연동 예정 (Coming Soon)</span>
+              </button>
             </div>
           </div>
+        </div>
+
+        <!-- 포터블 ZIP 대체 다운로드 링크 -->
+        <div class="dl-alt-link" style="text-align: center; margin-top: 18px; font-size: 0.88rem; color: var(--ink-muted);">
+          <span>📦 무설치 포터블 ZIP 압축본이 필요하신가요?</span>
+          <a href="downloads/BunnyPet-v1.0.1-win-x64.zip" download style="color: var(--accent); font-weight: 600; text-decoration: underline; margin-left: 6px;">BunnyPet-v1.0.1-win-x64.zip 받기 (6.8 MB)</a>
         </div>
 
         <!-- 스마트스크린 안내 -->

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Forms = System.Windows.Forms;
@@ -360,6 +361,34 @@ namespace BunnyPet
                 settings.Save();
             }
             catch { }
+        }
+
+        private void OnCheatUnlockClick(object sender, RoutedEventArgs e)
+        {
+            if (mainWindow != null)
+            {
+                mainWindow.CheatUnlockAll();
+                settings.Affinity = 100;
+                SaveSettings();
+                RefreshAll();
+                MessageBox.Show(
+                    "👑 치트키가 발동되었습니다!\n\n호감도가 100점(MAX)으로 설정되어 모든 특별 포즈 7종과 선물 아이템 5종이 즉시 해금되었습니다. ✨\n\n(전역 단축키: Ctrl + Shift + U)",
+                    "전체 해금 완료 👑",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            bool isCtrl = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            bool isShift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+            if ((isCtrl && isShift && (e.Key == Key.U || e.Key == Key.C)) || e.Key == Key.F12)
+            {
+                OnCheatUnlockClick(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
         }
 
         private void OnResetAffinityClick(object sender, RoutedEventArgs e)

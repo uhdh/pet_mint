@@ -88,6 +88,20 @@ namespace BunnyPet
 
             Log("Loading settings");
             settings = AppSettings.Load();
+            if (e.Args != null && e.Args.Length > 0)
+            {
+                foreach (var arg in e.Args)
+                {
+                    var a = arg.Trim().ToLowerInvariant();
+                    if (a == "--unlock-all" || a == "-u" || a == "cheat" || a == "/cheat" || a == "--cheat")
+                    {
+                        settings.Affinity = 100;
+                        SaveSettings();
+                        Log("CLI Argument detected: Unlocked all content (Affinity = 100)");
+                        break;
+                    }
+                }
+            }
             RegisterShowEvent();
             window = new MainWindow();
             MainWindow = window;
@@ -179,6 +193,15 @@ namespace BunnyPet
                     window?.OpenDashboard();
                 };
                 menu.Items.Add(dashboardItem);
+
+                var cheatItem = new Forms.ToolStripMenuItem("👑 [치트키] 전체 즉시 해금 (Ctrl+Alt+U)");
+                cheatItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
+                cheatItem.ForeColor = System.Drawing.Color.FromArgb(216, 80, 100);
+                cheatItem.Click += delegate
+                {
+                    window?.CheatUnlockAll();
+                };
+                menu.Items.Add(cheatItem);
 
                 menu.Items.Add(new Forms.ToolStripSeparator());
 

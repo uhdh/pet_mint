@@ -207,6 +207,7 @@ namespace BunnyPet
             companionTimer.Start();
             inputWatcher = new GlobalInputWatcher();
             inputWatcher.KeyPressed += OnGlobalKeyPressed;
+            inputWatcher.CheatKeyTriggered += OnGlobalCheatKeyTriggered;
             InitEmojiBitmaps();
             InitConfusedFrames();
             Loaded += OnLoaded;
@@ -235,11 +236,20 @@ namespace BunnyPet
             messageTimer.Stop();
             companionTimer?.Stop();
             inputWatcher.KeyPressed -= OnGlobalKeyPressed;
+            inputWatcher.CheatKeyTriggered -= OnGlobalCheatKeyTriggered;
             inputWatcher.Dispose();
             StopAnimation();
             StopConfusedAnimation();
             confusedFrames.Clear();
-            Hearts.Children.Clear();
+            try
+            {
+                var handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+                UnregisterHotKey(handle, HOTKEY_CHEAT_ALT_U);
+                UnregisterHotKey(handle, HOTKEY_CHEAT_SHIFT_U);
+                UnregisterHotKey(handle, HOTKEY_CHEAT_CTRL_F12);
+                UnregisterHotKey(handle, HOTKEY_CHEAT_SHIFT_F12);
+            }
+            catch { }
             if (dashboardWindow != null)
             {
                 try { dashboardWindow.Close(); } catch { }
@@ -602,6 +612,38 @@ namespace BunnyPet
             restTimer.IsEnabled = restRemindersEnabled;
             awarenessTimer.Start();
             PlayIntroGreeting();
+
+            try
+            {
+                var handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+                var source = System.Windows.Interop.HwndSource.FromHwnd(handle);
+                source?.AddHook(HwndHook);
+                bool okAltU = RegisterHotKey(handle, HOTKEY_CHEAT_ALT_U, MOD_CONTROL | MOD_ALT, 0x55);
+                bool okShiftU = RegisterHotKey(handle, HOTKEY_CHEAT_SHIFT_U, MOD_CONTROL | MOD_SHIFT, 0x55);
+                bool okCtrlF12 = RegisterHotKey(handle, HOTKEY_CHEAT_CTRL_F12, MOD_CONTROL, 0x7B);
+                bool okShiftF12 = RegisterHotKey(handle, HOTKEY_CHEAT_SHIFT_F12, MOD_CONTROL | MOD_SHIFT, 0x7B);
+                App.Log(string.Format("RegisterHotKey AltU={0}, ShiftU={1}, CtrlF12={2}, ShiftF12={3}, LastError={4}", okAltU, okShiftU, okCtrlF12, okShiftF12, Marshal.GetLastWin32Error()));
+            }
+            catch (Exception ex)
+            {
+                App.Log("RegisterHotKey exception: " + ex.Message);
+            }
+        }
+
+        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_HOTKEY = 0x0312;
+            if (msg == WM_HOTKEY)
+            {
+                int id = wParam.ToInt32();
+                if (id >= HOTKEY_CHEAT_ALT_U && id <= HOTKEY_CHEAT_SHIFT_F12)
+                {
+                    App.Log("WM_HOTKEY received: " + id);
+                    CheatUnlockAll();
+                    handled = true;
+                }
+            }
+            return IntPtr.Zero;
         }
 
         private void OnBehaviorTick(object sender, EventArgs e)
@@ -1620,6 +1662,53 @@ namespace BunnyPet
             catch (InvalidOperationException) { }
         }
 
+        private void OnGlobalCheatKeyTriggered()
+        {
+            if (resourcesDisposed) return;
+            try
+            {
+                Dispatcher.BeginInvoke(new Action(() => CheatUnlockAll()));
+            }
+            catch (InvalidOperationException) { }
+        }
+
+        public void CheatUnlockAll()
+        {
+            if (resourcesDisposed) return;
+
+            affinity = 100;
+            itemSpamLockoutUntilUtc = DateTime.MinValue;
+            itemSwitchCount = 0;
+
+            var app = Application.Current as App;
+            if (app != null && app.CurrentSettings != null)
+            {
+                app.CurrentSettings.Affinity = 100;
+                try { app.CurrentSettings.Save(); } catch { }
+            }
+
+            AffinityChanged?.Invoke(affinity);
+
+            AnimateHappy();
+            for (int i = 0; i < 7; i++)
+            {
+                int delay = i * 110;
+                Task.Delay(delay).ContinueWith(_ =>
+                {
+                    if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                    try { Dispatcher.BeginInvoke(new Action(delegate { if (!resourcesDisposed) AddHeart(); })); }
+                    catch (InvalidOperationException) { }
+                });
+            }
+
+            ShowMessage("👑", 3500, true);
+
+            if (dashboardWindow != null && dashboardWindow.IsLoaded)
+            {
+                try { dashboardWindow.RefreshAll(); } catch { }
+            }
+        }
+
         private void ReactToTyping()
         {
             // ponytail: only Idle/Sleep don't loop-animate the rotate transform,
@@ -1779,6 +1868,18 @@ namespace BunnyPet
             };
             menu.Items.Add(dashboardItem);
 
+            var cheatItem = new MenuItem
+            {
+                Header = "👑 [치트키] 전체 즉시 해금 (호감도 100점 MAX) [Ctrl+Alt+U]",
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush(Color.FromRgb(216, 80, 100))
+            };
+            cheatItem.Click += delegate
+            {
+                CheatUnlockAll();
+            };
+            menu.Items.Add(cheatItem);
+
             menu.Items.Add(new Separator());
 
             var playToggleItem = new MenuItem
@@ -1815,13 +1916,26 @@ namespace BunnyPet
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Escape) return;
-            CancelPointer();
-            StopWalking();
-            SetVisualState(BunnyState.Idle);
-            ResetPosition();
-            ScheduleBehavior(1600);
-            e.Handled = true;
+            if (e.Key == Key.Escape)
+            {
+                CancelPointer();
+                StopWalking();
+                SetVisualState(BunnyState.Idle);
+                ResetPosition();
+                ScheduleBehavior(1600);
+                e.Handled = true;
+                return;
+            }
+
+            bool isCtrl = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            bool isShift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+            bool isAlt = (Keyboard.Modifiers & ModifierKeys.Alt) != 0;
+            if ((isCtrl && (isAlt || isShift) && (e.Key == Key.U || e.Key == Key.C)) || (isCtrl && e.Key == Key.F12) || e.Key == Key.F12)
+            {
+                CheatUnlockAll();
+                e.Handled = true;
+                return;
+            }
         }
 
         private void ClampToWorkArea()
@@ -1900,6 +2014,20 @@ namespace BunnyPet
         private const uint SWP_NOSIZE = 0x0001;
         private const uint SWP_NOMOVE = 0x0002;
         private const uint SWP_NOACTIVATE = 0x0010;
+
+        private const int HOTKEY_CHEAT_ALT_U = 9001;
+        private const int HOTKEY_CHEAT_SHIFT_U = 9002;
+        private const int HOTKEY_CHEAT_CTRL_F12 = 9003;
+        private const int HOTKEY_CHEAT_SHIFT_F12 = 9004;
+        private const uint MOD_ALT = 0x0001;
+        private const uint MOD_CONTROL = 0x0002;
+        private const uint MOD_SHIFT = 0x0004;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct RectNative { public int Left; public int Top; public int Right; public int Bottom; }

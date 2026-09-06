@@ -149,6 +149,12 @@ namespace BunnyPet
         private int confusedFrameIndex = 0;
         private bool isPlayingConfusedAnim = false;
         private Action confusedCompletedCallback = null;
+
+        private readonly List<BitmapImage> petFrames = new List<BitmapImage>();
+        private DispatcherTimer petAnimTimer;
+        private int petFrameIndex = 0;
+        private bool isPlayingPetAnim = false;
+        private Action petCompletedCallback = null;
         private DashboardWindow dashboardWindow;
         private int emojiFrequency = 0;
         private int purrFrequency = 0;
@@ -210,6 +216,7 @@ namespace BunnyPet
             inputWatcher.CheatKeyTriggered += OnGlobalCheatKeyTriggered;
             InitEmojiBitmaps();
             InitConfusedFrames();
+            InitPetFrames();
             Loaded += OnLoaded;
             Closing += OnClosing;
             Deactivated += OnDeactivated;
@@ -240,7 +247,9 @@ namespace BunnyPet
             inputWatcher.Dispose();
             StopAnimation();
             StopConfusedAnimation();
+            StopPetAnimation();
             confusedFrames.Clear();
+            petFrames.Clear();
             try
             {
                 var handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
@@ -863,6 +872,9 @@ namespace BunnyPet
                 case BunnyState.Wash: AnimateWashing(); break;
                 case BunnyState.Flop: AnimateSleeping(); break;
                 case BunnyState.Confused: break;
+                case BunnyState.Wanted: AnimateBreathing(); break;
+                case BunnyState.RealAngry: AnimatePurring(); break;
+                case BunnyState.PetReal: break;
             }
         }
 
@@ -875,6 +887,18 @@ namespace BunnyPet
             if (state == BunnyState.Confused)
             {
                 return "confused/confused_000.png";
+            }
+            if (state == BunnyState.Wanted)
+            {
+                return "bunny-wanted.png";
+            }
+            if (state == BunnyState.RealAngry)
+            {
+                return "bunny-real-angry.png";
+            }
+            if (state == BunnyState.PetReal)
+            {
+                return "pet/pet_000.png";
             }
             if (state == BunnyState.Intro)
             {
@@ -916,6 +940,9 @@ namespace BunnyPet
                 case BunnyState.Wash: return "bunny-wash.png";
                 case BunnyState.Flop: return "bunny-flop.png";
                 case BunnyState.Confused: return "confused/confused_000.png";
+                case BunnyState.Wanted: return "bunny-wanted.png";
+                case BunnyState.RealAngry: return "bunny-real-angry.png";
+                case BunnyState.PetReal: return "pet/pet_000.png";
                 default: return "bunny-idle.png";
             }
         }
@@ -923,6 +950,7 @@ namespace BunnyPet
         private void StopAnimation()
         {
             StopConfusedAnimation();
+            StopPetAnimation();
             translate.BeginAnimation(TranslateTransform.YProperty, null);
             translate.BeginAnimation(TranslateTransform.XProperty, null);
             rotate.BeginAnimation(RotateTransform.AngleProperty, null);
@@ -1065,6 +1093,16 @@ namespace BunnyPet
                 string hayPhrase = hayPhrases[random.Next(hayPhrases.Length)];
                 ShowMessage(hayPhrase, 2500, true);
                 ScheduleBehavior(2800);
+                return;
+            }
+
+            // 실사 쓰다듬기 애니메이션 해금 시 발동
+            if (BunnyProgression.IsUnlocked(BunnyState.PetReal, affinity) && random.NextDouble() < 0.38)
+            {
+                PlayPetAnimation(() =>
+                {
+                    ResetVisualToIdle();
+                });
                 return;
             }
 
@@ -1277,6 +1315,29 @@ namespace BunnyPet
             App.Log($"InitConfusedFrames loaded: {confusedFrames.Count} frames");
         }
 
+        private void InitPetFrames()
+        {
+            for (int i = 0; i < 33; i++)
+            {
+                try
+                {
+                    var uri = new Uri($"pack://application:,,,/BunnyPet;component/Assets/pet/pet_{i:D3}.png", UriKind.Absolute);
+                    var bmp = new BitmapImage();
+                    bmp.BeginInit();
+                    bmp.UriSource = uri;
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.EndInit();
+                    bmp.Freeze();
+                    petFrames.Add(bmp);
+                }
+                catch (Exception ex)
+                {
+                    App.Log($"InitPetFrames frame {i} failed: {ex.Message}");
+                }
+            }
+            App.Log($"InitPetFrames loaded: {petFrames.Count} frames");
+        }
+
         public void PlayConfusedAnimation(Action onCompleted = null)
         {
             if (confusedFrames.Count == 0 || resourcesDisposed)
@@ -1352,6 +1413,82 @@ namespace BunnyPet
             }
         }
 
+        public void PlayPetAnimation(Action onCompleted = null)
+        {
+            if (petFrames.Count == 0 || resourcesDisposed)
+            {
+                onCompleted?.Invoke();
+                return;
+            }
+
+            if (currentItem != BunnyItem.None)
+            {
+                SetItem(BunnyItem.None);
+            }
+
+            machine.SetState(BunnyState.PetReal);
+            behaviorTimer.Stop();
+            StopAnimation();
+            StopWalking();
+            DirectionTransform.ScaleX = 1;
+            isPlayingPetAnim = true;
+            petFrameIndex = 0;
+            petCompletedCallback = onCompleted;
+
+            BunnyImage.Source = petFrames[0];
+
+            AddHeart();
+            string[] petEmojis = { "🥰", "💖", "💕", "🌸", "😻", "💓", "💗" };
+            ShowMessage(petEmojis[random.Next(petEmojis.Length)], 3500, true);
+
+            if (petAnimTimer == null)
+            {
+                petAnimTimer = new DispatcherTimer(DispatcherPriority.Render);
+                petAnimTimer.Interval = TimeSpan.FromMilliseconds(66);
+                petAnimTimer.Tick += OnPetAnimTick;
+            }
+            else
+            {
+                petAnimTimer.Stop();
+            }
+
+            petAnimTimer.Start();
+        }
+
+        private void OnPetAnimTick(object sender, EventArgs e)
+        {
+            if (resourcesDisposed || !isPlayingPetAnim)
+            {
+                petAnimTimer?.Stop();
+                isPlayingPetAnim = false;
+                return;
+            }
+
+            petFrameIndex++;
+            if (petFrameIndex < petFrames.Count)
+            {
+                BunnyImage.Source = petFrames[petFrameIndex];
+            }
+            else
+            {
+                petAnimTimer.Stop();
+                isPlayingPetAnim = false;
+                var cb = petCompletedCallback;
+                petCompletedCallback = null;
+                cb?.Invoke();
+            }
+        }
+
+        private void StopPetAnimation()
+        {
+            if (isPlayingPetAnim)
+            {
+                petAnimTimer?.Stop();
+                isPlayingPetAnim = false;
+                petCompletedCallback = null;
+            }
+        }
+
         public void ResetVisualToIdle()
         {
             SetVisualState(BunnyState.Idle);
@@ -1375,6 +1512,14 @@ namespace BunnyPet
             if (state == BunnyState.Confused)
             {
                 PlayConfusedAnimation(() =>
+                {
+                    ResetVisualToIdle();
+                });
+                return;
+            }
+            if (state == BunnyState.PetReal)
+            {
+                PlayPetAnimation(() =>
                 {
                     ResetVisualToIdle();
                 });
@@ -1411,6 +1556,12 @@ namespace BunnyPet
                     AddHeart();
                     ShowMessage(flopPhrases[random.Next(flopPhrases.Length)], 3200, true);
                     break;
+                case BunnyState.Wanted:
+                    ShowMessage("🔍", 3200, true);
+                    break;
+                case BunnyState.RealAngry:
+                    ShowMessage("なんでェ……", 3200, true);
+                    break;
             }
             ScheduleBehavior(3600);
         }
@@ -1424,12 +1575,19 @@ namespace BunnyPet
             {
                 SetItem(BunnyItem.None);
             }
-            SetVisualState(BunnyState.Angry);
+            if (BunnyProgression.IsUnlocked(BunnyState.RealAngry, affinity) && random.NextDouble() < 0.6)
+            {
+                SetVisualState(BunnyState.RealAngry);
+                ShowMessage("なんでェ……", 3200, true);
+            }
+            else
+            {
+                SetVisualState(BunnyState.Angry);
+                ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
+            }
             AnimatePurring();
             AddAffinity(-3);
             lastPetAffinityUtc = DateTime.UtcNow.AddSeconds(45);
-
-            ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
             ScheduleBehavior(3500);
         }
 

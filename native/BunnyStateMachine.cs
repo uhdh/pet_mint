@@ -16,7 +16,10 @@ public enum BunnyState
     Kiss,
     Wash,
     Flop,
-    Confused
+    Confused,
+    Wanted,
+    RealAngry,
+    PetReal
 }
 
 public enum BunnyItem
@@ -43,9 +46,12 @@ public static class BunnyProgression
     public const int AffinityWash = 15;
     public const int AffinityAngry = 20;
     public const int AffinityKiss = 30;
+    public const int AffinityPetReal = 45;
     public const int AffinityBinky = 50;
     public const int AffinityConfused = 70;
+    public const int AffinityRealAngry = 80;
     public const int AffinityFlop = 85;
+    public const int AffinityWanted = 90;
 
     public static int GetRequiredAffinity(BunnyItem item)
     {
@@ -67,9 +73,12 @@ public static class BunnyProgression
             case BunnyState.Wash: return AffinityWash;
             case BunnyState.Angry: return AffinityAngry;
             case BunnyState.Kiss: return AffinityKiss;
+            case BunnyState.PetReal: return AffinityPetReal;
             case BunnyState.Binky: return AffinityBinky;
             case BunnyState.Confused: return AffinityConfused;
+            case BunnyState.RealAngry: return AffinityRealAngry;
             case BunnyState.Flop: return AffinityFlop;
+            case BunnyState.Wanted: return AffinityWanted;
             default: return 0;
         }
     }
@@ -102,10 +111,13 @@ public static class BunnyProgression
         if (affinity < 25) return "다음 해금: 토끼 인형 (25점) 🧸";
         if (affinity < 30) return "다음 해금: 래빗키스 뽀뽀 (30점) 💋";
         if (affinity < 40) return "다음 해금: 토끼 가방 (40점) 🎒";
+        if (affinity < 45) return "다음 해금: 실사 쓰다듬기 영상 (45점) 🖐️";
         if (affinity < 50) return "다음 해금: 신나는 점프 빙키 (50점) 🤸";
         if (affinity < 60) return "다음 해금: 아늑한 집 (60점) 🏠";
         if (affinity < 70) return "다음 해금: 어리둥절 실사 영상 (70점) 👀";
+        if (affinity < 80) return "다음 해금: 찐 화난 민트 (80점) 👿";
         if (affinity < 85) return "다음 해금: 안심 벌러덩 눕기 (85점) 🛌";
+        if (affinity < 90) return "다음 해금: 현상수배 민트 (90점) 📜";
         return "모든 특별 포즈와 선물 해금 완료! 👑";
     }
 }

@@ -84,9 +84,12 @@ namespace BunnyPet
                 new { State = BunnyState.Wash, Req = 15, Title = "🧼 손으로 쓱싹 세수하기", Desc = "양 앞발로 귀와 얼굴을 문지르며 깔끔하게 세수합니다." },
                 new { State = BunnyState.Angry, Req = 20, Title = "💢 화났어! 민트", Desc = "귀를 젖히고 뾰로통한 표정으로 새침하게 화를 냅니다." },
                 new { State = BunnyState.Kiss, Req = 30, Title = "💋 래빗키스 뽀뽀", Desc = "주인님을 향해 사랑을 담아 쪽! 애정 어린 뽀뽀를 건넵니다." },
+                new { State = BunnyState.PetReal, Req = 45, Title = "🖐️ 실사 쓰다듬기 영상", Desc = "따스한 손길로 민트의 머리와 코를 정성껏 쓰다듬는 33프레임 실사 애니메이션입니다." },
                 new { State = BunnyState.Binky, Req = 50, Title = "🤸 기분 최고 점프! 빙키", Desc = "신나고 행복할 때 몸을 비틀며 공중으로 펄쩍 뛰어오릅니다." },
                 new { State = BunnyState.Confused, Req = 70, Title = "👀 어리둥절 실사 영상", Desc = "주변을 두리번거리며 갸우뚱하는 46프레임 실사 영상 애니메이션입니다." },
+                new { State = BunnyState.RealAngry, Req = 80, Title = "👿 찐 화난 민트 (なんでェ……)", Desc = "극적인 만화풍으로 절규하며 분노하는 민트의 충격적인 실사 모습입니다." },
                 new { State = BunnyState.Flop, Req = 85, Title = "🛌 안심하고 벌러덩 눕기", Desc = "주인님을 온전히 신뢰할 때 편안하게 옆으로 벌러덩 눕습니다." },
+                new { State = BunnyState.Wanted, Req = 90, Title = "📜 현상수배 민트 (특징: 귀여움)", Desc = "주변을 발칵 뒤집어 놓은 치명적인 귀여움의 수배 전단지 포즈입니다." },
                 new { State = BunnyState.Front, Req = 0, Title = "🐰 똘망똘망 정면 포즈", Desc = "동그란 눈망울로 정면을 가만히 응시하며 얌전히 앉아있습니다." },
                 new { State = BunnyState.Intro, Req = 0, Title = "✨ 천사 민트 등장!", Desc = "포근한 날개를 달고 반갑게 맞이해주는 특별 등장 포즈입니다." }
             };

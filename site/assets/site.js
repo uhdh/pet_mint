@@ -46,6 +46,9 @@
     sleep: 'assets/bunny-sleep.png',
     happy: 'assets/bunny-happy.png',
     confused: 'assets/bunny-confused.gif',
+    petReal: 'assets/bunny-pet.gif',
+    realAngry: 'assets/bunny-real-angry.png',
+    wanted: 'assets/bunny-wanted.png',
     beg: 'assets/bunny-beg.png',
     angry: 'assets/bunny-angry.png',
     front: 'assets/bunny-front.png',
@@ -74,6 +77,18 @@
 
   const FLOP_PHRASES = [
     '🛌', '💤', '😴', '☁️', '🌾', '🤍'
+  ];
+
+  const REAL_ANGRY_PHRASES = [
+    'なんでェ……', '💢', '👿', '⚡', '😡'
+  ];
+
+  const WANTED_PHRASES = [
+    '📜', '🔍', '🐰', '✨', '💖'
+  ];
+
+  const PET_REAL_PHRASES = [
+    '🥰', '💖', '💕', '🌸', '😻', '💓', '💗'
   ];
 
   const SPAM_ANGRY_PHRASES = [
@@ -193,9 +208,12 @@
       wash: 15,
       angry: 20,
       kiss: 30,
+      petReal: 45,
       binky: 50,
       confused: 70,
-      flop: 85
+      realAngry: 80,
+      flop: 85,
+      wanted: 90
     },
     milestones: [
       { threshold: 5, name: '간식 내놔! 포즈 🌾' },
@@ -205,10 +223,13 @@
       { threshold: 25, name: '토끼 인형 선물 🧸' },
       { threshold: 30, name: '래빗키스 뽀뽀 포즈 💋' },
       { threshold: 40, name: '토끼 가방 선물 🎒' },
+      { threshold: 45, name: '실사 쓰다듬기 영상 🖐️' },
       { threshold: 50, name: '신나는 점프 빙키 포즈 🤸' },
       { threshold: 60, name: '아늑한 집 선물 🏠' },
       { threshold: 70, name: '어리둥절 실사 영상 포즈 👀' },
-      { threshold: 85, name: '안심 벌러덩 눕기 포즈 🛌' }
+      { threshold: 80, name: '찐 화난 민트 포즈 👿' },
+      { threshold: 85, name: '안심 벌러덩 눕기 포즈 🛌' },
+      { threshold: 90, name: '현상수배 민트 포즈 📜' }
     ],
     getLevelName(aff) {
       return 'Lv.5 모든 기능 해금 ✨';
@@ -253,6 +274,12 @@
     if (flopBtn) flopBtn.textContent = '🛌 벌러덩';
     const confusedBtn = document.getElementById('sim-mock-confused-btn');
     if (confusedBtn) confusedBtn.textContent = '👀 어리둥절';
+    const petRealBtn = document.getElementById('sim-mock-petreal-btn');
+    if (petRealBtn) petRealBtn.textContent = '🖐️ 실사 쓰다듬기';
+    const realAngryBtn = document.getElementById('sim-mock-real-angry-btn');
+    if (realAngryBtn) realAngryBtn.textContent = '👿 찐 화남';
+    const wantedBtn = document.getElementById('sim-mock-wanted-btn');
+    if (wantedBtn) wantedBtn.textContent = '📜 현상수배';
 
     const chairBtn = document.getElementById('sim-chair-btn');
     if (chairBtn) chairBtn.textContent = '🪑 반성의자';
@@ -923,6 +950,37 @@
         floatSimHeart();
         showSimSpeech(randomItem(FLOP_PHRASES), 3000, true);
         scheduleSimBehavior(4500);
+      });
+    });
+
+    const petRealBtns = document.querySelectorAll('#sim-mock-petreal-btn');
+    petRealBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('petReal');
+        floatSimHeart();
+        showSimSpeech(randomItem(PET_REAL_PHRASES), 3000, true);
+        scheduleSimBehavior(3800);
+      });
+    });
+
+    const realAngryBtns = document.querySelectorAll('#sim-mock-real-angry-btn');
+    realAngryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('realAngry');
+        showSimSpeech(randomItem(REAL_ANGRY_PHRASES), 3000, true);
+        scheduleSimBehavior(3500);
+      });
+    });
+
+    const wantedBtns = document.querySelectorAll('#sim-mock-wanted-btn');
+    wantedBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopSimWalking();
+        setSimState('wanted');
+        showSimSpeech(randomItem(WANTED_PHRASES), 3000, true);
+        scheduleSimBehavior(3800);
       });
     });
 

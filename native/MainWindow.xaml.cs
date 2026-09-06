@@ -155,6 +155,7 @@ namespace BunnyPet
         private int petFrameIndex = 0;
         private bool isPlayingPetAnim = false;
         private Action petCompletedCallback = null;
+        private bool isWantedExpanded = false;
         private DashboardWindow dashboardWindow;
         private int emojiFrequency = 0;
         private int purrFrequency = 0;
@@ -248,6 +249,14 @@ namespace BunnyPet
             StopAnimation();
             StopConfusedAnimation();
             StopPetAnimation();
+            if (isWantedExpanded)
+            {
+                isWantedExpanded = false;
+                Width = WindowWidth;
+                Height = WindowHeight;
+                Root.Width = WindowWidth;
+                Root.Height = WindowHeight;
+            }
             confusedFrames.Clear();
             petFrames.Clear();
             try
@@ -511,9 +520,18 @@ namespace BunnyPet
             }
             else
             {
-                DirectionLayer.Width = 97;
-                DirectionLayer.Height = 88;
-                DirectionLayer.Margin = new Thickness(0);
+                if (isWantedExpanded)
+                {
+                    DirectionLayer.Width = 150;
+                    DirectionLayer.Height = 220;
+                    DirectionLayer.Margin = new Thickness(0);
+                }
+                else
+                {
+                    DirectionLayer.Width = 97;
+                    DirectionLayer.Height = 88;
+                    DirectionLayer.Margin = new Thickness(0);
+                }
             }
 
             if (item == BunnyItem.Hay)
@@ -849,6 +867,40 @@ namespace BunnyPet
 
         public void SetVisualState(BunnyState next)
         {
+            if (next == BunnyState.Wanted)
+            {
+                if (!isWantedExpanded)
+                {
+                    isWantedExpanded = true;
+                    double deltaW = 175 - WindowWidth;
+                    double deltaH = 245 - WindowHeight;
+                    Top -= deltaH;
+                    Left -= deltaW / 2;
+                    Width = 175;
+                    Height = 245;
+                    Root.Width = 175;
+                    Root.Height = 245;
+                    DirectionLayer.Width = 150;
+                    DirectionLayer.Height = 220;
+                    DirectionTransform.ScaleX = 1;
+                }
+            }
+            else if (isWantedExpanded)
+            {
+                isWantedExpanded = false;
+                double deltaW = 175 - WindowWidth;
+                double deltaH = 245 - WindowHeight;
+                Top += deltaH;
+                Left += deltaW / 2;
+                Width = WindowWidth;
+                Height = WindowHeight;
+                Root.Width = WindowWidth;
+                Root.Height = WindowHeight;
+                DirectionLayer.Width = 97;
+                DirectionLayer.Height = 88;
+                ClampToWorkArea();
+            }
+
             machine.SetState(next);
             BunnyImage.Source = new BitmapImage(new Uri("pack://application:,,,/BunnyPet;component/Assets/" + ImageName(next), UriKind.Absolute));
             StopAnimation();
@@ -1883,9 +1935,10 @@ namespace BunnyPet
             if (e.ChangedButton != MouseButton.Left) return;
             machine.Touch(DateTime.UtcNow);
 
-            if (isPlayingConfusedAnim || machine.State == BunnyState.Confused)
+            if (isPlayingConfusedAnim || isPlayingPetAnim || machine.State == BunnyState.Confused || machine.State == BunnyState.Wanted || isWantedExpanded)
             {
                 StopConfusedAnimation();
+                StopPetAnimation();
                 ResetVisualToIdle();
                 e.Handled = true;
                 return;
@@ -1915,7 +1968,7 @@ namespace BunnyPet
 
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
-            if (isPlayingConfusedAnim || machine.State == BunnyState.Confused) return;
+            if (isPlayingConfusedAnim || isPlayingPetAnim || machine.State == BunnyState.Confused || machine.State == BunnyState.Wanted || isWantedExpanded) return;
             if (!dragging)
             {
                 var pos = e.GetPosition(this);

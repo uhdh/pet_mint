@@ -500,22 +500,30 @@
         simImg.src = ASSETS[assetKey];
       }
       const itemClass = simCurrentItem === 'house' ? 'inside-house' : simCurrentItem === 'chair' ? 'on-chair' : '';
-      simSprite.className = `sim-bunny-sprite ${itemClass} ${simDirection < 0 ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' || next === 'beg' ? 'curious' : next === 'happy' ? 'happy' : next === 'angry' ? 'angry' : ''}`;
+      const wantedClass = next === 'wanted' ? 'state-wanted' : '';
+      simSprite.className = `sim-bunny-sprite ${itemClass} ${wantedClass} ${simDirection < 0 && next !== 'wanted' ? 'facing-left' : ''} anim-${(!simPlayMode && next === 'idle') || next === 'sleep' ? 'sleep' : next === 'idle' ? 'breathe' : next === 'stand' || next === 'beg' ? 'curious' : next === 'happy' ? 'happy' : next === 'angry' ? 'angry' : ''}`;
     }
 
     function hideSimSpeech() {
       if (simSpeechTimer) clearTimeout(simSpeechTimer);
       simSpeechTimer = null;
       simSpeech.classList.add('hidden');
+      simSpeech.style.top = '';
     }
 
     function showSimSpeech(text, duration = 2000, force = false) {
       if (!simPlayMode && !force) return;
       if (simSpeechTimer) clearTimeout(simSpeechTimer);
       simSpeechText.textContent = text;
+      if (simState === 'wanted') {
+        simSpeech.style.top = '-140px';
+      } else {
+        simSpeech.style.top = '';
+      }
       simSpeech.classList.remove('hidden');
       simSpeechTimer = setTimeout(() => {
         simSpeech.classList.add('hidden');
+        simSpeech.style.top = '';
       }, duration);
     }
 

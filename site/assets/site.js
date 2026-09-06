@@ -211,89 +211,64 @@
       { threshold: 85, name: '안심 벌러덩 눕기 포즈 🛌' }
     ],
     getLevelName(aff) {
-      if (aff >= 85) return 'Lv.5 가족이 된 민트 💖';
-      if (aff >= 60) return 'Lv.4 무한 애정 민트 💕';
-      if (aff >= 30) return 'Lv.3 단짝 친구 민트 🥰';
-      if (aff >= 10) return 'Lv.2 마음을 여는 민트 🌸';
-      return 'Lv.1 낯가리는 민트 🌱';
+      return 'Lv.5 모든 기능 해금 ✨';
     },
     getNextUnlock(aff) {
-      if (aff < 5) return '다음 해금: 간식 내놔! (5점) 🌾';
-      if (aff < 10) return '다음 해금: 작은 의자 (10점) 🪑';
-      if (aff < 15) return '다음 해금: 세수하기 (15점) 🧼';
-      if (aff < 20) return '다음 해금: 화났어! (20점) 💢';
-      if (aff < 25) return '다음 해금: 토끼 인형 (25점) 🧸';
-      if (aff < 30) return '다음 해금: 래빗키스 뽀뽀 (30점) 💋';
-      if (aff < 40) return '다음 해금: 소풍 가방 (40점) 🎒';
-      if (aff < 50) return '다음 해금: 신나는 점프 빙키 (50점) 🤸';
-      if (aff < 60) return '다음 해금: 아늑한 집 (60점) 🏠';
-      if (aff < 70) return '다음 해금: 어리둥절 실사 영상 (70점) 👀';
-      if (aff < 85) return '다음 해금: 안심 벌러덩 눕기 (85점) 🛌';
-      return '모든 특별 포즈와 선물 해금 완료! 👑';
+      return '웹 체험판: 모든 포즈와 선물이 해금되어 있습니다 👑';
     },
     isItemUnlocked(item, aff) {
-      return aff >= (this.items[item] ?? 0);
+      return true;
     },
     isStateUnlocked(state, aff) {
-      return aff >= (this.states[state] ?? 0);
+      return true;
     }
   };
 
-  let globalAffinity = parseInt(localStorage.getItem('mint-affinity') || '0', 10);
-  if (isNaN(globalAffinity)) globalAffinity = 0;
+  let globalAffinity = parseInt(localStorage.getItem('mint-affinity') || '100', 10);
+  if (isNaN(globalAffinity)) globalAffinity = 100;
 
   function updateAffinityUI() {
-    const levelName = BUNNY_PROGRESSION.getLevelName(globalAffinity);
-    const nextDesc = BUNNY_PROGRESSION.getNextUnlock(globalAffinity);
-
     const simBadge = document.getElementById('sim-affinity-badge');
     if (simBadge) {
-      const parts = levelName.split(' ');
-      const tag = parts[0];
-      const emoji = parts.pop();
-      simBadge.textContent = `💖 ${globalAffinity}점 (${tag} ${emoji})`;
+      simBadge.textContent = '💖 전체 해금 (자유 체험 ✨)';
     }
 
     const sbVal = document.getElementById('sandbox-affinity-val');
-    if (sbVal) sbVal.textContent = `💖 민트와의 호감도: ${globalAffinity}점`;
+    if (sbVal) sbVal.textContent = '💖 웹 체험판: 모든 포즈 & 아이템 100% 해금';
     const sbLevel = document.getElementById('sandbox-affinity-level');
-    if (sbLevel) sbLevel.textContent = `(${levelName})`;
+    if (sbLevel) sbLevel.textContent = '(잠금 없이 자유롭게 즐겨보세요 ✨)';
     const sbNext = document.getElementById('sandbox-affinity-next');
-    if (sbNext) sbNext.textContent = `💡 ${nextDesc}`;
+    if (sbNext) sbNext.textContent = '💡 실제 앱(BunnyPet.exe)에서는 호감도를 쌓으며 하나씩 해금할 수 있습니다!';
 
-    // Update buttons in demo mockup
+    // Update buttons in demo mockup (전체 해금 상태)
     const binkyBtn = document.getElementById('sim-mock-binky-btn');
-    if (binkyBtn) binkyBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('binky', globalAffinity) ? '🤸 빙키' : '🔒 빙키(50)';
+    if (binkyBtn) binkyBtn.textContent = '🤸 빙키';
     const kissBtn = document.getElementById('sim-mock-kiss-btn');
-    if (kissBtn) kissBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity) ? '💋 뽀뽀' : '🔒 뽀뽀(30)';
+    if (kissBtn) kissBtn.textContent = '💋 뽀뽀';
     const washBtn = document.getElementById('sim-mock-wash-btn');
-    if (washBtn) washBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity) ? '🧼 세수' : '🔒 세수(15)';
+    if (washBtn) washBtn.textContent = '🧼 세수';
     const flopBtn = document.getElementById('sim-mock-flop-btn');
-    if (flopBtn) flopBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('flop', globalAffinity) ? '🛌 벌러덩' : '🔒 벌러덩(85)';
+    if (flopBtn) flopBtn.textContent = '🛌 벌러덩';
     const confusedBtn = document.getElementById('sim-mock-confused-btn');
-    if (confusedBtn) confusedBtn.textContent = BUNNY_PROGRESSION.isStateUnlocked('confused', globalAffinity) ? '👀 어리둥절' : '🔒 어리둥절(70)';
+    if (confusedBtn) confusedBtn.textContent = '👀 어리둥절';
 
     const chairBtn = document.getElementById('sim-chair-btn');
-    if (chairBtn) chairBtn.textContent = BUNNY_PROGRESSION.isItemUnlocked('chair', globalAffinity) ? '🪑 의자' : '🔒 의자(10)';
+    if (chairBtn) chairBtn.textContent = '🪑 의자';
     const dollBtn = document.getElementById('sim-doll-btn');
-    if (dollBtn) dollBtn.textContent = BUNNY_PROGRESSION.isItemUnlocked('doll', globalAffinity) ? '🧸 인형' : '🔒 인형(25)';
+    if (dollBtn) dollBtn.textContent = '🧸 인형';
     const hayBtn = document.getElementById('sim-hay-btn');
     if (hayBtn) hayBtn.textContent = '🌾 건초';
+    const bagBtn = document.getElementById('sim-bag-btn');
+    if (bagBtn) bagBtn.textContent = '🎒 가방';
+    const houseBtn = document.getElementById('sim-house-btn');
+    if (houseBtn) houseBtn.textContent = '🏠 집';
 
-    // Update sandbox buttons
+    // Update sandbox buttons - remove all locked classes
     document.querySelectorAll('.state-btn').forEach(btn => {
-      const st = btn.dataset.state;
-      if (st && BUNNY_PROGRESSION.states[st] > 0) {
-        const unl = BUNNY_PROGRESSION.isStateUnlocked(st, globalAffinity);
-        btn.classList.toggle('locked-btn', !unl);
-      }
+      btn.classList.remove('locked-btn');
     });
     document.querySelectorAll('.item-btn').forEach(btn => {
-      const it = btn.dataset.item;
-      if (it && it !== 'none' && BUNNY_PROGRESSION.items[it] > 0) {
-        const unl = BUNNY_PROGRESSION.isItemUnlocked(it, globalAffinity);
-        btn.classList.toggle('locked-btn', !unl);
-      }
+      btn.classList.remove('locked-btn');
     });
   }
 
@@ -332,6 +307,8 @@
   const simChairBtn = document.getElementById('sim-chair-btn');
   const simDollBtn = document.getElementById('sim-doll-btn');
   const simHayBtn = document.getElementById('sim-hay-btn');
+  const simBagBtn = document.getElementById('sim-bag-btn');
+  const simHouseBtn = document.getElementById('sim-house-btn');
   const simItemHouse = document.getElementById('sim-item-house');
   const simItemChair = document.getElementById('sim-item-chair');
   const simItemDoll = document.getElementById('sim-item-doll');
@@ -376,31 +353,6 @@
 
     function setSimItem(item) {
       const now = Date.now();
-      if (simItemLockoutUntil && now < simItemLockoutUntil) {
-        showSimSpeech('😤', 2200, true);
-        return;
-      }
-
-      if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
-        showSimSpeech('🔒', 2500, true);
-        return;
-      }
-
-      if (item !== simCurrentItem) {
-        if (now - simLastItemSwitchTime < 3500) {
-          simItemSwitchCount++;
-          if (simItemSwitchCount >= 4) {
-            simItemLockoutUntil = now + 12000;
-            simItemSwitchCount = 0;
-            showSimSpeech('💢', 2500, true);
-            return;
-          }
-        } else {
-          simItemSwitchCount = 1;
-        }
-        simLastItemSwitchTime = now;
-      }
-
       simCurrentItem = item || 'none';
       if (simItemHouse) simItemHouse.classList.toggle('hidden', item !== 'house');
       if (simItemChair) simItemChair.classList.toggle('hidden', item !== 'chair');
@@ -411,6 +363,8 @@
       if (simDollBtn) simDollBtn.classList.toggle('active', item === 'doll');
       if (simHayBtn) simHayBtn.classList.toggle('active', item === 'hay');
       if (simChairBtn) simChairBtn.classList.toggle('active', item === 'chair');
+      if (simBagBtn) simBagBtn.classList.toggle('active', item === 'bag');
+      if (simHouseBtn) simHouseBtn.classList.toggle('active', item === 'house');
 
       if (item === 'house') {
         simSprite.classList.add('inside-house');
@@ -882,6 +836,16 @@
         setSimItem(simCurrentItem === 'hay' ? 'none' : 'hay');
       });
     }
+    if (simBagBtn) {
+      simBagBtn.addEventListener('click', () => {
+        setSimItem(simCurrentItem === 'bag' ? 'none' : 'bag');
+      });
+    }
+    if (simHouseBtn) {
+      simHouseBtn.addEventListener('click', () => {
+        setSimItem(simCurrentItem === 'house' ? 'none' : 'house');
+      });
+    }
 
     simBunny.addEventListener('dblclick', (e) => {
       e.stopPropagation();
@@ -898,10 +862,6 @@
     const confusedBtns = document.querySelectorAll('#sim-confused-btn, #sim-mock-confused-btn');
     confusedBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        if (!BUNNY_PROGRESSION.isStateUnlocked('confused', globalAffinity)) {
-          showSimSpeech('🔒', 2500, true);
-          return;
-        }
         stopSimWalking();
         setSimState('confused');
         showSimSpeech('👽', 2200, true);
@@ -912,10 +872,6 @@
     const binkyBtns = document.querySelectorAll('#sim-mock-binky-btn');
     binkyBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        if (!BUNNY_PROGRESSION.isStateUnlocked('binky', globalAffinity)) {
-          showSimSpeech('🔒', 2500, true);
-          return;
-        }
         stopSimWalking();
         setSimState('binky');
         floatSimHeart();
@@ -927,10 +883,6 @@
     const kissBtns = document.querySelectorAll('#sim-mock-kiss-btn');
     kissBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        if (!BUNNY_PROGRESSION.isStateUnlocked('kiss', globalAffinity)) {
-          showSimSpeech('🔒', 2500, true);
-          return;
-        }
         stopSimWalking();
         setSimState('kiss');
         floatSimHeart();
@@ -942,10 +894,6 @@
     const washBtns = document.querySelectorAll('#sim-mock-wash-btn');
     washBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        if (!BUNNY_PROGRESSION.isStateUnlocked('wash', globalAffinity)) {
-          showSimSpeech('🔒', 2500, true);
-          return;
-        }
         stopSimWalking();
         setSimState('wash');
         showSimSpeech(randomItem(WASH_PHRASES), 2600, true);
@@ -956,10 +904,6 @@
     const flopBtns = document.querySelectorAll('#sim-mock-flop-btn');
     flopBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        if (!BUNNY_PROGRESSION.isStateUnlocked('flop', globalAffinity)) {
-          showSimSpeech('🔒', 2500, true);
-          return;
-        }
         stopSimWalking();
         setSimState('flop');
         floatSimHeart();
@@ -1011,11 +955,6 @@
     }
 
     function setSandboxState(state, message) {
-      if (!BUNNY_PROGRESSION.isStateUnlocked(state, globalAffinity)) {
-        showSandboxSpeech('🔒', 2500);
-        return;
-      }
-
       currentState = state;
       sandboxImg.src = ASSETS[state] || ASSETS.idle;
       sandboxImg.className = (state === 'confused' || state === 'front' || state === 'beg' || state === 'angry' || state === 'intro' || state === 'binky' || state === 'kiss' || state === 'wash' || state === 'flop') ? '' : `anim-${state === 'idle' ? 'breathe' : state === 'walk' ? 'hop' : state === 'stand' ? 'curious' : state === 'happy' ? 'happy' : 'sleep'}`;
@@ -1041,11 +980,6 @@
     }
 
     function setSandboxItem(item) {
-      if (item && item !== 'none' && !BUNNY_PROGRESSION.isItemUnlocked(item, globalAffinity)) {
-        showSandboxSpeech('🔒', 2500);
-        return;
-      }
-
       sandboxCurrentItem = item || 'none';
       if (sandboxItemHouse) sandboxItemHouse.classList.toggle('hidden', item !== 'house');
       if (sandboxItemChair) sandboxItemChair.classList.toggle('hidden', item !== 'chair');

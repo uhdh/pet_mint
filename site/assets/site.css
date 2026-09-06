@@ -643,8 +643,8 @@ img {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 98px;
-  height: 90px;
+  width: 104px;
+  height: 118px;
   object-fit: contain;
 }
 .sim-item-chair {
@@ -657,14 +657,14 @@ img {
   object-fit: contain;
 }
 .sim-sprite-wrapper.on-chair {
-  transform: translateY(-22px);
+  transform: translateY(-36px);
 }
 .sim-item-doll {
   z-index: 12;
   bottom: 0;
   left: -12px;
-  width: 38px;
-  height: 42px;
+  width: 48px;
+  height: 44px;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
@@ -679,10 +679,10 @@ img {
 }
 .sim-item-bag {
   z-index: 12;
-  top: 14px;
-  left: 20px;
-  width: 26px;
-  height: 39px;
+  top: 10px;
+  left: 16px;
+  width: 34px;
+  height: 50px;
   object-fit: contain;
   transform: rotate(12deg);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
@@ -885,8 +885,8 @@ img {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 122px;
-  height: 112px;
+  width: 128px;
+  height: 144px;
   object-fit: contain;
 }
 .sandbox-item-chair {
@@ -899,13 +899,13 @@ img {
   object-fit: contain;
 }
 .sandbox-pet.on-chair {
-  transform: translateY(-28px);
+  transform: translateY(-46px);
 }
 .sandbox-item-doll {
   z-index: 4;
   bottom: 0;
   left: -14px;
-  width: 46px;
+  width: 58px;
   height: 52px;
   object-fit: contain;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
@@ -921,10 +921,10 @@ img {
 }
 .sandbox-item-bag {
   z-index: 4;
-  top: 20px;
-  left: 28px;
-  width: 34px;
-  height: 51px;
+  top: 14px;
+  left: 24px;
+  width: 44px;
+  height: 66px;
   object-fit: contain;
   transform: rotate(12deg);
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));

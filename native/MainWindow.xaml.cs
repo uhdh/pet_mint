@@ -16,8 +16,8 @@ namespace BunnyPet
 {
     public partial class MainWindow : Window
     {
-        private const int WindowWidth = 107;
-        private const int WindowHeight = 100;
+        private const int WindowWidth = 120;
+        private const int WindowHeight = 125;
         private const int WalkStep = 2;
         private const double DragThreshold = 8;
 
@@ -441,16 +441,16 @@ namespace BunnyPet
 
             if (item == BunnyItem.House)
             {
-                DirectionLayer.Width = 52;
-                DirectionLayer.Height = 58;
-                DirectionLayer.Margin = new Thickness(0, 0, 2, 22);
+                DirectionLayer.Width = 50;
+                DirectionLayer.Height = 54;
+                DirectionLayer.Margin = new Thickness(0, 0, 0, 16);
                 DirectionTransform.ScaleX = 1;
             }
             else if (item == BunnyItem.Chair)
             {
-                DirectionLayer.Width = 84;
-                DirectionLayer.Height = 76;
-                DirectionLayer.Margin = new Thickness(0, 0, 0, 26);
+                DirectionLayer.Width = 74;
+                DirectionLayer.Height = 66;
+                DirectionLayer.Margin = new Thickness(0, 0, 0, 42);
                 DirectionTransform.ScaleX = 1;
             }
             else
@@ -507,7 +507,7 @@ namespace BunnyPet
                     break;
 
                 case BunnyItem.House:
-                    SetVisualState(BunnyState.Front);
+                    SetVisualState(!machine.PlayMode ? BunnyState.Sleep : BunnyState.Idle);
                     AddHeart();
                     ShowMessage(housePhrases[random.Next(housePhrases.Length)], 2500, true);
                     ScheduleBehavior(3000);
@@ -516,7 +516,7 @@ namespace BunnyPet
                 case BunnyItem.Chair:
                     DirectionTransform.ScaleX = 1;
                     machine.SetDirection(1);
-                    SetVisualState(BunnyState.Idle);
+                    SetVisualState(!machine.PlayMode ? BunnyState.Sleep : BunnyState.Idle);
                     AddHeart();
                     ShowMessage(chairPhrases[random.Next(chairPhrases.Length)], 2500, true);
                     ScheduleBehavior(2800);
@@ -571,7 +571,19 @@ namespace BunnyPet
             if (currentItem == BunnyItem.House)
             {
                 StopWalking();
-                SetVisualState(BunnyState.Front);
+                SetVisualState(!machine.PlayMode ? BunnyState.Sleep : BunnyState.Idle);
+                if (random.NextDouble() < 0.25)
+                {
+                    AddHeart();
+                }
+                ScheduleBehavior(RandomBetween(4000, 8000));
+                return;
+            }
+
+            if (currentItem == BunnyItem.Chair)
+            {
+                StopWalking();
+                SetVisualState(!machine.PlayMode ? BunnyState.Sleep : BunnyState.Idle);
                 if (random.NextDouble() < 0.25)
                 {
                     AddHeart();
@@ -693,7 +705,7 @@ namespace BunnyPet
         private void StartWalking()
         {
             StopWalking();
-            if (currentItem == BunnyItem.House) return;
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair) return;
             climbing = false;
             if (random.NextDouble() < 0.24) DirectionTransform.ScaleX = machine.TurnAround();
             walkingTimer.Start();
@@ -769,9 +781,9 @@ namespace BunnyPet
 
         private string ImageName(BunnyState state)
         {
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
-                return "bunny-front.png";
+                return (!machine.PlayMode || state == BunnyState.Sleep) ? "bunny-sleep.png" : "bunny-idle.png";
             }
             if (state == BunnyState.Confused)
             {
@@ -925,6 +937,15 @@ namespace BunnyPet
                 AddHeart();
                 string housePhrase = housePhrases[random.Next(housePhrases.Length)];
                 ShowMessage(housePhrase, 2500, true);
+                ScheduleBehavior(3000);
+                return;
+            }
+
+            if (currentItem == BunnyItem.Chair)
+            {
+                AddHeart();
+                string chairPhrase = chairPhrases[random.Next(chairPhrases.Length)];
+                ShowMessage(chairPhrase, 2500, true);
                 ScheduleBehavior(3000);
                 return;
             }
@@ -1221,7 +1242,7 @@ namespace BunnyPet
             }
             StopAnimation();
             StopWalking();
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
                 SetItem(BunnyItem.None);
             }
@@ -1273,7 +1294,7 @@ namespace BunnyPet
             if (resourcesDisposed) return;
             StopAnimation();
             StopWalking();
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
                 SetItem(BunnyItem.None);
             }
@@ -1291,7 +1312,7 @@ namespace BunnyPet
             if (resourcesDisposed) return;
             StopAnimation();
             StopWalking();
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
                 SetItem(BunnyItem.None);
             }
@@ -1319,7 +1340,7 @@ namespace BunnyPet
             if (resourcesDisposed) return;
             StopAnimation();
             StopWalking();
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
                 SetItem(BunnyItem.None);
             }
@@ -1335,7 +1356,7 @@ namespace BunnyPet
             if (resourcesDisposed) return;
             StopAnimation();
             StopWalking();
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
                 SetItem(BunnyItem.None);
             }
@@ -1350,7 +1371,7 @@ namespace BunnyPet
             if (resourcesDisposed) return;
             StopAnimation();
             StopWalking();
-            if (currentItem == BunnyItem.House)
+            if (currentItem == BunnyItem.House || currentItem == BunnyItem.Chair)
             {
                 SetItem(BunnyItem.None);
             }

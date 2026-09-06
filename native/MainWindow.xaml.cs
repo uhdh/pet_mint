@@ -1670,26 +1670,6 @@ namespace BunnyPet
             e.Handled = true;
         }
 
-        private void AddPoseMenuItem(MenuItem parent, BunnyState state, string title, string shortName)
-        {
-            bool unlocked = BunnyProgression.IsUnlocked(state, affinity);
-            int req = BunnyProgression.GetRequiredAffinity(state);
-            string header = unlocked ? title : $"🔒 {shortName} (호감도 {req}점 필요)";
-            var item = new MenuItem { Header = header };
-            item.Click += delegate { TriggerPose(state); };
-            parent.Items.Add(item);
-        }
-
-        private void AddGiftMenuItem(MenuItem parent, BunnyItem itemType, string title, string shortName)
-        {
-            bool unlocked = BunnyProgression.IsUnlocked(itemType, affinity);
-            int req = BunnyProgression.GetRequiredAffinity(itemType);
-            string header = unlocked ? title : $"🔒 {shortName} (호감도 {req}점 필요)";
-            var item = new MenuItem { Header = header };
-            item.Click += delegate { SetItem(itemType); };
-            parent.Items.Add(item);
-        }
-
         private void ShowContextMenu()
         {
             var menu = new ContextMenu();
@@ -1702,83 +1682,10 @@ namespace BunnyPet
                 }
             };
 
-            var playToggleItem = new MenuItem
-            {
-                Header = machine.PlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)",
-                FontWeight = FontWeights.Bold
-            };
-            playToggleItem.Click += delegate
-            {
-                TogglePlayMode();
-            };
-            menu.Items.Add(playToggleItem);
-
-            var petItem = new MenuItem { Header = "🖐️ 민트 쓰다듬기" };
-            petItem.Click += delegate { ReactToPetting(); };
-            menu.Items.Add(petItem);
-
-            var hayQuickItem = new MenuItem { Header = "🌾 맛있는 건초 주기 (+2)" };
-            hayQuickItem.Click += delegate
-            {
-                SetItem(BunnyItem.Hay);
-            };
-            menu.Items.Add(hayQuickItem);
-
-            menu.Items.Add(new Separator());
-
-            var poseMenu = new MenuItem { Header = "📸 특별 포즈 ▶" };
-            AddPoseMenuItem(poseMenu, BunnyState.Binky, "🤸 빙키 점프", "빙키 점프");
-            AddPoseMenuItem(poseMenu, BunnyState.Kiss, "💋 래빗키스 뽀뽀", "래빗키스");
-            AddPoseMenuItem(poseMenu, BunnyState.Wash, "🧼 세수하기", "세수하기");
-            AddPoseMenuItem(poseMenu, BunnyState.Flop, "🛌 벌러덩 눕기", "벌러덩");
-            AddPoseMenuItem(poseMenu, BunnyState.Beg, "🌾 간식 내놔!", "간식 내놔");
-            AddPoseMenuItem(poseMenu, BunnyState.Angry, "💢 화났어!", "화났어");
-            AddPoseMenuItem(poseMenu, BunnyState.Front, "🐰 똘망똘망 정면", "정면");
-            AddPoseMenuItem(poseMenu, BunnyState.Confused, "👀 어리둥절 영상", "어리둥절");
-
-            var introItem = new MenuItem { Header = "✨ 천사 민트 등장" };
-            introItem.Click += delegate { PlayIntroGreeting(); };
-            poseMenu.Items.Add(introItem);
-
-            menu.Items.Add(poseMenu);
-
-            var itemsMenu = new MenuItem { Header = "🎁 아이템 선물 ▶" };
-            AddGiftMenuItem(itemsMenu, BunnyItem.Hay, "🌾 맛있는 건초", "건초");
-            AddGiftMenuItem(itemsMenu, BunnyItem.Chair, "🪑 작은 의자", "작은 의자");
-            AddGiftMenuItem(itemsMenu, BunnyItem.Doll, "🧸 토끼 인형", "토끼 인형");
-            AddGiftMenuItem(itemsMenu, BunnyItem.Bag, "🎒 소풍 가방", "소풍 가방");
-            AddGiftMenuItem(itemsMenu, BunnyItem.House, "🏠 아늑한 집", "아늑한 집");
-
-            itemsMenu.Items.Add(new Separator());
-
-            var clearItem = new MenuItem { Header = "❌ 아이템 치우기" };
-            clearItem.Click += delegate { SetItem(BunnyItem.None); };
-            itemsMenu.Items.Add(clearItem);
-
-            menu.Items.Add(itemsMenu);
-            var topItem = new MenuItem
-            {
-                Header = "📌 항상 위에 표시 (Always on Top)",
-                IsCheckable = true,
-                IsChecked = Topmost
-            };
-            topItem.Click += delegate
-            {
-                var app = Application.Current as App;
-                bool newTop = topItem.IsChecked;
-                SetAlwaysOnTop(newTop);
-                if (app != null && app.CurrentSettings != null)
-                {
-                    app.CurrentSettings.AlwaysOnTop = newTop;
-                    try { app.CurrentSettings.Save(); } catch { }
-                }
-            };
-            menu.Items.Add(topItem);
-
             var dashboardItem = new MenuItem
             {
                 Header = "🌸 민트 대시보드 및 설정...",
-                FontWeight = FontWeights.SemiBold
+                FontWeight = FontWeights.Bold
             };
             dashboardItem.Click += delegate
             {
@@ -1788,6 +1695,16 @@ namespace BunnyPet
 
             menu.Items.Add(new Separator());
 
+            var playToggleItem = new MenuItem
+            {
+                Header = machine.PlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)"
+            };
+            playToggleItem.Click += delegate
+            {
+                TogglePlayMode();
+            };
+            menu.Items.Add(playToggleItem);
+
             var resetItem = new MenuItem { Header = "↩ 민트 자리로 부르기 (오른쪽 아래)" };
             resetItem.Click += delegate
             {
@@ -1795,6 +1712,8 @@ namespace BunnyPet
                 PlayIntroGreeting();
             };
             menu.Items.Add(resetItem);
+
+            menu.Items.Add(new Separator());
 
             var quitItem = new MenuItem { Header = "👋 민트 재우기 (종료)" };
             quitItem.Click += delegate

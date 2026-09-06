@@ -172,103 +172,6 @@ namespace BunnyPet
             {
                 var menu = new Forms.ContextMenuStrip();
 
-                playToggleItem = new Forms.ToolStripMenuItem(window != null && window.IsPlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)");
-                playToggleItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
-                playToggleItem.Click += delegate
-                {
-                    if (window != null) window.TogglePlayMode();
-                };
-                menu.Items.Add(playToggleItem);
-
-                var petItem = new Forms.ToolStripMenuItem("🖐️ 민트 쓰다듬기 (Pet Mint)", null, delegate { window?.ReactToPetting(); });
-                menu.Items.Add(petItem);
-
-                var hayQuickItem = new Forms.ToolStripMenuItem("🌾 맛있는 건초 주기 (+2)", null, delegate { window?.SetItem(BunnyItem.Hay); });
-                menu.Items.Add(hayQuickItem);
-
-                menu.Items.Add(new Forms.ToolStripSeparator());
-
-                var poseMenu = new Forms.ToolStripMenuItem("📸 민트 특별 포즈 (Special Poses)");
-
-                var binkyItem = new Forms.ToolStripMenuItem("🤸 기분 최고 점프! 빙키", null, delegate { window?.TriggerPose(BunnyState.Binky); });
-                poseMenu.DropDownItems.Add(binkyItem);
-
-                var kissItem = new Forms.ToolStripMenuItem("💋 뽀뽀해주는 래빗키스", null, delegate { window?.TriggerPose(BunnyState.Kiss); });
-                poseMenu.DropDownItems.Add(kissItem);
-
-                var washItem = new Forms.ToolStripMenuItem("🧼 손으로 쓱싹 세수하기", null, delegate { window?.TriggerPose(BunnyState.Wash); });
-                poseMenu.DropDownItems.Add(washItem);
-
-                var flopItem = new Forms.ToolStripMenuItem("🛌 안심하고 벌러덩 눕기", null, delegate { window?.TriggerPose(BunnyState.Flop); });
-                poseMenu.DropDownItems.Add(flopItem);
-
-                var begItem = new Forms.ToolStripMenuItem("🌾 간식 내놔!", null, delegate { window?.TriggerPose(BunnyState.Beg); });
-                poseMenu.DropDownItems.Add(begItem);
-
-                var angryItem = new Forms.ToolStripMenuItem("💢 화났어!", null, delegate { window?.TriggerPose(BunnyState.Angry); });
-                poseMenu.DropDownItems.Add(angryItem);
-
-                var frontItem = new Forms.ToolStripMenuItem("🐰 똘망똘망 정면 포즈", null, delegate { window?.TriggerPose(BunnyState.Front); });
-                poseMenu.DropDownItems.Add(frontItem);
-
-                var confusedItem = new Forms.ToolStripMenuItem("👀 어리둥절 실사 영상", null, delegate { window?.TriggerPose(BunnyState.Confused); });
-                poseMenu.DropDownItems.Add(confusedItem);
-
-                var introItem = new Forms.ToolStripMenuItem("✨ 천사 민트 등장", null, delegate { window?.PlayIntroGreeting(); });
-                poseMenu.DropDownItems.Add(introItem);
-
-                menu.Items.Add(poseMenu);
-
-                var itemsMenu = new Forms.ToolStripMenuItem("🎁 민트에게 선물하기");
-                var hayItem = new Forms.ToolStripMenuItem("🌾 맛있는 건초 (Hay)", null, delegate { window?.SetItem(BunnyItem.Hay); });
-                var chairItem = new Forms.ToolStripMenuItem("🪑 작은 의자 (Chair)", null, delegate { window?.SetItem(BunnyItem.Chair); });
-                var dollItem = new Forms.ToolStripMenuItem("🧸 토끼 인형 (Plush Doll)", null, delegate { window?.SetItem(BunnyItem.Doll); });
-                var bagItem = new Forms.ToolStripMenuItem("🎒 소풍 가방 (Backpack)", null, delegate { window?.SetItem(BunnyItem.Bag); });
-                var houseItem = new Forms.ToolStripMenuItem("🏠 아늑한 집 (House)", null, delegate { window?.SetItem(BunnyItem.House); });
-                var clearItem = new Forms.ToolStripMenuItem("❌ 아이템 치우기 (Remove Item)", null, delegate { window?.SetItem(BunnyItem.None); });
-
-                itemsMenu.DropDownItems.Add(hayItem);
-                itemsMenu.DropDownItems.Add(chairItem);
-                itemsMenu.DropDownItems.Add(dollItem);
-                itemsMenu.DropDownItems.Add(bagItem);
-                itemsMenu.DropDownItems.Add(houseItem);
-                itemsMenu.DropDownItems.Add(new Forms.ToolStripSeparator());
-                itemsMenu.DropDownItems.Add(clearItem);
-                menu.Items.Add(itemsMenu);
-
-                menu.Opening += delegate
-                {
-                    int aff = window != null ? window.Affinity : settings.Affinity;
-                    UpdatePoseItemText(binkyItem, BunnyState.Binky, aff, "🤸 기분 최고 점프! 빙키", "빙키 점프");
-                    UpdatePoseItemText(kissItem, BunnyState.Kiss, aff, "💋 뽀뽀해주는 래빗키스", "래빗키스");
-                    UpdatePoseItemText(washItem, BunnyState.Wash, aff, "🧼 손으로 쓱싹 세수하기", "세수하기");
-                    UpdatePoseItemText(flopItem, BunnyState.Flop, aff, "🛌 안심하고 벌러덩 눕기", "벌러덩 눕기");
-                    UpdatePoseItemText(begItem, BunnyState.Beg, aff, "🌾 간식 내놔!", "간식 내놔");
-                    UpdatePoseItemText(angryItem, BunnyState.Angry, aff, "💢 화났어!", "화났어");
-                    UpdatePoseItemText(frontItem, BunnyState.Front, aff, "🐰 똘망똘망 정면 포즈", "정면 포즈");
-                    UpdatePoseItemText(confusedItem, BunnyState.Confused, aff, "👀 어리둥절 실사 영상", "어리둥절 영상");
-
-                    UpdateGiftItemText(hayItem, BunnyItem.Hay, aff, "🌾 맛있는 건초 (Hay)", "건초");
-                    UpdateGiftItemText(chairItem, BunnyItem.Chair, aff, "🪑 작은 의자 (Chair)", "작은 의자");
-                    UpdateGiftItemText(dollItem, BunnyItem.Doll, aff, "🧸 토끼 인형 (Plush Doll)", "토끼 인형");
-                    UpdateGiftItemText(bagItem, BunnyItem.Bag, aff, "🎒 소풍 가방 (Backpack)", "소풍 가방");
-                    UpdateGiftItemText(houseItem, BunnyItem.House, aff, "🏠 아늑한 집 (House)", "아늑한 집");
-                };
-
-                var topmostItem = new Forms.ToolStripMenuItem("📌 항상 위에 표시 (Always on Top)")
-                {
-                    CheckOnClick = true,
-                    Checked = settings.AlwaysOnTop
-                };
-                topmostItem.Click += delegate
-                {
-                    settings.AlwaysOnTop = topmostItem.Checked;
-                    window?.SetAlwaysOnTop(settings.AlwaysOnTop);
-                    SaveSettings();
-                };
-                menu.Opening += delegate { topmostItem.Checked = settings.AlwaysOnTop; };
-                menu.Items.Add(topmostItem);
-
                 var dashboardItem = new Forms.ToolStripMenuItem("🌸 민트 대시보드 및 설정...");
                 dashboardItem.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
                 dashboardItem.Click += delegate
@@ -279,7 +182,14 @@ namespace BunnyPet
 
                 menu.Items.Add(new Forms.ToolStripSeparator());
 
-                var resetItem = new Forms.ToolStripMenuItem("↩ 민트 자리로 부르기 (Reset position)");
+                playToggleItem = new Forms.ToolStripMenuItem(window != null && window.IsPlayMode ? "🛑 나대지마 (멈추기)" : "🎉 놀자! (움직이기)");
+                playToggleItem.Click += delegate
+                {
+                    if (window != null) window.TogglePlayMode();
+                };
+                menu.Items.Add(playToggleItem);
+
+                var resetItem = new Forms.ToolStripMenuItem("↩ 민트 자리로 부르기 (오른쪽 아래)");
                 resetItem.Click += delegate
                 {
                     if (window != null)
@@ -354,30 +264,6 @@ namespace BunnyPet
         }
 
 
-
-        private static void UpdatePoseItemText(Forms.ToolStripMenuItem item, BunnyState state, int affinity, string fullTitle, string shortTitle)
-        {
-            if (BunnyProgression.IsUnlocked(state, affinity))
-            {
-                item.Text = fullTitle;
-            }
-            else
-            {
-                item.Text = $"🔒 {shortTitle} (호감도 {BunnyProgression.GetRequiredAffinity(state)}점 필요)";
-            }
-        }
-
-        private static void UpdateGiftItemText(Forms.ToolStripMenuItem item, BunnyItem itemType, int affinity, string fullTitle, string shortTitle)
-        {
-            if (BunnyProgression.IsUnlocked(itemType, affinity))
-            {
-                item.Text = fullTitle;
-            }
-            else
-            {
-                item.Text = $"🔒 {shortTitle} (호감도 {BunnyProgression.GetRequiredAffinity(itemType)}점 필요)";
-            }
-        }
 
         private void ShowWindow()
         {

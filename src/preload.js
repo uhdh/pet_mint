@@ -21,5 +21,10 @@ contextBridge.exposeInMainWorld('bunnyDesktop', {
     const listener = () => callback();
     ipcRenderer.on('pet:pet-requested', listener);
     return () => ipcRenderer.removeListener('pet:pet-requested', listener);
+  },
+  onBubbleFrequencyChanged: (callback) => {
+    const listener = (_event, freq) => callback(freq);
+    ipcRenderer.on('pet:bubble-frequency-changed', listener);
+    return () => ipcRenderer.removeListener('pet:bubble-frequency-changed', listener);
   }
 });

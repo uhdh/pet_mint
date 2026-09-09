@@ -2,7 +2,7 @@ param(
     [string]$IdentityName = "UHDH.473259539542C",
     [string]$Publisher = "CN=9FE15EFB-BC7B-4D79-9643-4458FCDB174F",
     [string]$PublisherDisplayName = "UHDH",
-    [string]$DisplayName = [string]::Concat([char]0xB0B4, ' ', [char]0xD1A0, [char]0xB07C, ' ', [char]0xB370, [char]0xC2A4, [char]0xD06C, [char]0xD1B1, ' ', [char]0xD3AB)
+    [string]$DisplayName = [string]::Concat([char]0xBBFC, [char]0xD2B8, ' ', [char]0xD0A4, [char]0xC6B0, [char]0xAE30)
 )
 
 $ErrorActionPreference = "Stop"
@@ -11,7 +11,7 @@ $TemplateRoot = Join-Path $ProjectRoot "store-package"
 $StagingRoot = Join-Path $ProjectRoot "native-store-staging"
 $AppDestination = Join-Path $StagingRoot "app"
 $OutputRoot = Join-Path $ProjectRoot "store-output"
-$PackagePath = Join-Path $OutputRoot "BunnyPet-native_1.0.1.0_x64.msix"
+$PackagePath = Join-Path $OutputRoot "BunnyPet-native_1.1.1.0_x64.msix"
 $TemplatePath = Join-Path $TemplateRoot "Package.appxmanifest.template"
 $ManifestPath = Join-Path $StagingRoot "AppxManifest.xml"
 
@@ -28,7 +28,7 @@ function Assert-StagedPackage([string]$Path) {
     $forbidden = @('electron.exe', 'resources.pak', 'icudtl.dat', 'node.dll')
     $files = @(Get-ChildItem -LiteralPath $Path -File -Recurse -Force)
     foreach ($file in $files) {
-        if ($file.Length -gt 10MB) { throw "Staged file exceeds 10 MB: $($file.FullName)" }
+        if ($file.Length -gt 20MB) { throw "Staged file exceeds 20 MB: $($file.FullName)" } # ponytail: raised from 10MB, exe now embeds real-photo animation frames; revisit if assets keep growing
         $name = $file.Name.ToLowerInvariant()
         if (($forbidden -contains $name) -or ($name -like 'chrome_*.pak')) {
             throw "Forbidden Electron runtime file in staging: $($file.FullName)"
@@ -39,7 +39,7 @@ function Assert-StagedPackage([string]$Path) {
 
 function Assert-Msix([string]$Path) {
     $package = Get-Item -LiteralPath $Path -ErrorAction Stop
-    if ($package.Length -gt 5MB) { throw "MSIX exceeds 5 MB: $($package.Length) bytes" }
+    if ($package.Length -gt 20MB) { throw "MSIX exceeds 20 MB: $($package.Length) bytes" } # ponytail: raised from 5MB, same asset growth as staging check
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $archive = [IO.Compression.ZipFile]::OpenRead($package.FullName)

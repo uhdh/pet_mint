@@ -1,7 +1,7 @@
 {
   "name": "my-bunny-desktop-pet",
-  "version": "1.0.1",
-  "description": "사진 속 롭이어 토끼를 닮은 투명 바탕화면 펫",
+  "version": "1.1.0",
+  "description": "실제 반려 토끼 민트를 모티브로 한 인터랙티브 투명 바탕화면 펫",
   "main": "src/main.js",
   "author": "Manus",
   "license": "MIT",

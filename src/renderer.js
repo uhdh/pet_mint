@@ -70,10 +70,20 @@ let currentItem = 'none';
 let behaviorTimer = null;
 let walkTimer = null;
 let messageTimer = null;
+let bubbleTimer = null;
 let dragging = false;
 let dragMoved = false;
 let lastPointer = null;
 let movementQueue = Promise.resolve();
+
+// 말풍선 빈도 설정: 각 모드의 평균 간격(ms)
+const BUBBLE_FREQ_MS = {
+  adhd:   60 * 1000,   // 1분
+  normal: 2 * 60 * 1000, // 2분
+  rare:   5 * 60 * 1000, // 5분
+  coma:   20 * 60 * 1000  // 20분
+};
+let currentBubbleFreq = 'normal';
 
 function randomBetween(min, max) {
   return Math.round(min + Math.random() * (max - min));
@@ -174,6 +184,25 @@ function setPlayMode(play) {
   }
 }
 
+function scheduleBubble(delayOverride) {
+  if (bubbleTimer) clearTimeout(bubbleTimer);
+  const base = BUBBLE_FREQ_MS[currentBubbleFreq] ?? BUBBLE_FREQ_MS.normal;
+  // ±30% 지터를 줘서 자연스럽게
+  const jitter = base * 0.3;
+  const delay = delayOverride ?? randomBetween(base - jitter, base + jitter);
+  bubbleTimer = setTimeout(() => {
+    if (!dragging && machine.playMode) {
+      showMessage(PHRASES[randomBetween(0, PHRASES.length - 1)], 2100);
+    }
+    scheduleBubble();
+  }, delay);
+}
+
+function setBubbleFrequency(freq) {
+  currentBubbleFreq = freq in BUBBLE_FREQ_MS ? freq : 'normal';
+  scheduleBubble(); // 즉시 새 주기로 재설정
+}
+
 function scheduleBehavior(delay = randomBetween(3500, 7600)) {
   if (behaviorTimer) clearTimeout(behaviorTimer);
   behaviorTimer = setTimeout(() => {
@@ -182,10 +211,6 @@ function scheduleBehavior(delay = randomBetween(3500, 7600)) {
 
     if (!machine.playMode) {
       setVisualState('idle');
-      const roll = Math.random();
-      if (roll < 0.30) {
-        triggerPurring();
-      }
       scheduleBehavior(randomBetween(4500, 8500));
       return;
     }
@@ -416,10 +441,20 @@ if (window.bunnyDesktop.onPetRequested) {
   });
 }
 
+if (window.bunnyDesktop.onBubbleFrequencyChanged) {
+  window.bunnyDesktop.onBubbleFrequencyChanged((freq) => {
+    setBubbleFrequency(freq);
+  });
+}
+
 window.bunnyDesktop.getState().then((state) => {
   machine.setPaused(Boolean(state?.paused));
   machine.setPlayMode(false);
   setVisualState(machine.paused ? 'sleep' : 'idle');
   hideMessage();
+  // 저장된 말풍선 빈도 설정 적용
+  const savedFreq = state?.settings?.bubbleFrequency;
+  if (savedFreq) currentBubbleFreq = savedFreq;
   scheduleBehavior(2200);
+  scheduleBubble(5000); // 앱 시작 5초 후 첫 말풍선
 });

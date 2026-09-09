@@ -53,29 +53,11 @@ namespace BunnyPet
 
             base.OnStartup(e);
 
-            var currentProc = Process.GetCurrentProcess();
-            var others = Process.GetProcessesByName(currentProc.ProcessName);
-            foreach (var other in others)
-            {
-                if (other.Id != currentProc.Id)
-                {
-                    try
-                    {
-                        Log("Terminating older instance PID: " + other.Id);
-                        other.Kill();
-                        other.WaitForExit(500);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log("Could not terminate PID " + other.Id + ": " + ex.Message);
-                    }
-                }
-            }
-
             EnsureShowEvent();
+            bool createdNew = false;
             try
             {
-                instanceMutex = new Mutex(true, MutexName, out _);
+                instanceMutex = new Mutex(true, MutexName, out createdNew);
             }
             catch (AbandonedMutexException ame)
             {
@@ -84,6 +66,12 @@ namespace BunnyPet
             catch (Exception ex)
             {
                 Log("Mutex Exception: " + ex.Message);
+            }
+            if (instanceMutex != null && !createdNew)
+            {
+                SignalExistingInstance();
+                Shutdown();
+                return;
             }
 
             Log("Loading settings");

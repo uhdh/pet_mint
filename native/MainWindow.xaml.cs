@@ -28,7 +28,6 @@ namespace BunnyPet
         private readonly DispatcherTimer restTimer;
         private readonly DispatcherTimer awarenessTimer;
         private readonly DispatcherTimer messageTimer;
-        private readonly GlobalInputWatcher inputWatcher;
         private readonly Random random = new Random();
         private readonly TranslateTransform translate = new TranslateTransform();
         private readonly RotateTransform rotate = new RotateTransform();
@@ -190,6 +189,10 @@ namespace BunnyPet
         private DateTime lastSpontaneousEmojiUtc = DateTime.MinValue;
         private DateTime lastSpontaneousPurrUtc = DateTime.MinValue;
 
+        // 해금 알림 말풍선
+        private DispatcherTimer unlockBubbleTimer;
+        private Action unlockBubbleAction;
+
         public int EmojiFrequency => emojiFrequency;
         public int PurrFrequency => purrFrequency;
 
@@ -240,9 +243,6 @@ namespace BunnyPet
                 if (!resourcesDisposed) AddAffinity(1);
             };
             companionTimer.Start();
-            inputWatcher = new GlobalInputWatcher();
-            inputWatcher.KeyPressed += OnGlobalKeyPressed;
-            inputWatcher.CheatKeyTriggered += OnGlobalCheatKeyTriggered;
             InitEmojiBitmaps();
             InitConfusedFrames();
             InitPetFrames();
@@ -271,9 +271,7 @@ namespace BunnyPet
             awarenessTimer.Stop();
             messageTimer.Stop();
             companionTimer?.Stop();
-            inputWatcher.KeyPressed -= OnGlobalKeyPressed;
-            inputWatcher.CheatKeyTriggered -= OnGlobalCheatKeyTriggered;
-            inputWatcher.Dispose();
+            unlockBubbleTimer?.Stop();
             StopAnimation();
             StopConfusedAnimation();
             StopPetAnimation();
@@ -441,36 +439,49 @@ namespace BunnyPet
         private void CheckUnlockMilestones(int oldVal, int newVal)
         {
             if (newVal <= oldVal) return;
-            var milestones = new (int Threshold, string Name)[]
+            var milestones = new (int Threshold, string Name, Action OnClick)[]
             {
-                (5, "간식 내놔! 포즈 🌾"),
-                (10, "반성의자 선물 🪑"),
-                (15, "손으로 세수하기 포즈 🧼"),
-                (20, "화났어! 포즈 💢"),
-                (25, "토끼 인형 선물 🧸"),
-                (30, "래빗키스 뽀뽀 포즈 💋"),
-                (40, "토끼 가방 선물 🎒"),
-                (50, "신나는 점프 빙키 포즈 🤸"),
-                (60, "아늑한 집 선물 🏠"),
-                (70, "어리둥절 실사 영상 포즈 👀"),
-                (85, "안심 벌러덩 눕기 포즈 🛌")
+                // 일반
+                (5,  "간식 내놔! 포즈 🌾",                  () => TriggerPose(BunnyState.Beg)),
+                (10, "반성의자 선물 🪑",                     () => SetItem(BunnyItem.Chair)),
+                (15, "손으로 세수하기 포즈 🧼",              () => TriggerPose(BunnyState.Wash)),
+                (20, "화났어! 포즈 💢",                      () => TriggerPose(BunnyState.Angry)),
+                (25, "호기심 포즈 👀 & 인형 선물 🧸",       () => SetItem(BunnyItem.Doll)),
+                (30, "앞발 올리기 포즈 🐾",                  () => TriggerPose(BunnyState.Paw)),
+                (40, "토끼 가방 선물 🎒",                    () => SetItem(BunnyItem.Bag)),
+                (50, "두발 서기 포즈 🙏",                    () => TriggerPose(BunnyState.Stand2)),
+                // 희귀
+                (35, "⭐⭐ 희귀 | 천사 민트 등장 ✨",         () => TriggerPose(BunnyState.Intro)),
+                (45, "⭐⭐ 희귀 | 발라당 눕기 🛌",            () => TriggerPose(BunnyState.Flop)),
+                // 특별
+                (55, "⭐⭐⭐ 특별 | 래빗키스 뽀뽀 💋",        () => TriggerPose(BunnyState.Kiss)),
+                (60, "아늑한 집 선물 🏠",                    () => SetItem(BunnyItem.House)),
+                (63, "⭐⭐⭐ 특별 | 빙키 점프 🤸",            () => TriggerPose(BunnyState.Binky)),
+                // 유니크
+                (72, "⭐⭐⭐⭐ 유니크 | 찐 화난 민트 👿",     () => TriggerPose(BunnyState.RealAngry)),
+                (80, "⭐⭐⭐⭐ 유니크 | 똘망똘망 정면 🐰",    () => TriggerPose(BunnyState.Front)),
+                // 전설
+                (88, "⭐⭐⭐⭐⭐ 전설 | 실사 쓰다듬기 영상 🖐️", () => { /* 자동 발동, 쓰다듬기 시 발동 */ }),
+                (94, "⭐⭐⭐⭐⭐ 전설 | 어리둥절 실사 영상 👀",  () => TriggerPose(BunnyState.Confused))
             };
 
             string newlyUnlocked = null;
+            Action clickAction = null;
             foreach (var m in milestones)
             {
                 if (oldVal < m.Threshold && newVal >= m.Threshold)
                 {
                     newlyUnlocked = m.Name;
+                    clickAction = m.OnClick;
                 }
             }
             if (newlyUnlocked != null)
             {
-                TriggerUnlockCelebration(newlyUnlocked, newVal);
+                TriggerUnlockCelebration(newlyUnlocked, newVal, clickAction);
             }
         }
 
-        private void TriggerUnlockCelebration(string unlockedName, int currentAffinity)
+        private void TriggerUnlockCelebration(string unlockedName, int currentAffinity, Action clickAction = null)
         {
             if (resourcesDisposed) return;
             AnimateHappy();
@@ -484,7 +495,92 @@ namespace BunnyPet
                     catch (InvalidOperationException) { }
                 });
             }
-            ShowMessage("🎁", 2800, true);
+            // 🎁 메시지 잠깐 보여주고, 그 뒤에 노란 ❗ 클릭 버튼 표시
+            ShowMessage("🎁", 1800, true);
+            Task.Delay(2000).ContinueWith(_ =>
+            {
+                if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                try
+                {
+                    Dispatcher.BeginInvoke(new Action(delegate
+                    {
+                        if (!resourcesDisposed) ShowUnlockBubble(clickAction);
+                    }));
+                }
+                catch (InvalidOperationException) { }
+            });
+        }
+
+        private void ShowUnlockBubble(Action onClicked)
+        {
+            if (resourcesDisposed || UnlockNotifyBorder == null) return;
+            unlockBubbleAction = onClicked;
+
+            HideMessage();
+            UnlockNotifyBorder.Visibility = Visibility.Visible;
+            UnlockNotifyBorder.BeginAnimation(OpacityProperty, null);
+            UnlockNotifyBorder.Opacity = 1;
+
+            // 펄떡 애니메이션 (주기적으로 약간 튀기)
+            var pulse = new DoubleAnimation(1.0, 0.7, TimeSpan.FromMilliseconds(400))
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            UnlockNotifyBorder.BeginAnimation(OpacityProperty, pulse);
+
+            // 30초 후 자동으로 사라짐
+            if (unlockBubbleTimer == null)
+            {
+                unlockBubbleTimer = new DispatcherTimer(DispatcherPriority.Normal)
+                {
+                    Interval = TimeSpan.FromSeconds(30)
+                };
+                unlockBubbleTimer.Tick += (s, e) =>
+                {
+                    unlockBubbleTimer.Stop();
+                    HideUnlockBubble();
+                };
+            }
+            else
+            {
+                unlockBubbleTimer.Stop();
+            }
+            unlockBubbleTimer.Start();
+        }
+
+        private void HideUnlockBubble()
+        {
+            if (resourcesDisposed || UnlockNotifyBorder == null) return;
+            unlockBubbleTimer?.Stop();
+            unlockBubbleAction = null;
+            UnlockNotifyBorder.BeginAnimation(OpacityProperty, null);
+            UnlockNotifyBorder.Opacity = 0;
+            UnlockNotifyBorder.Visibility = Visibility.Collapsed;
+        }
+
+        private void OnUnlockBubbleClicked(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            var action = unlockBubbleAction;
+            HideUnlockBubble();
+            if (action != null && !resourcesDisposed)
+            {
+                // 등장 포즈(Intro) 먼저 취한 후 해금 포즈/아이템 실행
+                TriggerPose(BunnyState.Intro);
+                Task.Delay(800).ContinueWith(_ =>
+                {
+                    if (resourcesDisposed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished) return;
+                    try
+                    {
+                        Dispatcher.BeginInvoke(new Action(delegate
+                        {
+                            if (!resourcesDisposed) action();
+                        }));
+                    }
+                    catch (InvalidOperationException) { }
+                });
+            }
         }
 
         public BunnyItem CurrentItem => currentItem;
@@ -1729,7 +1825,7 @@ namespace BunnyPet
                 ShowMessage(spamAngryPhrases[random.Next(spamAngryPhrases.Length)], 2800, true);
             }
             AnimatePurring();
-            AddAffinity(-3);
+            AddAffinity(-1);
             lastPetAffinityUtc = DateTime.UtcNow.AddSeconds(45);
             ScheduleBehavior(3500);
         }

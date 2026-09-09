@@ -127,6 +127,43 @@
                       Margin="0,-1,0,0" />
             </StackPanel>
         </Grid>
+        <!-- 해금 알림 전용 클릭 가능한 노란 말풍선 -->
+        <Grid x:Name="UnlockNotifyBorder"
+              Panel.ZIndex="6"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Top"
+              Margin="2,1,2,0"
+              Opacity="0"
+              Visibility="Collapsed"
+              IsHitTestVisible="True"
+              MouseLeftButtonUp="OnUnlockBubbleClicked"
+              Cursor="Hand">
+            <StackPanel HorizontalAlignment="Center">
+                <Border x:Name="UnlockBubbleBg"
+                        Padding="6,4"
+                        Background="#FFF9C2"
+                        BorderBrush="#F5C518"
+                        BorderThickness="1.5"
+                        CornerRadius="10">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock x:Name="UnlockExclaim"
+                                   Text="❗"
+                                   FontFamily="Segoe UI Emoji, Segoe UI Symbol, Malgun Gothic, sans-serif"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="#D48000"
+                                   VerticalAlignment="Center"
+                                   Padding="0" />
+                    </StackPanel>
+                </Border>
+                <Path Data="M 0,0 L 3,3 L 6,0"
+                      Fill="#FFF9C2"
+                      Stroke="#F5C518"
+                      StrokeThickness="1.5"
+                      HorizontalAlignment="Center"
+                      Margin="0,-1,0,0" />
+            </StackPanel>
+        </Grid>
         <Canvas x:Name="Hearts" Panel.ZIndex="4" IsHitTestVisible="False" />
     </Grid>
 </Window>

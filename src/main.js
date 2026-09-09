@@ -11,7 +11,7 @@ const MARGIN = 4;
 let petWindow = null;
 let tray = null;
 let isPaused = false;
-let settings = { alwaysOnTop: true, autoStart: false };
+let settings = { alwaysOnTop: true, autoStart: false, bubbleFrequency: 'normal' };
 
 function settingsPath() {
   return path.join(app.getPath('userData'), 'settings.json');
@@ -101,7 +101,19 @@ function refreshTrayMenu() {
   tray?.setContextMenu(buildMenu());
 }
 
+function sendBubbleFrequency() {
+  petWindow?.webContents.send('pet:bubble-frequency-changed', settings.bubbleFrequency);
+}
+
 function buildMenu() {
+  const freqLabels = {
+    adhd:   '⚡ ADHD (1분)',
+    normal: '💬 기본 (2분)',
+    rare:   '🌙 가끔 (5분)',
+    coma:   '💀 기절 (20분)'
+  };
+  const freqKeys = ['adhd', 'normal', 'rare', 'coma'];
+
   return Menu.buildFromTemplate([
     {
       label: '🖐️ 민트 쓰다듬기',
@@ -119,6 +131,21 @@ function buildMenu() {
         { type: 'separator' },
         { label: '❌ 아이템 치우기', click: () => petWindow?.webContents.send('pet:item-changed', 'none') }
       ]
+    },
+    { type: 'separator' },
+    {
+      label: '💬 말풍선 빈도',
+      submenu: freqKeys.map((key) => ({
+        label: freqLabels[key],
+        type: 'radio',
+        checked: settings.bubbleFrequency === key,
+        click: () => {
+          settings.bubbleFrequency = key;
+          saveSettings();
+          sendBubbleFrequency();
+          refreshTrayMenu();
+        }
+      }))
     },
     { type: 'separator' },
     {

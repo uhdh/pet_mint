@@ -57,6 +57,11 @@ $msbuild = $msbuildCandidates | Where-Object { $_ -and (Test-Path -LiteralPath $
 if (-not $msbuild) { throw 'Could not locate MSBuild.exe.' }
 
 $project = Join-Path $root 'native\BunnyPet.csproj'
+$projectXml = Get-Content -LiteralPath $project -Raw
+$appSource = Get-Content -LiteralPath (Join-Path $root 'native\App.xaml.cs') -Raw
+if ($projectXml -match 'GlobalInputWatcher\.cs' -or $appSource -match '\.Kill\s*\(') {
+    throw 'Store build must not install a global keyboard hook or terminate other processes.'
+}
 $targetFrameworkVersion = 'v4.8'
 $targetFrameworkRoot = Split-Path -Parent (Split-Path -Parent $referenceAssemblies)
 & $msbuild $project /t:Rebuild /p:Configuration=Release /p:Platform=x64 "/p:TargetFrameworkVersion=$targetFrameworkVersion" "/p:TargetFrameworkRootPath=$targetFrameworkRoot" /v:minimal

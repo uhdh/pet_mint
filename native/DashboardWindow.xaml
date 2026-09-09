@@ -283,17 +283,62 @@
                             </Grid>
 
                             <Button Style="{StaticResource SecondaryButton}" Content="🔄 호감도 초기화 (0점부터 다시 키우기)" Margin="0,0,0,16" Click="OnResetAffinityClick" Foreground="#C03A50" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
 
-                            <!-- 단축키 가이드 -->
-                            <Border Background="#F9F6F0" CornerRadius="8" Padding="12" BorderBrush="#EAE3D8" BorderThickness="1">
+                <!-- 탭 4: 케어 가이드 -->
+                <TabItem Header="📖 케어 가이드">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="6,10,6,6">
+                        <StackPanel>
+                            <TextBlock Text="🐰 민트 케어 가이드" FontSize="14" FontWeight="Bold" Foreground="#3B342E" Margin="0,0,0,12" />
+
+                            <Border Background="#FFF9F5" CornerRadius="8" Padding="14" BorderBrush="#FEEADF" BorderThickness="1" Margin="0,0,0,10">
                                 <StackPanel>
-                                    <TextBlock Text="⌨️ 주요 조작 및 케어 가이드" FontWeight="Bold" FontSize="12" Foreground="#4A3F35" Margin="0,0,0,6" />
-                                    <TextBlock Text="• 클릭 / 문지르기 : 민트 쓰다듬기 (60초마다 정성껏 쓰다듬을 때 호감도 +1)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
-                                    <TextBlock Text="• 빠른 연타/괴롭힘 : 민트가 뿔나서 호감도 3점 감점 (-3)" FontSize="11.5" Foreground="#C03A50" LineHeight="18" />
-                                    <TextBlock Text="• 건초 먹이기 : 3분마다 배고플 때 주면 호감도 +1 (배부를 땐 효과 없음)" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
-                                    <TextBlock Text="• 함께 머무르기 : 10분 평화롭게 켜둘 때마다 호감도 +1" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
-                                    <TextBlock Text="• 마우스 더블클릭 : 놀자! (움직이기) / 나대지마 (멈추기) 토글" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
-                                    <TextBlock Text="• 드래그 : 원하는 화면 위치로 이동 | Esc 키 : 기본 위치 복귀" FontSize="11.5" Foreground="#6E645B" LineHeight="18" />
+                                    <TextBlock Text="💖 호감도 올리기" FontWeight="Bold" FontSize="12.5" Foreground="#C03A50" Margin="0,0,0,8" />
+                                    <TextBlock Text="• 쓰다듬기 : 민트를 클릭하거나 문질러서 쓰다듬기 (60초마다 정성껏 쓰다듬을 때 호감도 +1)" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="• 건초 먹이기 : 3분마다 배고플 때 주면 호감도 +1 (배부를 땐 효과 없음)" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="• 함께 머무르기 : 10분 평화롭게 켜둘 때마다 호감도 +1" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="• 선물하기 : 반성의자, 토끼 가방, 아늑한 집 등 아이템 선물 시 5분마다 +1" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#FFF2F4" CornerRadius="8" Padding="14" BorderBrush="#F9CDD3" BorderThickness="1" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="⚠️ 호감도 주의사항" FontWeight="Bold" FontSize="12.5" Foreground="#C03A50" Margin="0,0,0,8" />
+                                    <TextBlock Text="• 빠른 연타 / 괴롭힘 : 민트가 뿔나서 호감도 1점 감점 (-1) 🐾" FontSize="11.5" Foreground="#C03A50" LineHeight="20" />
+                                    <TextBlock Text="• 아이템 스팸 전환 : 3.5초 안에 4번 이상 바꾸면 12초 잠금 💢" FontSize="11.5" Foreground="#C03A50" LineHeight="20" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F0F8FF" CornerRadius="8" Padding="14" BorderBrush="#C8E0F5" BorderThickness="1" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="⌨️ 주요 조작법" FontWeight="Bold" FontSize="12.5" Foreground="#2E5F8A" Margin="0,0,0,8" />
+                                    <TextBlock Text="• 마우스 더블클릭 : 놀자! (움직이기) / 나대지마 (멈추기) 토글" FontSize="11.5" Foreground="#4A6B8A" LineHeight="20" />
+                                    <TextBlock Text="• 드래그 : 원하는 화면 위치로 이동" FontSize="11.5" Foreground="#4A6B8A" LineHeight="20" />
+                                    <TextBlock Text="• Esc 키 : 기본 위치 (오른쪽 아래) 복귀" FontSize="11.5" Foreground="#4A6B8A" LineHeight="20" />
+                                    <TextBlock Text="• 우클릭 : 트레이 메뉴 열기" FontSize="11.5" Foreground="#4A6B8A" LineHeight="20" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F4FFF7" CornerRadius="8" Padding="14" BorderBrush="#C2EDD1" BorderThickness="1" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="✨ 해금 알림 말풍선" FontWeight="Bold" FontSize="12.5" Foreground="#257B57" Margin="0,0,0,8" />
+                                    <TextBlock Text="포즈나 아이템을 새로 해금하면 민트 말풍선에 노란색 ❗ 아이콘이 나타납니다." FontSize="11.5" Foreground="#3D7A5A" LineHeight="20" />
+                                    <TextBlock Text="❗ 아이콘을 클릭하면 민트가 등장 포즈를 취한 후 새로운 포즈나 아이템을 바로 보여드려요!" FontSize="11.5" Foreground="#3D7A5A" LineHeight="20" />
+                                    <TextBlock Text="30초 안에 클릭하지 않으면 알림이 사라집니다." FontSize="11" Foreground="#6A9A7D" LineHeight="20" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#FAF7F2" CornerRadius="8" Padding="14" BorderBrush="#EAE3D8" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="🌸 호감도 레벨 안내" FontWeight="Bold" FontSize="12.5" Foreground="#4A3F35" Margin="0,0,0,8" />
+                                    <TextBlock Text="Lv.1 (0~9점)    낯가리는 민트 🌱" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="Lv.2 (10~34점)  마음을 여는 민트 🌸" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="Lv.3 (35~54점)  단짝 친구 민트 🥰 ━ 희귀 해금 구간" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="Lv.4 (55~71점)  무한 애정 민트 💕 ━ 특별 해금 구간" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="Lv.5 (72~87점)  가족이 된 민트 💖 ━ 유니크 해금 구간" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
+                                    <TextBlock Text="Lv.6 (88~100점) 전설의 민트 친구 🌟 ━ 전설 해금 구간" FontSize="11.5" Foreground="#6E645B" LineHeight="20" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>

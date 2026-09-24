@@ -1,49 +1,66 @@
-# 내 토끼 데스크톱 펫
+# 민트 키우기 🐰
 
-사용자가 제공한 사진 속 **회백색 롭이어 토끼**를 참고해 만든 투명 바탕화면 펫입니다. 인터넷 연결이나 계정 없이 컴퓨터 안에서만 동작합니다.
+<p align="center">
+  <a href="https://uhdh.github.io/pet_mint/">
+    <img src="site/assets/bunny-intro.png" width="280" alt="민트 키우기">
+  </a>
+</p>
 
-## 들어 있는 기능
+<p align="center">
+  화면 아래를 자유롭게 돌아다니는 가벼운 Windows 데스크톱 토끼입니다.<br>
+  인터넷 연결이나 계정 없이 컴퓨터 안에서만 동작합니다.
+</p>
 
-토끼는 화면 아래쪽을 천천히 산책하고, 가장자리에 닿으면 방향을 바꿉니다. 가끔 일어서거나 잠이 들며, 오래 상호작용하지 않아도 스스로 쉽니다. 클릭하면 쓰다듬기 반응과 하트가 나타나고, 더블클릭하면 호기심 있게 일어섭니다. 마우스로 끌어 원하는 위치에 놓을 수 있습니다.
+<p align="center">
+  <a href="https://apps.microsoft.com/detail/9P717Q34DQDF?hl=ko-kr&gl=KR&ocid=pdpshare"><strong>Microsoft Store에서 설치</strong></a>
+  ·
+  <a href="https://uhdh.github.io/pet_mint/">웹사이트</a>
+  ·
+  <a href="https://github.com/uhdh/pet_mint/releases/latest">GitHub Release</a>
+</p>
 
-우클릭 메뉴에서는 움직임 일시 정지, 항상 위에 표시, 화면 오른쪽 아래로 복귀, 종료를 선택할 수 있습니다. Windows에서는 로그인 시 자동 실행도 켤 수 있습니다. `Esc` 키를 누르면 토끼가 오른쪽 아래로 돌아갑니다.
+## 민트와 놀기
 
-## Windows에서 실행
+| 산책 | 쓰다듬기 | 휴식 |
+|:---:|:---:|:---:|
+| <img src="site/assets/bunny-walk.png" width="150" alt="산책하는 민트"> | <img src="site/assets/bunny-kiss.png" width="150" alt="쓰다듬기에 반응하는 민트"> | <img src="site/assets/bunny-sleep.png" width="150" alt="잠자는 민트"> |
+| 화면 아래를 천천히 산책해요. | 클릭하면 하트로 답해요. | 가끔 식빵 자세로 쉬어요. |
 
-압축 파일을 원하는 폴더에 푼 뒤 `My Bunny Desktop Pet.exe`를 더블클릭합니다. Windows SmartScreen이 뜨면 **추가 정보 → 실행**을 선택합니다. 이 앱은 코드 서명을 하지 않은 개인용 빌드이므로 경고가 나타날 수 있습니다.
+| 장난감 | 간식 | 집 |
+|:---:|:---:|:---:|
+| <img src="site/assets/item-doll.png" width="110" alt="토끼 인형"> | <img src="site/assets/item-hay.png" width="110" alt="건초"> | <img src="site/assets/item-house.png" width="120" alt="토끼 집"> |
 
-완전히 종료하려면 토끼를 우클릭해 **토끼 보내기**를 선택하거나, 작업 표시줄 알림 영역의 토끼 아이콘을 우클릭해 같은 메뉴를 선택합니다.
+민트를 마우스로 끌어 원하는 위치에 놓을 수 있습니다. 우클릭 메뉴에서는 움직임 일시 정지, 항상 위에 표시, 화면 오른쪽 아래로 복귀, Windows 시작 시 자동 실행과 종료를 설정할 수 있습니다.
 
-## 소스에서 실행
+## 설치
 
-Node.js 22 이상이 설치된 환경에서 다음 명령을 사용합니다.
+가장 안전하고 간편한 방법은 [Microsoft Store](https://apps.microsoft.com/detail/9P717Q34DQDF?hl=ko-kr&gl=KR&ocid=pdpshare)입니다.
 
-```bash
-pnpm install
-pnpm start
-```
+직접 실행 파일이 필요하면 [GitHub Releases](https://github.com/uhdh/pet_mint/releases/latest)에서 ZIP을 받을 수 있습니다. 서명되지 않은 직접 다운로드 파일은 Windows SmartScreen 경고가 표시될 수 있습니다.
 
-테스트와 패키징 명령은 다음과 같습니다.
+지원 환경: Windows 10/11 x64
 
-```bash
-pnpm test
-pnpm package:win
-pnpm package:linux
-```
+## 개발
 
-`pnpm package:win` is the legacy Electron Windows build. The native Store build is Windows-only (Windows 10/11 x64), uses the dependency-free .NET Framework 4.8 WPF executable, and does not bundle Electron, Chromium, or Node.js:
+네이티브 앱은 .NET Framework 4.8 WPF로 제작되며 Electron, Chromium, Node.js를 포함하지 않습니다.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-native.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build_native_store_msix.ps1
 ```
 
-The native script builds `native/BunnyPet.csproj` as Release/x64 and creates an unsigned `store-output/BunnyPet-native_1.0.1.0_x64.msix` for Microsoft Store submission. The completed MSIX is expected to be at most 5 MB.
+레거시 Electron 버전:
 
-## 개인정보
+```bash
+pnpm install
+pnpm test
+pnpm start
+```
 
-사진은 캐릭터 자산 제작에만 사용되었으며 앱에 원본 사진은 포함되지 않습니다. 앱은 네트워크 요청, 광고, 분석 도구 또는 데이터 수집 기능을 포함하지 않습니다.
+## 개인정보 보호
 
-## 알려진 제한
+민트 키우기는 네트워크 요청, 광고, 분석 도구 또는 개인정보 수집 기능을 포함하지 않습니다. 모든 설정과 동작은 사용자의 컴퓨터 안에서만 처리됩니다.
 
-운영체제별 투명 창 처리 방식 때문에 토끼 주변의 작은 사각 영역이 아래 창의 클릭을 가릴 수 있습니다. 앱은 Windows 10/11 x64를 우선 대상으로 패키징되며, macOS용 실행 파일은 macOS 환경에서 별도 패키징과 서명이 필요합니다.
+<p align="center">
+  <img src="site/assets/bunny-wash.png" width="150" alt="세수하는 민트">
+</p>

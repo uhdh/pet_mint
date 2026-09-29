@@ -225,6 +225,28 @@ img {
   background: var(--accent-soft);
 }
 
+/* GitHub 소스코드 링크 (테마 토글과 같은 원형 버튼) */
+.icon-link {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: background-color 0.2s, color 0.2s;
+}
+.icon-link:hover,
+.icon-link:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+/* 좁은 폰에서는 헤더 공간 확보를 위해 숨김 (푸터 링크는 유지) */
+@media (max-width: 480px) {
+  .icon-link { display: none; }
+}
+
 .theme-icon {
   width: 18px;
   height: 18px;
